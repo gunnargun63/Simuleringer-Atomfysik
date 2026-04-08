@@ -1,0 +1,811 @@
+<!DOCTYPE html>
+<html lang="da">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Bohr-modellen & Spektrallinjer</title>
+<style>
+*,*::before,*::after{box-sizing:border-box;margin:0;padding:0}
+
+:root{
+  --bg:#05050e;--bg2:#0a0a1c;--border:rgba(0,229,255,.22);
+  --ac:#00e5ff;--ac2:#ff2d78;--ac3:#39ff14;
+  --tx:#ddeeff;--dm:#6a8aaa;--dm2:#99bbdd;
+}
+.light{
+  --bg:#f0f4ff;--bg2:#e4e8ff;--border:rgba(0,50,170,.22);
+  --ac:#0044cc;--ac2:#cc0055;--ac3:#006633;
+  --tx:#00112a;--dm:#334466;--dm2:#5577aa;
+}
+
+body{
+  background:var(--bg);color:var(--tx);
+  font-family:'Courier New',Courier,monospace;
+  display:flex;justify-content:center;align-items:flex-start;
+  min-height:100vh;padding:10px;
+  transition:background .3s,color .3s;
+}
+.sim{width:986px;max-width:100%}
+
+.hd{
+  text-align:center;padding-bottom:8px;
+  border-bottom:1px solid var(--border);margin-bottom:8px;
+  position:relative;
+}
+.hd-title{font-size:15px;letter-spacing:4px;color:var(--ac);font-weight:bold;text-shadow:0 0 16px rgba(0,229,255,.5)}
+.light .hd-title{text-shadow:0 0 10px rgba(0,68,204,.3)}
+.hd-sub{font-size:11px;letter-spacing:2px;color:var(--dm2);margin-top:3px}
+.hd-crn{position:absolute;top:0;font-size:10px;color:var(--border)}
+.hd-crn-l{left:0}.hd-crn-r{right:0}
+
+.main{display:flex;gap:8px;margin-bottom:8px}
+canvas{display:block;border:1px solid var(--border);transition:border-color .3s}
+#aC{flex:1;min-width:0}
+#eC{width:294px;flex-shrink:0}
+
+.ctrl{background:var(--bg2);border:1px solid var(--border);padding:10px 13px;transition:background .3s}
+
+.st-row{display:flex;justify-content:space-between;align-items:center;margin-bottom:8px;gap:8px;min-height:24px}
+.st-txt{font-size:12px;color:var(--dm2);letter-spacing:.5px;flex:1;min-width:0;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+.badge{font-size:11px;letter-spacing:1.5px;padding:2px 9px;border:1px solid;flex-shrink:0;white-space:nowrap}
+.b-yes{border-color:var(--ac3);color:var(--ac3);background:rgba(57,255,20,.07)}
+.b-no {border-color:var(--ac2);color:var(--ac2);background:rgba(255,45,120,.07)}
+.b-ion{border-color:#ffaa00;color:#ffaa00;background:rgba(255,170,0,.08)}
+
+.sl-row{display:flex;align-items:center;gap:10px;margin-bottom:8px}
+.sl-lbl{font-size:11px;color:var(--ac);letter-spacing:2px;width:108px;flex-shrink:0}
+input[type=range]{flex:1;accent-color:var(--ac);cursor:pointer;height:3px}
+.sl-val{font-size:13px;min-width:68px;text-align:right;color:var(--tx);white-space:nowrap}
+.sl-ev{font-size:12px;color:var(--ac3);min-width:60px;text-align:right;white-space:nowrap}
+
+.swatch-row{display:flex;align-items:center;gap:10px;margin-bottom:9px}
+.swatch-lbl{font-size:11px;color:var(--dm2);letter-spacing:2px;width:108px;flex-shrink:0}
+.swatch-bar{flex:1;height:8px;position:relative;overflow:visible}
+.swatch-marker{position:absolute;top:-3px;width:3px;height:14px;background:var(--tx);transform:translateX(-50%);box-shadow:0 0 5px rgba(255,255,255,.6);transition:left .08s}
+.swatch-tag{font-size:11px;min-width:62px;text-align:right;white-space:nowrap}
+
+/* START LEVEL SELECTOR */
+.nl-row{display:flex;align-items:center;gap:10px;margin-bottom:9px}
+.nl-lbl{font-size:11px;color:var(--ac);letter-spacing:2px;width:108px;flex-shrink:0}
+.nl-btns{display:flex;gap:4px;flex:1}
+.nl-btn{
+  flex:1;background:transparent;border:1px solid var(--dm);color:var(--dm2);
+  font-family:'Courier New',monospace;font-size:11px;letter-spacing:1px;
+  padding:4px 0;cursor:pointer;text-align:center;transition:all .15s;
+  text-transform:none;
+}
+.nl-btn:hover{border-color:var(--ac);color:var(--ac)}
+.nl-btn.nl-on{
+  border-color:var(--ac);color:var(--ac);
+  background:rgba(0,229,255,.13);
+  box-shadow:0 0 8px rgba(0,229,255,.35);
+}
+.light .nl-btn.nl-on{background:rgba(0,68,204,.1);box-shadow:0 0 8px rgba(0,68,204,.25)}
+
+.btn-row{display:flex;gap:7px;justify-content:center;flex-wrap:wrap}
+button{
+  background:transparent;border:1px solid var(--ac);color:var(--ac);
+  font-family:'Courier New',monospace;font-size:11px;letter-spacing:2px;
+  padding:6px 13px;cursor:pointer;transition:background .15s,box-shadow .15s;
+  text-transform:uppercase;
+}
+button:hover{background:rgba(0,229,255,.1);box-shadow:0 0 12px rgba(0,229,255,.3)}
+.light button:hover{background:rgba(0,68,204,.08);box-shadow:0 0 10px rgba(0,68,204,.25)}
+button.on{background:rgba(0,229,255,.15)}
+/* NOTE: Nulstil now has same style as Afspil (no b2 class) */
+.bm{border-color:var(--dm);color:var(--dm)}
+.bm:hover{background:rgba(60,90,120,.18)!important;box-shadow:none!important}
+</style>
+</head>
+<body>
+<div class="sim">
+  <div class="hd">
+    <div class="hd-crn hd-crn-l">╔═</div>
+    <div class="hd-crn hd-crn-r">═╗</div>
+    <div class="hd-title">{ BOHR-MODELLEN &amp; SPEKTRALLINJER }</div>
+    <div class="hd-sub">HYDROGEN · ENERGINIVEAUER n=1..6 · DIPOLTRANSITIONER</div>
+  </div>
+  <div class="main">
+    <canvas id="aC" width="659" height="448"></canvas>
+    <canvas id="eC" width="294" height="448"></canvas>
+  </div>
+  <div class="ctrl">
+    <div class="st-row">
+      <span class="st-txt" id="stTxt">KLAR — VÆLG BØLGELÆNGDE OG KLIK AFSPIL</span>
+      <span class="badge b-no" id="badge">INGEN MATCH</span>
+    </div>
+    <div class="nl-row">
+      <span class="nl-lbl">STARTTILSTAND</span>
+      <div class="nl-btns" id="nlBtns">
+        <button class="nl-btn nl-on" data-n="1">n=1</button>
+        <button class="nl-btn" data-n="2">n=2</button>
+        <button class="nl-btn" data-n="3">n=3</button>
+        <button class="nl-btn" data-n="4">n=4</button>
+        <button class="nl-btn" data-n="5">n=5</button>
+      </div>
+    </div>
+    <div class="sl-row">
+      <span class="sl-lbl">BØLGELÆNGDE</span>
+      <input type="range" id="sl" min="90" max="700" step="0.1" value="121.6">
+      <span class="sl-val"><span id="wlv">121.6</span> nm</span>
+      <span class="sl-ev"><span id="ev">10.20</span> eV</span>
+    </div>
+    <div class="swatch-row">
+      <span class="swatch-lbl">FOTONFARVE</span>
+      <div class="swatch-bar" id="swatchBar">
+        <div class="swatch-marker" id="swatchMark"></div>
+      </div>
+      <span class="swatch-tag" id="swatchTag" style="color:#dd55ff">UV / 122 nm</span>
+    </div>
+    <div class="btn-row">
+      <button id="playBtn">▶ AFSPIL</button>
+      <button id="resetBtn">↺ NULSTIL</button>
+      <button id="copyBtn">⎘ KOPIER KODE</button>
+      <button id="modeBtn" class="bm">☀ LYS TILSTAND</button>
+    </div>
+  </div>
+</div>
+
+<script>
+'use strict';
+
+// ── Physics ───────────────────────────────────────────────────────────────
+const HC = 1240;                           // eV·nm
+const En = n => -13.6 / (n * n);          // energy of level n (eV)
+const ionE = n => Math.abs(En(n));         // ionization energy from n (eV)
+
+function calcAbsTrans(fromN) {
+  const res = [];
+  for (let hi = fromN + 1; hi <= 6; hi++) {
+    const dE = En(hi) - En(fromN);
+    res.push({ lo: fromN, hi, dE, lam: HC / dE });
+  }
+  return res;
+}
+let absTransitions = calcAbsTrans(1);
+
+function findAbs(lam) {
+  for (const t of absTransitions)
+    if (Math.abs(lam - t.lam) / t.lam < 0.005) return t;
+  return null;
+}
+
+// Wavelength → bright glowing color
+function wlCol(nm) {
+  if (nm < 380) return '#ee66ff';
+  if (nm < 450) return '#aa44ff';
+  if (nm < 490) return '#4466ff';
+  if (nm < 510) return '#00bbff';
+  if (nm < 560) return '#00ff77';
+  if (nm < 590) return '#bbff00';
+  if (nm < 625) return '#ffee00';
+  if (nm < 700) return '#ff6600';
+  return '#dd2200';
+}
+const seriesName = lo => (['','Lyman','Balmer','Paschen','Brackett','Pfund'][lo]||'');
+const wlLabel = nm => nm < 380 ? `UV / ${nm.toFixed(0)} nm` : nm > 700 ? `IR / ${nm.toFixed(0)} nm` : `${nm.toFixed(0)} nm`;
+
+// ── Canvas ────────────────────────────────────────────────────────────────
+const aEl = document.getElementById('aC');
+const eEl = document.getElementById('eC');
+const ac = aEl.getContext('2d');
+const ec = eEl.getContext('2d');
+const AW = aEl.width, AH = aEl.height;
+const EW = eEl.width, EH = eEl.height;
+const CX = AW * 0.46, CY = AH * 0.5;
+const R = n => 34 * n;   // orbit radius px
+
+// ── State ─────────────────────────────────────────────────────────────────
+let dark = true;
+let startN = 1;
+let ss = 'READY';   // READY|SHOOTING|PASSING|ABSORBING|EXCITED|DECAYING|IONIZING|IONIZED
+let eN = 1;
+let pX = 0, pCol = '#00e5ff';
+let matched = false, tgtN = 1, pendingIon = false;
+let dPath = [], dStep = 0;
+let flash = 0, tmr = 0;
+let decayWait = 0;   // stochastic wait time (frames) drawn from exponential distribution
+let selWL = 121.6;
+let paused = false;
+let ePh = [], elog = [];
+let lastTs = 0;
+let ionAngle = 0, ionProgress = 0;
+let ionBallX = 0, ionBallY = 0;   // flying electron ball during ionization
+
+// ── Electron cloud — analytical ring method (perfectly smooth) ────────────
+// No random dots. We sample the Gaussian probability density at each radius
+// and stroke a concentric ring with matching opacity. Result is rotationally
+// symmetric and mathematically smooth.
+let lastCloudN = -1;
+let cloudRings = [];   // [{r, alpha}]
+
+function buildCloud(n) {
+  if (n === lastCloudN) return;
+  lastCloudN = n;
+  cloudRings = [];
+  const r0 = R(n);
+  const sigma = 5 + n * 2.8;   // ring width grows with n
+  const rMin = Math.max(2, r0 - sigma * 3.2);
+  const rMax = r0 + sigma * 3.2;
+  const steps = 180;            // number of concentric rings
+  for (let i = 0; i <= steps; i++) {
+    const r = rMin + (rMax - rMin) * i / steps;
+    const dr = r - r0;
+    // Gaussian probability density at this radius
+    const density = Math.exp(-(dr * dr) / (2 * sigma * sigma));
+    cloudRings.push({ r, alpha: density });
+  }
+}
+
+function drawCloudAt(ctx, cx, cy, t, fadeAlpha) {
+  ctx.save();
+  const peakAlpha = dark ? 0.38 : 0.28;
+  for (const ring of cloudRings) {
+    ctx.globalAlpha = ring.alpha * peakAlpha * fadeAlpha;
+    ctx.strokeStyle = t.eCol;
+    ctx.lineWidth = (rMax(lastCloudN) - rMin(lastCloudN)) / 180 + 0.5;
+    ctx.shadowColor = t.eCol;
+    ctx.shadowBlur = 2 + ring.alpha * 5;
+    ctx.beginPath();
+    ctx.arc(cx, cy, ring.r, 0, Math.PI * 2);
+    ctx.stroke();
+  }
+  ctx.restore();
+}
+
+// Helper to compute rMin / rMax for a given n (needed for lineWidth)
+function rMin(n) { const sigma = 5 + n * 2.8; return Math.max(2, R(n) - sigma * 3.2); }
+function rMax(n) { const sigma = 5 + n * 2.8; return R(n) + sigma * 3.2; }
+
+// ── Theme ─────────────────────────────────────────────────────────────────
+const T = () => dark ? {
+  bg:'#05050e', grid:'rgba(255,255,255,.03)',
+  orb:'rgba(0,229,255,.12)', orbHi:'rgba(0,229,255,.5)',
+  nuc:'#ff6600', nucGlow:'#ff4400',
+  eCol:'#00e5ff', eSh:'#00e5ff',
+  tx:'#ddeeff', tx2:'#ffffff', dm:'#6a8aaa', dm2:'#99bbdd',
+  ac:'#00e5ff', ac3:'#39ff14',
+} : {
+  bg:'#f0f4ff', grid:'rgba(0,0,0,.04)',
+  orb:'rgba(0,50,170,.11)', orbHi:'rgba(0,50,170,.5)',
+  nuc:'#cc3300', nucGlow:'#aa2200',
+  eCol:'#0044cc', eSh:'#0044cc',
+  tx:'#00112a', tx2:'#00112a', dm:'#334466', dm2:'#5577aa',
+  ac:'#0044cc', ac3:'#005522',
+};
+
+// ── Non-linear energy → y mapping (log scale so n=4,5,6 are spread out) ──
+const EPS = 0.20;
+const LOG_MAX = Math.log(13.6 / EPS + 1); // ≈ 4.234
+
+function e2y(e, PB, PH) {
+  const be = Math.max(0, -e);
+  const frac = 1 - Math.log(be / EPS + 1) / LOG_MAX;
+  return PB - Math.max(0, Math.min(1, frac)) * PH;
+}
+
+// ── Draw utilities ────────────────────────────────────────────────────────
+function drawGrid(ctx, w, h) {
+  ctx.strokeStyle = T().grid; ctx.lineWidth = 1; const s = 40;
+  for (let x = s; x < w; x += s) { ctx.beginPath(); ctx.moveTo(x,0); ctx.lineTo(x,h); ctx.stroke(); }
+  for (let y = s; y < h; y += s) { ctx.beginPath(); ctx.moveTo(0,y); ctx.lineTo(w,y); ctx.stroke(); }
+}
+function glw(ctx, col, b) { ctx.shadowColor = col; ctx.shadowBlur = b; }
+function noglw(ctx) { ctx.shadowBlur = 0; ctx.globalAlpha = 1; }
+function corners(ctx, w, h, sz) {
+  ctx.strokeStyle = dark ? 'rgba(0,229,255,.18)' : 'rgba(0,50,170,.15)';
+  ctx.lineWidth = 1;
+  [[0,0,1,1],[w,0,-1,1],[0,h,1,-1],[w,h,-1,-1]].forEach(([cx,cy,sx,sy]) => {
+    ctx.beginPath(); ctx.moveTo(cx+sx*sz,cy); ctx.lineTo(cx,cy); ctx.lineTo(cx,cy+sy*sz); ctx.stroke();
+  });
+}
+function waveArrow(ctx, x1, y1, x2, y2, col, amp) {
+  amp = amp || 7;
+  const dx=x2-x1, dy=y2-y1, len=Math.sqrt(dx*dx+dy*dy);
+  if (len < 5) return;
+  const ux=dx/len, uy=dy/len, nx=-uy, ny=ux, wl=17;
+  ctx.strokeStyle = col; ctx.lineWidth = 2; glw(ctx, col, 10);
+  ctx.beginPath();
+  const st = Math.ceil(len);
+  for (let i=0; i<=st; i++) {
+    const d=(i/st)*len, w=amp*Math.sin(2*Math.PI*d/wl);
+    if (i===0) ctx.moveTo(x1+d*ux+w*nx, y1+d*uy+w*ny);
+    else        ctx.lineTo(x1+d*ux+w*nx, y1+d*uy+w*ny);
+  }
+  ctx.stroke();
+  const as=9, hx=x2-as*ux, hy=y2-as*uy;
+  ctx.fillStyle = col;
+  ctx.beginPath();
+  ctx.moveTo(x2,y2); ctx.lineTo(hx+as*.45*nx,hy+as*.45*ny); ctx.lineTo(hx-as*.45*nx,hy-as*.45*ny);
+  ctx.closePath(); ctx.fill(); noglw(ctx);
+}
+
+// ── Draw atom canvas ──────────────────────────────────────────────────────
+function drawAtom() {
+  const t = T();
+  ac.fillStyle = t.bg; ac.fillRect(0, 0, AW, AH);
+  drawGrid(ac, AW, AH); corners(ac, AW, AH, 20);
+
+  // Orbits + n-labels
+  for (let n = 1; n <= 6; n++) {
+    const r = R(n), act = n === eN && ss !== 'IONIZED';
+    ac.strokeStyle = act ? t.orbHi : t.orb;
+    ac.lineWidth = act ? 1.5 : 1;
+    ac.setLineDash([5, 5]);
+    ac.beginPath(); ac.arc(CX, CY, r, 0, Math.PI * 2); ac.stroke();
+    ac.setLineDash([]);
+    ac.fillStyle = act ? t.eCol : t.dm2;
+    ac.font = (act ? 'bold ' : '') + '12px Courier New';
+    ac.textAlign = 'left';
+    ac.fillText('n=' + n, CX + r + 6, CY + 4);
+  }
+
+  // Nucleus halo + core
+  const ng = ac.createRadialGradient(CX,CY,0,CX,CY,26);
+  ng.addColorStop(0, dark?'rgba(255,100,0,.35)':'rgba(200,50,0,.25)');
+  ng.addColorStop(1,'transparent');
+  ac.fillStyle = ng; ac.beginPath(); ac.arc(CX,CY,26,0,Math.PI*2); ac.fill();
+  glw(ac, t.nucGlow, 15);
+  ac.fillStyle = t.nuc; ac.beginPath(); ac.arc(CX,CY,10,0,Math.PI*2); ac.fill();
+  noglw(ac);
+  // H⁺ label when ionized, else p⁺
+  ac.fillStyle = ss === 'IONIZED' ? '#ffaa00' : '#fff';
+  ac.font = 'bold 9px Courier New';
+  ac.textAlign = 'center'; ac.textBaseline = 'middle';
+  ac.fillText(ss === 'IONIZED' ? 'H⁺' : 'p⁺', CX, CY);
+  ac.textBaseline = 'alphabetic';
+
+  // ── Electron cloud / ionization ──
+  buildCloud(eN);
+  if (ss === 'IONIZING') {
+    // Cloud fades out at nucleus as electron departs
+    const cloudFade = Math.max(0, 1 - ionProgress * 2.5);
+    if (cloudFade > 0) drawCloudAt(ac, CX, CY, t, cloudFade);
+    // Free electron drawn as a glowing ball
+    glw(ac, t.eCol, 16);
+    ac.fillStyle = t.eCol;
+    ac.beginPath(); ac.arc(ionBallX, ionBallY, 6, 0, Math.PI * 2); ac.fill();
+    noglw(ac);
+    ac.fillStyle = t.tx2; ac.font = 'bold 10px Courier New'; ac.textAlign = 'center';
+    ac.fillText('e⁻', ionBallX, ionBallY - 10);
+    ac.textAlign = 'left';
+  } else if (ss === 'IONIZED') {
+    // Cloud gone; show message
+    glw(ac, '#ffaa00', 14);
+    ac.fillStyle = '#ffaa00'; ac.font = 'bold 16px Courier New'; ac.textAlign = 'center';
+    ac.fillText('IONISERET', CX, CY - 38);
+    noglw(ac);
+    ac.fillStyle = t.dm2; ac.font = '11px Courier New';
+    ac.fillText('Elektronen er frigjort fra atomet', CX, CY - 20);
+    ac.textAlign = 'left';
+  } else {
+    drawCloudAt(ac, CX, CY, t, 1);
+  }
+
+  // Emission photons flying outward
+  for (const p of ePh) {
+    const alpha = Math.max(0, 1 - p.life / 75);
+    ac.globalAlpha = alpha;
+    waveArrow(ac, p.x - p.vx*28, p.y - p.vy*28, p.x, p.y, p.col, 5);
+    ac.globalAlpha = 1;
+  }
+
+  // Incoming photon
+  if (ss === 'SHOOTING') {
+    const stopX = CX - R(startN) - 8;
+    const sx = Math.max(-15, pX - 90), ex2 = Math.min(pX, stopX);
+    if (ex2 > sx + 5) waveArrow(ac, sx, CY, ex2, CY, pCol);
+  }
+  if (ss === 'PASSING') {
+    const sx = Math.max(-15, pX - 90);
+    if (pX > sx + 5) waveArrow(ac, sx, CY, pX, CY, pCol);
+  }
+
+  // Flash overlay
+  if (flash > 0) { ac.fillStyle = `rgba(255,255,255,${flash})`; ac.fillRect(0,0,AW,AH); }
+
+  // ── Info text (top-left) ── RETTELSE: λ-symbol
+  ac.fillStyle = t.tx2; ac.font = 'bold 14px Courier New'; ac.textAlign = 'left';
+  ac.fillText(`λ = ${selWL.toFixed(1)} nm     E = ${(HC/selWL).toFixed(2)} eV`, 10, 24);
+  ac.fillStyle = t.dm2; ac.font = '12px Courier New';
+  if (ss !== 'IONIZED') {
+    ac.fillText(`ELEKTRONNIVEAU: n = ${eN}   (${En(eN).toFixed(2)} eV)`, 10, 44);
+  }
+
+  // ── Emission log (bottom-left) ── RETTELSE: glow + god luft
+  if (elog.length > 0) {
+    const LH = 20;
+    const BOTTOM = AH - 10;
+    const headerY = BOTTOM - elog.length * LH - 14;
+    ac.fillStyle = t.dm2; ac.font = 'bold 11px Courier New';
+    ac.fillText('EMITTEREDE FOTONER:', 10, headerY);
+    elog.forEach((e, i) => {
+      const col = wlCol(e.lam);
+      const tag = e.lam < 380 ? 'UV' : e.lam > 700 ? 'IR' : 'synlig';
+      // RETTELSE: glødende farve på emissionstekst
+      ac.shadowColor = col; ac.shadowBlur = 12;
+      ac.fillStyle = col; ac.font = '12px Courier New';
+      ac.fillText(`n=${e.hi}→${e.lo}:  λ=${e.lam.toFixed(0)} nm   ${seriesName(e.lo)}  (${tag})`,
+                  10, headerY + 12 + (i + 1) * LH);
+    });
+    ac.shadowBlur = 0;
+  }
+
+  // Pause overlay
+  if (paused && ss !== 'READY') {
+    ac.fillStyle = dark ? 'rgba(5,5,14,.65)' : 'rgba(240,244,255,.65)';
+    ac.fillRect(0, 0, AW, AH);
+    glw(ac, t.ac, 18);
+    ac.fillStyle = t.ac; ac.font = 'bold 20px Courier New'; ac.textAlign = 'center';
+    ac.fillText('[ PAUSE ]', AW/2, AH/2);
+    noglw(ac); ac.textAlign = 'left';
+  }
+}
+
+// ── Draw energy diagram ───────────────────────────────────────────────────
+function drawEnergy() {
+  const t = T();
+  ec.fillStyle = t.bg; ec.fillRect(0, 0, EW, EH);
+  drawGrid(ec, EW, EH); corners(ec, EW, EH, 16);
+
+  // Title
+  ec.fillStyle = t.ac; ec.font = 'bold 12px Courier New'; ec.textAlign = 'center';
+  ec.fillText('ENERGINIVEAUER', EW/2, 20);
+  ec.fillStyle = t.dm2; ec.font = '11px Courier New';
+  ec.fillText('HYDROGEN (eV)', EW/2, 33);
+
+  // Plot bounds
+  const PT = 46, PB = EH - 24, PH = PB - PT;
+  const LX = 38, RX = EW - 8, MX = (LX + RX) / 2;
+  const yOf = e => e2y(e, PB, PH);
+
+  // Ionization limit
+  const yInf = PT;
+  ec.strokeStyle = t.dm + '44'; ec.setLineDash([3,5]); ec.lineWidth = 1;
+  ec.beginPath(); ec.moveTo(LX, yInf); ec.lineTo(RX, yInf); ec.stroke();
+  ec.setLineDash([]);
+  ec.fillStyle = t.dm2; ec.font = '10px Courier New'; ec.textBaseline = 'middle';
+  ec.textAlign = 'right'; ec.fillText('n=∞', LX-3, yInf);
+  ec.textAlign = 'right'; ec.fillText('0.00', RX, yInf - 10);
+  ec.textBaseline = 'alphabetic';
+  ec.fillStyle = t.dm; ec.font = '8px Courier New'; ec.textAlign = 'center';
+  ec.fillText('(log skala)', EW/2, yInf + 11);
+
+  // Energy levels n=1..6
+  for (let n = 1; n <= 6; n++) {
+    const e = En(n), y = yOf(e), act = n === eN && ss !== 'IONIZED';
+    ec.strokeStyle = act ? t.orbHi : t.orb;
+    ec.lineWidth = act ? 2 : 1;
+    ec.beginPath(); ec.moveTo(LX, y); ec.lineTo(RX, y); ec.stroke();
+    // n= label (left)
+    ec.fillStyle = act ? t.tx2 : t.dm2;
+    ec.font = (act ? 'bold ' : '') + '12px Courier New';
+    ec.textBaseline = 'middle'; ec.textAlign = 'right';
+    ec.fillText('n='+n, LX-3, y);
+    // energy value (right, above line)
+    ec.fillStyle = act ? t.tx2 : t.dm;
+    ec.font = (act ? 'bold ' : '') + '11px Courier New';
+    ec.textBaseline = 'alphabetic'; ec.textAlign = 'right';
+    ec.fillText(e.toFixed(2), RX, y - 4);
+    ec.textBaseline = 'alphabetic';
+  }
+
+  // ── STEP 1: Emission arrows (behind) ──
+  if (dStep > 0 && dPath.length > 1) {
+    for (let i = 0; i < dStep && i < dPath.length - 1; i++) {
+      const fN = dPath[i], tN = dPath[i+1];
+      if (tN === undefined) break;
+      const lam = HC / (En(fN) - En(tN));
+      const col = wlCol(lam);
+      const y1 = yOf(En(fN)), y2 = yOf(En(tN));
+      const x = LX + 14 + i * 11;
+      ec.strokeStyle = col + 'cc'; ec.lineWidth = 2;
+      ec.beginPath(); ec.moveTo(x,y1); ec.lineTo(x,y2); ec.stroke();
+      // Arrowhead (emission = downward)
+      ec.fillStyle = col + 'cc';
+      ec.beginPath(); ec.moveTo(x,y2); ec.lineTo(x-5,y2-9); ec.lineTo(x+5,y2-9); ec.closePath(); ec.fill();
+      // RETTELSE: glødende bølgelængde + enhed nm
+      ec.shadowColor = col; ec.shadowBlur = 10;
+      ec.fillStyle = col; ec.font = 'bold 11px Courier New';
+      ec.textBaseline = 'middle'; ec.textAlign = 'left';
+      ec.fillText(lam.toFixed(0) + ' nm', x + 5, (y1 + y2) / 2);
+      ec.shadowBlur = 0; ec.textBaseline = 'alphabetic';
+    }
+  }
+
+  // ── STEP 2: Absorption / ionization arrow (on top, only before decay) ──
+  if ((ss === 'READY' || ss === 'SHOOTING') && dStep === 0) {
+    const pE = HC / selWL;
+    const y1 = yOf(En(startN));
+    const isIon = pE >= ionE(startN) * 0.999;
+    const y2 = isIon ? PT - 8 : yOf(En(startN) + pE);
+    const col = isIon ? '#ffaa00' : wlCol(selWL);
+    const ax = MX + 20;
+
+    ec.strokeStyle = col; ec.lineWidth = 2; ec.setLineDash([6, 3]);
+    ec.beginPath(); ec.moveTo(ax, y1); ec.lineTo(ax, y2); ec.stroke();
+    ec.setLineDash([]);
+    // Arrowhead (absorption/ionization = upward)
+    ec.fillStyle = col;
+    ec.beginPath(); ec.moveTo(ax,y2); ec.lineTo(ax-6,y2+10); ec.lineTo(ax+6,y2+10); ec.closePath(); ec.fill();
+    if (isIon) {
+      // Label above ionization line
+      glw(ec, col, 6);
+      ec.fillStyle = col; ec.font = 'bold 10px Courier New';
+      ec.textBaseline = 'bottom'; ec.textAlign = 'left';
+      ec.fillText('ION.', ax + 7, PT - 6);
+      noglw(ec); ec.textBaseline = 'alphabetic';
+    }
+    // Energy label
+    glw(ec, col, 5);
+    ec.fillStyle = col; ec.font = 'bold 11px Courier New';
+    ec.textBaseline = 'middle'; ec.textAlign = 'left';
+    ec.fillText(pE.toFixed(2) + ' eV', ax + 8, (y1 + y2) / 2);
+    noglw(ec); ec.textBaseline = 'alphabetic';
+  }
+
+  // Ionized state: electron dot above ionization line
+  if (ss === 'IONIZED') {
+    glw(ec, '#ffaa00', 14);
+    ec.fillStyle = '#ffaa00';
+    ec.beginPath(); ec.arc(MX, PT - 16, 5, 0, Math.PI*2); ec.fill();
+    noglw(ec);
+    ec.fillStyle = '#ffaa00'; ec.font = 'bold 11px Courier New';
+    ec.textBaseline = 'middle'; ec.textAlign = 'left';
+    ec.fillText('e⁻ fri', MX + 9, PT - 16);
+    ec.textBaseline = 'alphabetic';
+  } else {
+    // Electron dot at current level
+    const edy = yOf(En(eN));
+    glw(ec, t.eSh, 12);
+    ec.fillStyle = t.eCol;
+    ec.beginPath(); ec.arc(MX, edy, 5, 0, Math.PI*2); ec.fill();
+    noglw(ec);
+    ec.fillStyle = t.tx2; ec.font = 'bold 11px Courier New';
+    ec.textBaseline = 'middle'; ec.textAlign = 'left';
+    ec.fillText('e⁻', MX + 8, edy);
+    ec.textBaseline = 'alphabetic';
+  }
+
+  // Axis label
+  ec.fillStyle = t.dm2; ec.font = '11px Courier New'; ec.textAlign = 'center';
+  ec.fillText('Energi (eV)', EW/2, EH - 8);
+}
+
+// ── Decay helper ──────────────────────────────────────────────────────────
+function randDecay(from) {
+  const path = [from]; let cur = from;
+  while (cur > 1) {
+    const tgts=[], ws=[];
+    for (let n=1; n<cur; n++) { tgts.push(n); ws.push(1/Math.pow(cur-n,1.5)); }
+    const sum = ws.reduce((a,b)=>a+b,0);
+    let r = Math.random()*sum, chosen = tgts[0];
+    for (let i=0; i<tgts.length; i++) { r-=ws[i]; if(r<=0){chosen=tgts[i];break;} }
+    path.push(chosen); cur=chosen;
+  }
+  return path;
+}
+
+// ── Animation loop ────────────────────────────────────────────────────────
+// ── Stochastic lifetimes ──────────────────────────────────────────────────
+// Physical mean lifetimes τ (ns): n=2: 1.6, n=3: 5.3, n=4: 12, n=5: 23, n=6: 40
+// Scaled for visibility (sqrt-compressed so animation stays watchable):
+// τ_anim(n) = 22 * sqrt(τ_phys(n) / τ_phys(2)) frames at 60 fps
+const TAU_PHYS_NS = [0, 0, 1.6, 5.3, 12.0, 23.0, 40.0]; // index = n
+const TAU_BASE_FRAMES = 22;
+function tauFrames(n) {
+  return TAU_BASE_FRAMES * Math.sqrt(TAU_PHYS_NS[n] / TAU_PHYS_NS[2]);
+}
+// Draw a random wait time from exponential distribution: P(t) = (1/τ)·e^(−t/τ)
+function drawWait(n) {
+  return -tauFrames(n) * Math.log(Math.random());
+}
+
+const SPD = 3.8;
+
+function tick(ts) {
+  const dt = Math.min((ts - lastTs) / 16.667, 3); lastTs = ts;
+
+  if (paused && ss !== 'READY') { drawAtom(); drawEnergy(); requestAnimationFrame(tick); return; }
+
+  flash = Math.max(0, flash - dt * 0.045);
+  for (const p of ePh) { p.x+=p.vx*dt; p.y+=p.vy*dt; p.life+=dt; }
+  ePh = ePh.filter(p => p.life < 75);
+  tmr += dt;
+
+  switch (ss) {
+    case 'SHOOTING':
+      pX += SPD * dt;
+      if (pX >= CX - R(startN) - 8) {
+        if (pendingIon) {
+          // IONIZATION — ball starts at orbit edge in flight direction
+          ss = 'IONIZING'; ionAngle = -Math.PI/2 + (Math.random()-0.5)*1.2;
+          ionBallX = CX + Math.cos(ionAngle) * R(eN);
+          ionBallY = CY + Math.sin(ionAngle) * R(eN);
+          ionProgress = 0; flash = 0.9; tmr = 0;
+          setSt('IONISERING! — FOTONEN HAR NOK ENERGI TIL AT FRIGØRE ELEKTRONEN');
+        } else if (matched) {
+          ss = 'ABSORBING'; flash = 0.55; tmr = 0;
+          setSt('FOTON ABSORBERET — RESONANS!  ELEKTRON EXCITERES');
+        } else {
+          ss = 'PASSING'; tmr = 0;
+          setSt('INGEN RESONANS — FOTON PASSERER IGENNEM UABSORBERET');
+        }
+      }
+      break;
+    case 'PASSING':
+      pX += SPD * 1.9 * dt;
+      if (pX > AW + 110) { ss = 'READY'; setSt('KLAR'); setPlay(false); }
+      break;
+    case 'ABSORBING':
+      if (tmr > 20) {
+        eN = tgtN; buildCloud(eN); dPath = randDecay(tgtN); dStep = 0;
+        decayWait = drawWait(tgtN);   // draw lifetime for the excited state
+        ss = 'EXCITED'; tmr = 0;
+        setSt(`ELEKTRON I n=${tgtN}  (τ ≈ ${TAU_PHYS_NS[tgtN].toFixed(1)} ns) — VENTER PÅ SPONTANT HENFALD...`);
+      }
+      break;
+    case 'EXCITED':
+      // Show a countdown-style progress in status while waiting
+      if (tmr % 8 < 1) {   // update status text periodically
+        const pct = Math.min(100, Math.round(tmr / decayWait * 100));
+        setSt(`ELEKTRON I n=${eN}  (τ ≈ ${TAU_PHYS_NS[eN].toFixed(1)} ns) — VENTER PÅ SPONTANT HENFALD... ${pct}%`);
+      }
+      if (tmr > decayWait) { ss = 'DECAYING'; tmr = 0; }
+      break;
+    case 'DECAYING':
+      if (tmr > decayWait) {
+        tmr = 0;
+        if (dStep < dPath.length - 1) {
+          const fN = dPath[dStep], tN = dPath[dStep+1];
+          const lam = HC / (En(fN) - En(tN));
+          elog.push({ lo:tN, hi:fN, lam });
+          eN = tN; buildCloud(eN); flash = 0.16; dStep++;
+          // Draw new stochastic lifetime for the next level (if not ground state)
+          decayWait = eN > 1 ? drawWait(eN) : 0;
+          const ang = Math.random() * Math.PI * 2;
+          ePh.push({ x:CX+R(fN)*Math.cos(ang), y:CY+R(fN)*Math.sin(ang),
+                     vx:Math.cos(ang)*2.6, vy:Math.sin(ang)*2.6, col:wlCol(lam), life:0 });
+          const tag = lam<380?'UV':lam>700?'IR':'synlig';
+          setSt(`HENFALD n=${fN}→${tN}: λ=${lam.toFixed(0)} nm   ${seriesName(tN)}  (${tag})`);
+        } else {
+          ss = 'READY'; setPlay(false);
+          setSt('HENFALD AFSLUTTET — ELEKTRONEN ER TILBAGE I GRUNDTILSTANDEN');
+        }
+      }
+      break;
+    case 'IONIZING':
+      ionProgress = Math.min(1, ionProgress + dt * 0.013);
+      ionBallX += Math.cos(ionAngle) * 5.5 * dt;   // ball flies outward
+      ionBallY += Math.sin(ionAngle) * 5.5 * dt;
+      if (ionProgress >= 1) {
+        ss = 'IONIZED'; setPlay(false);
+        setSt('ATOM IONISERET — ELEKTRONEN ER FRIGJORT  |  KLIK NULSTIL');
+      }
+      break;
+    case 'IONIZED':
+      break;
+  }
+
+  drawAtom(); drawEnergy();
+  requestAnimationFrame(tick);
+}
+
+// ── UI helpers ────────────────────────────────────────────────────────────
+function setSt(msg) { document.getElementById('stTxt').textContent = msg; }
+
+function setPlay(on) {
+  const b = document.getElementById('playBtn');
+  b.textContent = (on && !paused) ? '⏸ PAUSE' : '▶ AFSPIL';
+  b.classList.toggle('on', on && !paused);
+}
+
+function buildSwatch() {
+  const total = 700 - 90, pct = nm => ((nm-90)/total*100).toFixed(1)+'%';
+  document.getElementById('swatchBar').style.background =
+    `linear-gradient(to right,
+      #660088 0%,#aa22cc ${pct(200)},
+      #cc44ff ${pct(380)},
+      #8833ee ${pct(420)},#8833ee ${pct(450)},
+      #3355ff ${pct(450)},#3355ff ${pct(490)},
+      #00aaff ${pct(490)},#00aaff ${pct(510)},
+      #00ee66 ${pct(510)},#00ee66 ${pct(560)},
+      #aaff00 ${pct(560)},#aaff00 ${pct(590)},
+      #ffee00 ${pct(590)},#ffee00 ${pct(625)},
+      #ff5500 ${pct(625)},#ff5500 100%)`;
+}
+
+function updateSwatch(nm) {
+  const p = (nm-90)/(700-90)*100;
+  document.getElementById('swatchMark').style.left = p + '%';
+  const col = wlCol(nm), tag = document.getElementById('swatchTag');
+  tag.textContent = wlLabel(nm); tag.style.color = col;
+}
+
+function updSlider() {
+  selWL = parseFloat(document.getElementById('sl').value);
+  document.getElementById('wlv').textContent = selWL.toFixed(1);
+  document.getElementById('ev').textContent = (HC/selWL).toFixed(2);
+  updateSwatch(selWL);
+
+  const pE = HC / selWL;
+  const isIon = pE >= ionE(startN) * 0.999;
+  const ab = isIon ? null : findAbs(selWL);
+  const badge = document.getElementById('badge');
+
+  if (isIon) {
+    badge.className = 'badge b-ion';
+    badge.textContent = `IONISERING  E=${pE.toFixed(2)} > ${ionE(startN).toFixed(2)} eV`;
+  } else if (ab) {
+    badge.className = 'badge b-yes';
+    badge.textContent = `MATCH: n=${startN}→${ab.hi}  (${ab.lam.toFixed(1)} nm)`;
+  } else {
+    badge.className = 'badge b-no';
+    badge.textContent = 'INGEN MATCH';
+  }
+}
+
+function doReset() {
+  ss = 'READY'; eN = startN; flash = 0;
+  buildCloud(startN); lastCloudN = startN;
+  ePh = []; elog = []; dPath = []; dStep = 0;
+  ionProgress = 0; paused = false; decayWait = 0;
+  setPlay(false); updSlider();
+  setSt('NULSTILLET — VÆLG BØLGELÆNGDE OG KLIK AFSPIL');
+}
+
+// ── Event listeners ───────────────────────────────────────────────────────
+document.getElementById('sl').addEventListener('input', updSlider);
+
+document.getElementById('nlBtns').addEventListener('click', e => {
+  const btn = e.target.closest('.nl-btn');
+  if (!btn) return;
+  document.querySelectorAll('.nl-btn').forEach(b => b.classList.remove('nl-on'));
+  btn.classList.add('nl-on');
+  startN = parseInt(btn.dataset.n);
+  absTransitions = calcAbsTrans(startN);
+  doReset();
+});
+
+document.getElementById('playBtn').addEventListener('click', () => {
+  if (ss === 'READY' && !paused) {
+    elog = []; dPath = []; dStep = 0;
+    const pE = HC / selWL;
+    pendingIon = pE >= ionE(startN) * 0.999;
+    const ab = pendingIon ? null : findAbs(selWL);
+    matched = !!ab;
+    tgtN = ab ? ab.hi : startN;
+    pX = -10; pCol = wlCol(selWL);
+    ss = 'SHOOTING'; tmr = 0; paused = false;
+    setSt('FOTON SENDT MOD ATOMET...');
+    setPlay(true);
+  } else if (ss !== 'READY' && ss !== 'IONIZED') {
+    paused = !paused; setPlay(!paused);
+    if (paused) setSt('PAUSE — KLIK AFSPIL FOR AT FORTSÆTTE');
+  }
+});
+
+document.getElementById('resetBtn').addEventListener('click', doReset);
+
+document.getElementById('copyBtn').addEventListener('click', () => {
+  navigator.clipboard.writeText(document.documentElement.outerHTML).then(() => {
+    const b = document.getElementById('copyBtn');
+    b.textContent = '✓ KOPIERET!';
+    setTimeout(() => b.textContent = '{ } KOPIER KODE', 2200);
+  });
+});
+
+document.getElementById('modeBtn').addEventListener('click', () => {
+  dark = !dark;
+  document.body.classList.toggle('light', !dark);
+  document.getElementById('modeBtn').textContent = dark ? '☀ LYS TILSTAND' : '🌙 MØRK TILSTAND';
+  updSlider();
+});
+
+// ── Init ──────────────────────────────────────────────────────────────────
+buildSwatch(); updSlider(); buildCloud(1);
+lastTs = performance.now();
+requestAnimationFrame(tick);
+</script>
+</body>
+</html>
