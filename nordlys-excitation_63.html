@@ -1,0 +1,1296 @@
+<!DOCTYPE html>
+<html lang="da">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Nordlys — Solvind og Exciterede Atomer</title>
+<link href="https://fonts.googleapis.com/css2?family=Orbitron:wght@400;700&display=swap" rel="stylesheet">
+<style>
+:root {
+  --bg0:#030810; --bg1:#060e18; --bg2:#0a1622; --bg3:#0f1e2d;
+  --border:#1a3a52;
+  --green:#00ff9f; --cyan:#00cfff; --yellow:#ffd93d;
+  --text:#d0eef5;  --dim:#8ec8d8;
+  --font:'Courier New','Lucida Console',monospace;
+  --tr:0.15s ease;
+}
+*{ box-sizing:border-box; margin:0; padding:0; }
+body{
+  background:var(--bg0); color:var(--text); font-family:var(--font);
+  height:100vh; overflow:hidden; display:flex; flex-direction:column;
+}
+
+/* ── HEADER ──────────────────────────────── */
+header{
+  flex-shrink:0; height:44px;
+  display:flex; align-items:center; justify-content:space-between;
+  padding:0 16px; border-bottom:1px solid var(--border); background:var(--bg1);
+}
+.logo{ display:flex; align-items:center; gap:10px; }
+.aurora-icon{ font-size:20px; color:var(--green); animation:gp 2.5s ease-in-out infinite; }
+@keyframes gp{ 0%,100%{opacity:1;text-shadow:0 0 8px var(--green)} 50%{opacity:.4;text-shadow:none} }
+h1{
+  font-family:'Orbitron',monospace; font-size:12px; font-weight:700;
+  letter-spacing:.18em; color:var(--green); text-transform:uppercase;
+}
+h1 span{ color:var(--cyan); }
+.header-sub{ font-size:9px; color:var(--dim); letter-spacing:.12em; text-transform:uppercase; }
+
+/* ── MAIN ROW ─────────────────────────────── */
+.main-row{ flex:1; display:flex; overflow:hidden; }
+
+/* ── MODAL ────────────────────────────────── */
+.modal-overlay{
+  display:none; position:fixed; inset:0;
+  background:rgba(1,4,12,0.88); z-index:100;
+  align-items:center; justify-content:center;
+  backdrop-filter:blur(3px);
+}
+.modal-overlay.open{ display:flex; }
+.modal{
+  background:var(--bg1); border:1px solid var(--border);
+  width:min(1020px, 96vw); max-height:88vh;
+  display:flex; flex-direction:column;
+  box-shadow:0 0 40px rgba(0,255,159,0.08), 0 0 0 1px var(--border);
+}
+.modal-head{
+  display:flex; align-items:center; justify-content:space-between;
+  padding:10px 16px; border-bottom:1px solid var(--border); flex-shrink:0;
+}
+.modal-title{
+  font-family:'Orbitron',monospace; font-size:11px; font-weight:700;
+  letter-spacing:.20em; color:var(--green); text-transform:uppercase;
+}
+.modal-close{
+  font-family:var(--font); font-size:11px; letter-spacing:.1em;
+  border:1px solid var(--border); background:var(--bg3);
+  color:var(--dim); padding:4px 10px; cursor:pointer;
+  text-transform:uppercase; transition:var(--tr);
+}
+.modal-close:hover{ border-color:var(--green); color:var(--green); box-shadow:0 0 6px var(--green); }
+.modal-body{
+  overflow-y:auto; padding:24px 28px 32px 28px;
+  scrollbar-width:thin; scrollbar-color:var(--border) transparent;
+}
+.fact-grid{
+  display:grid; grid-template-columns:1fr 1fr 1fr;
+  gap:14px; margin-bottom:20px;
+}
+.fact-card{
+  background:var(--bg2); border:1px solid var(--border);
+  padding:14px 16px;
+}
+.fc-head{
+  font-size:10px; letter-spacing:.18em; color:var(--cyan);
+  text-transform:uppercase; border-bottom:1px solid var(--border);
+  padding-bottom:6px; margin-bottom:10px;
+}
+.fc-body{ font-size:12px; color:var(--text); line-height:1.8; }
+.fc-body .hl{ color:var(--yellow); font-weight:bold; }
+.fc-body .hg{ color:#00d45a; font-weight:bold; }
+.fc-body .hr{ color:#ff6666; font-weight:bold; }
+.fc-body .hv{ color:#aa88ff; font-weight:bold; }
+.fc-body .hc{ color:var(--cyan); }
+.fact-table{ width:100%; border-collapse:collapse; font-size:12px; margin-bottom:16px; }
+.fact-table th{
+  font-size:10px; letter-spacing:.14em; color:var(--green); text-transform:uppercase;
+  border-bottom:1px solid var(--border); padding:6px 10px; text-align:left;
+  background:var(--bg2);
+}
+.fact-table td{ padding:6px 10px; border-bottom:1px solid var(--bg3); color:var(--text); }
+.fact-table tr:last-child td{ border-bottom:none; }
+.fact-table .col-n{ color:#aa88ff; }
+.fact-table .col-g{ color:#00d45a; }
+.fact-table .col-r{ color:#ff6666; }
+.fact-note{
+  font-size:11px; color:var(--dim); line-height:1.75;
+  border-top:1px solid var(--border); padding-top:12px;
+  letter-spacing:.03em;
+}
+
+.aurora-panel{
+  flex:1; position:relative; overflow:hidden;
+  border-right:1px solid var(--border);
+}
+#auroraCanvas{ position:absolute; top:0; left:0; width:100%; height:100%; }
+
+/* ── RIGHT PANEL ──────────────────────────── */
+.right-panel{
+  width:330px; flex-shrink:0; background:var(--bg1);
+  display:flex; flex-direction:column;
+}
+.rp-title{
+  font-size:11px; letter-spacing:.22em; color:var(--green);
+  text-transform:uppercase; padding:8px 12px; flex-shrink:0;
+  border-bottom:1px solid var(--border);
+}
+.energy-diagrams{ flex:1; display:flex; flex-direction:column; overflow:hidden; }
+.energy-block{
+  flex:1; display:flex; flex-direction:column;
+  border-bottom:1px solid var(--border); padding:6px 10px 6px 10px;
+  overflow:hidden;
+}
+.energy-block:last-child{ border-bottom:none; }
+.eb-title{
+  font-size:9px; letter-spacing:.15em; color:var(--cyan);
+  text-transform:uppercase; margin-bottom:4px; flex-shrink:0;
+}
+.energy-block canvas{ flex:1; width:100%; display:block; }
+
+/* ── BOTTOM BAR ───────────────────────────── */
+.bottom-bar{
+  flex-shrink:0; border-top:1px solid var(--border); background:var(--bg1);
+  display:flex; flex-direction:column;
+}
+.info-row{
+  display:flex; align-items:center; gap:10px;
+  padding:8px 14px; border-bottom:1px solid var(--border); height:42px; overflow:hidden;
+}
+.info-dot{
+  width:8px; height:8px; border-radius:50%; flex-shrink:0;
+  background:#1a3a52; transition:background .3s, box-shadow .3s;
+}
+#infoText{ font-size:10px; color:var(--text); letter-spacing:.04em; }
+.ctrl-row{
+  display:flex; align-items:center; gap:10px;
+  padding:7px 14px; height:40px;
+}
+.btn{
+  font-family:var(--font); font-size:10px; letter-spacing:.1em;
+  border:1px solid; background:var(--bg3);
+  padding:6px 16px; cursor:pointer; text-transform:uppercase;
+  transition:var(--tr); user-select:none; flex-shrink:0;
+}
+.btn-g{ border-color:var(--green); color:var(--green); }
+.btn-g:hover{ background:rgba(0,255,159,.09); box-shadow:0 0 8px var(--green); }
+.vsep{ width:1px; height:22px; background:var(--border); flex-shrink:0; }
+.spd-grp{ display:flex; align-items:center; gap:7px; }
+.ctrl-lbl{ font-size:9px; color:var(--dim); letter-spacing:.1em; text-transform:uppercase; white-space:nowrap; }
+input[type=range]{
+  -webkit-appearance:none; width:80px; height:2px;
+  background:var(--border); outline:none; cursor:pointer;
+}
+input[type=range]::-webkit-slider-thumb{
+  -webkit-appearance:none; width:10px; height:10px;
+  background:var(--green); cursor:pointer;
+}
+.toggles{ display:flex; gap:6px; margin-left:auto; }
+.tog{
+  font-family:var(--font); font-size:9px; letter-spacing:.08em;
+  border:1px solid; background:var(--bg3);
+  padding:4px 8px; cursor:pointer; text-transform:uppercase;
+  transition:var(--tr); user-select:none; opacity:.35;
+}
+.tog.on{ opacity:1; }
+.tog-n{ border-color:#9977ff; color:#9977ff; }
+.tog-n.on{ box-shadow:0 0 6px #9977ff; }
+.tog-g{ border-color:#00d45a; color:#00d45a; }
+.tog-g.on{ box-shadow:0 0 6px #00d45a; }
+.tog-r{ border-color:#ff4444; color:#ff4444; }
+.tog-r.on{ box-shadow:0 0 6px #ff4444; }
+
+::-webkit-scrollbar{ width:4px; }
+::-webkit-scrollbar-track{ background:var(--bg0); }
+::-webkit-scrollbar-thumb{ background:var(--border); }
+</style>
+</head>
+<body>
+
+<header>
+  <div class="logo">
+    <span class="aurora-icon">◈</span>
+    <h1>Nordlys — <span>Solvind og Exciterede Atomer</span></h1>
+  </div>
+  <div class="header-sub">Atmosfærelag · 80–300 km højde</div>
+</header>
+
+<div class="main-row">
+  <div class="aurora-panel">
+    <canvas id="auroraCanvas"></canvas>
+  </div>
+  <div class="right-panel">
+    <div class="rp-title">Energiniveauer</div>
+    <div class="energy-diagrams">
+      <div class="energy-block" id="oBlock">
+        <div class="eb-title">O — Atomart oxygen</div>
+        <canvas id="oCanvas"></canvas>
+      </div>
+      <div class="energy-block" id="n2Block">
+        <div class="eb-title">N₂⁺ — Ioniseret nitrogen</div>
+        <canvas id="n2Canvas"></canvas>
+      </div>
+    </div>
+  </div>
+</div>
+
+<div class="bottom-bar">
+  <div class="info-row">
+    <div class="info-dot" id="infoDot"></div>
+    <div id="infoText">Elektroner fra solvinden strømmer ned og exciterer molekyler i karakteristiske højdebånd — tryk PLAY for at starte...</div>
+  </div>
+  <div class="ctrl-row">
+    <button class="btn btn-g" id="playBtn">▶ AFSPIL</button>
+    <button class="btn btn-g" id="resetBtn" style="margin-left:6px">↺ NULSTIL</button>
+    <div class="vsep"></div>
+    <div class="spd-grp">
+      <span class="ctrl-lbl">Simuleringsfart</span>
+      <input type="range" id="speedSlider" min="0.3" max="4" step="0.1" value="1">
+    </div>
+    <div class="vsep"></div>
+    <div class="spd-grp">
+      <span class="ctrl-lbl" style="color:#ffd93d">☀ Solvind</span>
+      <input type="range" id="solarSlider" min="0" max="4" step="1" value="1" style="accent-color:#ffd93d;width:120px">
+      <span id="solarLabel" style="font-size:9px;color:#ffd93d;min-width:52px">Svag</span>
+    </div>
+    <div class="vsep"></div>
+    <div class="toggles">
+      <button class="tog tog-n on" data-sp="N2plus">N₂⁺ 428nm</button>
+      <button class="tog tog-g on" data-sp="O_green">O 558nm</button>
+      <button class="tog tog-r on" data-sp="O_red">O 630nm</button>
+    </div>
+    <div class="vsep"></div>
+    <button class="btn-sm btn-sm-util" id="faktaBtn">ℹ FAKTA</button>
+    <button class="btn btn-g" id="copyBtn" style="margin-left:6px">⧉ KOPIER KODE</button>
+  </div>
+</div><!-- /.bottom-bar -->
+
+<!-- ══════════════ MODAL ══════════════ -->
+<div class="modal-overlay" id="modalOverlay">
+  <div class="modal">
+    <div class="modal-head">
+      <span class="modal-title">◈ Fysikken i Nordlys</span>
+      <button class="modal-close" id="modalClose">✕ LUK</button>
+    </div>
+    <div class="modal-body">
+      <div class="fact-grid">
+        <div class="fact-card">
+          <div class="fc-head">Hvad er nordlys?</div>
+          <div class="fc-body">
+            Nordlys (<em>aurora borealis</em>) opstår når ladede partikler fra Solen — primært elektroner og protoner — følger Jordens magnetfeltlinjer ned i de polare atmosfærelag. Her kolliderer de med atmosfærens atomer og molekyler, exciterer dem til højere energitilstande, og lyset udsendes når atomerne falder tilbage til grundtilstanden.
+            <br><br>
+            Solvinden strømmer konstant fra Solen med <span class="hl">400–800 km/s</span>. Under kraftige solstorme (CME'er) kan nordlyset ses helt ned til mellembreddegraderne.
+          </div>
+        </div>
+        <div class="fact-card">
+          <div class="fc-head">Collisional quenching</div>
+          <div class="fc-body">
+            Ikke alle exciterede atomer udsender lys. I de <span class="hl">tætte nedre lag</span> sker der hyppigt <em>collisional quenching</em>: atomet afleverer sin energi som varme ved kollision med et nabomolekyle, <em>inden</em> det når at udsende en foton.
+            <br><br>
+            Det er netop derfor det <span class="hg">grønne O-lys</span> (¹S-tilstanden, levetid ~0,7 s) dominerer ved 100–150 km. Over ~200 km er atmosfæren så tynd at den langsomme <span class="hr">¹D-tilstand</span> (levetid ~110 s) kan overleve til at udsende rødt lys.
+          </div>
+        </div>
+        <div class="fact-card">
+          <div class="fc-head">Energiniveaunotation</div>
+          <div class="fc-body">
+            Tilstandene for atomart oxygen og ioniseret nitrogen skrives på en speciel måde, som vi ikke skal nærmere ind på her.
+            <br><br>
+            For oxygen er der to exciterede tilstande relevante for nordlys. Den højest exciterede kaldes <span class="hg">¹S</span> (4,19 eV over grundtilstanden <span class="hc">³P</span>). Den lavest exciterede kaldes <span class="hr">¹D</span> (1,97 eV over grundtilstanden). Overgangen ¹S → ¹D giver <span class="hg">557,7 nm</span> (grønt), og ¹D → ³P giver <span class="hr">630,0 nm</span> (rødt). Begge tilstande er usædvanlig langlivede — det kræver lav atmosfærisk tæthed for at observere overgangene.
+            <br><br>
+            For ioniseret nitrogen (N₂⁺) er det overgangen fra den exciterede tilstand <span class="hv">B²Σ⁺ᵤ</span> ned til grundtilstanden <span class="hc">X²Σ⁺ᵍ</span> der giver den karakteristiske <span class="hv">428 nm</span> violette emission. Denne overgang er — i modsætning til oxygens — en hurtig, tilladt overgang med en levetid på blot ~10 nanosekunder. Den kræver derfor ikke lav atmosfæretæthed og ses typisk i de nedre nordlyslag ved kraftig solvind, hvor energirige elektroner kan ionisere og excitere N₂.
+          </div>
+        </div>
+      </div>
+      <table class="fact-table">
+        <thead>
+          <tr>
+            <th>Art</th><th>Overgang</th><th>Bølgelængde</th>
+            <th>Farve</th><th>Højde</th><th>Excit. levetid</th><th>Bemærkning</th>
+          </tr>
+        </thead>
+        <tbody>
+          <tr>
+            <td class="col-n">N₂⁺</td><td>B²Σ⁺ᵤ → X²Σ⁺ᵍ</td><td class="col-n">428 nm</td>
+            <td>Blåviolet</td><td>80–105 km</td><td>~10 ns</td>
+            <td>Hurtig tilladt overgang — ses i yderkanten af nordlysbånd</td>
+          </tr>
+          <tr>
+            <td class="col-g">O (oxygen)</td><td>¹S → ¹D</td><td class="col-g">557,7 nm</td>
+            <td>Grøn</td><td>100–155 km</td><td>~0,74 s</td>
+            <td>Den hyppigste nordlyslinje — dominerer de fleste nordlys</td>
+          </tr>
+          <tr>
+            <td class="col-r">O (oxygen)</td><td>¹D → ³P</td><td class="col-r">630,0 nm</td>
+            <td>Rød</td><td>200–300 km</td><td>~110 s</td>
+            <td>Meget langsom overgang — kræver ekstrem lav atmosfæretæthed</td>
+          </tr>
+        </tbody>
+      </table>
+      <div class="fact-note">
+        Simuleringen viser en forenklet model af excitationsprocessen. Sandsynlighederne afspejler relative hyppigheder: grøn O dominerer klart, rød O kræver stor højde og lav tæthed, blåviolet N₂⁺ ses primært i de laveste lag. Collisional quenching er implementeret for ¹S: excitationer under ~145 km kan resultere i varmeafgivelse frem for lysemission.
+      </div>
+    </div>
+  </div>
+</div>
+
+<script>
+// ══════════════════════════════════════════════════════════════
+// SPECIES DATA
+// ══════════════════════════════════════════════════════════════
+const SP = {
+  N2plus:{
+    altMin:80, altMax:100,
+    color:'#9977ff', glow:'rgba(153,119,255,',
+    wl:'428', eV:'2,90', prob:0.006,
+    infoExc: 'Elektron exciterer N₂⁺ ved ~90 km ↑ til B²Σ⁺ᵤ tilstand (2,90 eV)',
+    infoDe:  'N₂⁺ de-exciteres: B²Σ⁺ᵤ → X²Σ⁺ᵍ  ·  λ = 428 nm  ·  E = 2,90 eV  ·  blåviolet lys',
+    infoQ:   'N₂⁺ de-exciteres: B²Σ⁺ᵤ → X²Σ⁺ᵍ  ·  λ = 428 nm  ·  E = 2,90 eV  ·  blåviolet lys',
+  },
+  O_green:{
+    altMin:108, altMax:155,
+    color:'#00d45a', glow:'rgba(0,212,90,',
+    wl:'557,7', eV:'2,22', prob:0.015,
+    infoExc: 'Elektron exciterer O ved ~120 km ↑ til ¹S tilstand (4,19 eV) — mulig quenching ved lav højde',
+    infoDe:  'O de-exciteres: ¹S → ¹D  ·  λ = 557,7 nm  ·  E = 2,22 eV  ·  grønt lys (hyppigst!)',
+    infoQ:   'Collisional quenching: ¹S-atomet mister energi ved kollision → varme i stedet for foton',
+  },
+  O_red:{
+    altMin:200, altMax:300,
+    color:'#ff4444', glow:'rgba(255,68,68,',
+    wl:'630,0', eV:'1,97', prob:0.003,
+    infoExc: 'Elektron exciterer O ved ~250 km ↑ til ¹D tilstand (1,97 eV over grundtilstand)',
+    infoDe:  'O de-exciteres: ¹D → ³P  ·  λ = 630,0 nm  ·  E = 1,97 eV  ·  rødt lys',
+    infoQ:   'Collisional quenching: ¹D-atomet mister energi ved kollision → varme (sker ved ~200 km)',
+  },
+};
+
+// ══════════════════════════════════════════════════════════════
+// CANVAS SETUP
+// ══════════════════════════════════════════════════════════════
+const AC = document.getElementById('auroraCanvas');
+const ac = AC.getContext('2d');
+const OC = document.getElementById('oCanvas');
+const oc = OC.getContext('2d');
+const NC = document.getElementById('n2Canvas');
+const nc = NC.getContext('2d');
+
+function resize(){
+  const ap = AC.parentElement;
+  AC.width  = ap.clientWidth;
+  AC.height = ap.clientHeight;
+  const ob = document.getElementById('oBlock');
+  OC.width  = ob.clientWidth  - 20;
+  OC.height = ob.clientHeight - 26;
+  const nb = document.getElementById('n2Block');
+  NC.width  = nb.clientWidth  - 20;
+  NC.height = nb.clientHeight - 26;
+}
+window.addEventListener('resize', resize);
+resize();
+
+// ══════════════════════════════════════════════════════════════
+// SIMULATION STATE
+// ══════════════════════════════════════════════════════════════
+let running    = false;
+let speed      = 1.0;
+let solarWind  = 0.22;   // default: Svag (step 1)
+const enabled  = { N2plus:true, O_green:true, O_red:true };
+
+// Per-species excitation probability mapped to discrete solar wind steps:
+//   Stille=0.00  Svag=0.22  Moderat=0.52  Kraftig=0.76  Storm=1.00
+function spProb(key){
+  const sw = solarWind;
+  if(key==='O_green'){
+    return 0.004 + 0.014 * sw;  // much dimmer at Stille, same at Storm
+  }
+  if(key==='N2plus'){
+    const onset = Math.max(0, (sw - 0.74) / 0.26);       // only Kraftig→Storm
+    return 0.022 * onset * onset;
+  }
+  if(key==='O_red'){
+    const onset = Math.max(0, (sw - 0.48) / 0.52);       // trace at Moderat, grows to Storm
+    return 0.018 * onset * onset;
+  }
+  return 0;
+}
+
+const particles = [];
+const events    = [];
+const glow       = { N2plus:0, O_green:0, O_red:0 };
+const glowTarget = { N2plus:0, O_green:0, O_red:0 };
+
+// Per-species diagram state — completely independent so they never overwrite each other
+const diagState = {
+  N2plus:  { phase:'idle', startT:0, deexcT:0, quenched:false },
+  O_green: { phase:'idle', startT:0, deexcT:0, quenched:false },
+  O_red:   { phase:'idle', startT:0, deexcT:0, quenched:false },
+};
+
+// activeEvt is still used for the info-bar (shows most recent event)
+let activeEvt = null;
+let lastSpawn = 0, lastTs = 0;
+let auroraTime = 0;  // always-running time for curtain animation
+
+// Offscreen canvas for per-band alpha compositing (avoids double-band artefact)
+let offCvs = null, offCtx = null;
+function ensureOff(){
+  if(!offCvs || offCvs.width !== AC.width || offCvs.height !== AC.height){
+    offCvs = document.createElement('canvas');
+    offCvs.width  = AC.width;
+    offCvs.height = AC.height;
+    offCtx = offCvs.getContext('2d');
+  }
+}
+
+const ALT_BOT = 55, ALT_TOP = 335;
+const SPLIT = 0.50;   // fraction of canvas width: left=particles, right=aurora
+
+function altY(alt){
+  return AC.height * (1 - (alt - ALT_BOT) / (ALT_TOP - ALT_BOT));
+}
+function yToAlt(y){
+  return ALT_BOT + (1 - y / AC.height) * (ALT_TOP - ALT_BOT);
+}
+
+// ══════════════════════════════════════════════════════════════
+// AURORA CANVAS
+// ══════════════════════════════════════════════════════════════
+function drawBg(){
+  const W = AC.width, H = AC.height;
+  const g = ac.createLinearGradient(0,0,0,H);
+  g.addColorStop(0,   '#000206');
+  g.addColorStop(0.2, '#010510');
+  g.addColorStop(1,   '#02091c');
+  ac.fillStyle = g;
+  ac.fillRect(0,0,W,H);
+
+  // Atmosphere tint at bottom (below ~120km)
+  const atmY = altY(120);
+  const ag = ac.createLinearGradient(0, atmY, 0, H);
+  ag.addColorStop(0, 'rgba(0,10,30,0)');
+  ag.addColorStop(1, 'rgba(2,12,35,0.35)');
+  ac.fillStyle = ag;
+  ac.fillRect(0, atmY, W, H - atmY);
+}
+
+function drawStars(){
+  const W = AC.width;
+  const spaceH = altY(ALT_TOP - 15);
+  for(let i=0;i<55;i++){
+    const sx = ((i*137.508 + 30) * W / 200) % W;
+    const sy = ((i*97.3  * 0.9 * spaceH / 260)) % spaceH;
+    const sr = 0.3 + (i%3)*0.35;
+    const sa = 0.25 + (i%5)*0.12;
+    ac.beginPath();
+    ac.arc(sx, sy, sr, 0, Math.PI*2);
+    ac.fillStyle = `rgba(210,230,255,${sa})`;
+    ac.fill();
+  }
+}
+
+function drawAltBands(){
+  // Band boundaries intentionally invisible — nordlys speaks for itself
+}
+
+// Turbulence: sum of sinusoids with incommensurate high frequencies + random phases
+// Correlation length ≈ canvas_width / max_freq (very short)
+// Phases are fixed per call site to avoid propagation direction
+const TURB_FREQS = [13.7, 19.3, 27.1, 34.6, 43.9, 58.2, 71.4, 89.7];
+const TURB_TSPD  = [0.41, 0.29, 0.53, 0.37, 0.61, 0.23, 0.47, 0.31];
+const TURB_PHASE = [1.23, 3.71, 0.84, 5.12, 2.39, 4.67, 1.95, 3.28];
+// Returns ~[-1,+1] with short spatial correlation
+function turb(fx, t, pOff){
+  let v = 0;
+  for(let i = 0; i < TURB_FREQS.length; i++){
+    // Opposing directions cancel propagation while keeping temporal variation
+    v += Math.sin(fx * TURB_FREQS[i] + t * TURB_TSPD[i] + TURB_PHASE[i] + pOff) * 0.5
+       + Math.sin(fx * TURB_FREQS[i] - t * TURB_TSPD[i] + TURB_PHASE[i] + pOff) * 0.5;
+  }
+  return v / TURB_FREQS.length;  // normalise to ~[-1,+1]
+}
+
+function drawAuroraColumn(){
+  const W = AC.width;
+  const stormBoost = 1 + solarWind * 0.08;  // minimal extra boost at storm
+  const t = auroraTime;
+
+  const spPhase = {
+    N2plus:  [0.00, 1.73, 3.14, 5.20],
+    O_green: [1.05, 2.81, 0.42, 3.97],
+    O_red:   [2.31, 0.94, 4.51, 1.28],
+  };
+
+  // Blobs confined to right half (aurora side): 55–92% of canvas width
+  const N_BLOBS = 10;
+  const BLOB_BASE  = [0.57, 0.62, 0.67, 0.72, 0.77, 0.82, 0.63, 0.70, 0.58, 0.75];
+  const BLOB_DRIFT = [0.031, 0.019, 0.027, 0.013, 0.023, 0.017, 0.029, 0.011, 0.021, 0.025];
+  const BLOB_PULSE = [0.19, 0.27, 0.14, 0.33, 0.22, 0.16, 0.31, 0.24, 0.18, 0.29];
+  const BLOB_PHASE_OFF = Array.from({length: N_BLOBS}, (_, i) => i * (2*Math.PI / N_BLOBS));
+
+  ensureOff();
+
+  for(const [k, sp] of Object.entries(SP)){
+    const g = glow[k];
+    if(g < 0.01) continue;
+
+    const nomTop = altY(sp.altMax);
+    const nomBot = altY(sp.altMin);
+    const nomH   = nomBot - nomTop;
+    if(nomH < 4) continue;
+
+    const ph  = spPhase[k];
+    const blurPx = Math.round(nomH * 0.08);
+
+    // ── Per-blob properties at this moment ─────────────────────
+    const blobs = [];
+    for(let b = 0; b < N_BLOBS; b++){
+      const cx = BLOB_BASE[b]
+        + Math.sin(t * BLOB_DRIFT[b] + ph[b % 4] + b * 0.71) * 0.04;
+      // Narrower blobs: 2.5–5% of canvas wide
+      const sigma = 0.008 + 0.010 * (0.5 + 0.5 * Math.sin(t * 0.07 + b * 1.31 + ph[b % 4]));
+      // NO baseline — brightness goes from 0 to max, staggered phases prevent simultaneous glow
+      const raw = Math.sin(t * BLOB_PULSE[b] + BLOB_PHASE_OFF[b] + ph[b % 4]);
+      const bright = Math.max(0, raw)   // only positive half of sine = blob is dark half the time
+        * (0.7 + 0.3 * turb(cx, t, ph[b % 4] + b))
+        * g * stormBoost;
+      blobs.push({ cx, sigma, bright });
+    }
+
+    // ── Wavy edge shape (kept for organic boundary) ─────────────
+    const pts = 80;
+    const topY = [], botY = [];
+    for(let i = 0; i <= pts; i++){
+      const fx = i / pts;
+      topY.push(nomTop
+        + Math.sin(fx * 4.7 + t * 0.17 + ph[0]) * nomH * 0.05
+        + Math.sin(fx * 4.7 - t * 0.17 + ph[0]) * nomH * 0.05
+        + Math.sin(fx * 2.3 + t * 0.09 + ph[2]) * nomH * 0.04
+        + turb(fx, t, ph[0]) * nomH * 0.10);
+      botY.push(nomBot
+        + Math.sin(fx * 3.5 + t * 0.22 + ph[1]) * nomH * 0.09
+        + Math.sin(fx * 3.5 - t * 0.22 + ph[1]) * nomH * 0.09
+        + Math.sin(fx * 1.9 + t * 0.13 + ph[0]) * nomH * 0.05
+        + turb(fx, t, ph[1]) * nomH * 0.14);
+    }
+
+    let _minY = topY[0], _maxY = botY[0];
+    for(let i = 1; i <= pts; i++){
+      if(topY[i] < _minY) _minY = topY[i];
+      if(botY[i] > _maxY) _maxY = botY[i];
+    }
+    const extTop = _minY - blurPx;
+    const extBot = _maxY + blurPx;
+    const spanY  = extBot - extTop;
+
+    // ── Build horizontal gradient from blob sum ─────────────────
+    const hg = ac.createLinearGradient(0, 0, W, 0);
+    for(let i = 0; i <= 64; i++){
+      const fx = i / 64;
+      // Sum gaussian contributions from all blobs
+      let a = 0;
+      for(const bl of blobs){
+        const d = (fx - bl.cx) / bl.sigma;
+        a += bl.bright * Math.exp(-0.5 * d * d);
+      }
+      a = Math.min(0.12, a);  // lower cap — never a solid wall
+      hg.addColorStop(fx, `${sp.glow}${a})`);
+    }
+
+    // ── Apply horizontal clip to contain glow within right half ───
+    // (shadowBlur can bleed, so clip to right-half + small margins)
+    const clipL = W * (SPLIT + 0.01);
+    const clipR = W * 0.97;
+
+    const glowPasses = [
+      { blur: blurPx * 6,   alpha: 0.80 },
+      { blur: blurPx * 3, alpha: 0.9 },
+      { blur: blurPx * 1, alpha: 0.70 },
+    ];
+
+    for(const pass of glowPasses){
+      ac.save();
+      ac.beginPath();
+      ac.rect(clipL, extTop - blurPx * 4, clipR - clipL, spanY + blurPx * 8);
+      ac.clip();
+      ac.globalAlpha = pass.alpha;
+      ac.shadowColor = sp.color;
+      ac.shadowBlur  = pass.blur;
+      ac.beginPath();
+      for(let i = 0; i <= pts; i++){
+        const x = (i / pts) * W;
+        if(i === 0) ac.moveTo(x, topY[i]); else ac.lineTo(x, topY[i]);
+      }
+      for(let i = pts; i >= 0; i--){
+        ac.lineTo((i / pts) * W, botY[i]);
+      }
+      ac.closePath();
+      ac.fillStyle = hg;
+      ac.fill();
+      ac.restore();
+    }
+  }
+}
+
+
+function drawAltAxis(){
+  const W = AC.width, H = AC.height;
+  const xA = W * 0.115;
+
+  // Main axis line — slightly brighter
+  ac.strokeStyle = '#2a5c7a';
+  ac.lineWidth   = 1;
+  ac.beginPath();
+  ac.moveTo(xA, altY(ALT_TOP - 5));
+  ac.lineTo(xA, altY(ALT_BOT + 5));
+  ac.stroke();
+
+  for(let a=100; a<=300; a+=50){
+    const y = altY(a);
+    // Tick mark — longer and brighter
+    ac.strokeStyle = '#2a5c7a';
+    ac.lineWidth   = 1;
+    ac.beginPath();
+    ac.moveTo(xA-6, y); ac.lineTo(xA+3, y);
+    ac.stroke();
+    // Tick label — brighter, slightly larger
+    ac.fillStyle  = '#9ad0e0';
+    ac.font       = '10px Courier New';
+    ac.textAlign  = 'right';
+    ac.fillText(a, xA-9, y+3.5);
+  }
+  ac.save();
+  ac.translate(xA-34, altY(230));
+  ac.rotate(-Math.PI/2);
+  ac.fillStyle   = '#9ad0e0';
+  ac.font        = '10px Courier New';
+  ac.textAlign   = 'center';
+  ac.fillText('HØJDE (km)', 0, 0);
+  ac.restore();
+
+  // Species labels — in right half
+  const xLbl = W * 0.955;
+  for(const [k,sp] of Object.entries(SP)){
+    if(!enabled[k]) continue;
+    let yMid = (altY(sp.altMax) + altY(sp.altMin)) * 0.5;
+    if(k === 'N2plus') yMid = altY(sp.altMin) - 8;
+    ac.fillStyle  = sp.color;
+    ac.font       = 'bold 9px Courier New';
+    ac.textAlign  = 'right';
+    ac.fillText(sp.wl + ' nm', xLbl, yMid+3);
+  }
+
+  // ── Vertical divider ──────────────────────────────────────────
+  const xDiv = W * SPLIT;
+  ac.strokeStyle = '#1a3a52';
+  ac.lineWidth   = 1;
+  ac.beginPath();
+  ac.moveTo(xDiv, altY(ALT_TOP));
+  ac.lineTo(xDiv, altY(ALT_BOT));
+  ac.stroke();
+
+  // Section labels
+  const lblY = altY(ALT_TOP) + 14;
+  ac.fillStyle  = '#7ab8cc';
+  ac.font       = 'bold 10px Courier New';
+  ac.textAlign  = 'center';
+  ac.fillText('SOLVIND — ELEKTRONER', W * SPLIT * 0.50, lblY);
+  ac.fillText('NORDLYS',  W * (SPLIT + (1-SPLIT)*0.50), lblY);
+}
+
+// ══════════════════════════════════════════════════════════════
+// PARTICLES
+// ══════════════════════════════════════════════════════════════
+function spawnParticle(){
+  const W = AC.width;
+  const xMin = W*0.14, xMax = W*(SPLIT - 0.04);
+  particles.push({
+    x: xMin + Math.random()*(xMax-xMin),
+    y: altY(ALT_TOP - 4),
+    vx:(Math.random()-0.5)*0.3,
+    vy:1.4 + Math.random()*0.9,
+    a: 0.5 + Math.random()*0.45,
+    r: 1.2 + Math.random()*0.9,
+    alive:true,
+  });
+}
+
+function updateParticles(){
+  const W = AC.width;
+  for(let i=particles.length-1; i>=0; i--){
+    const p = particles[i];
+    if(!p.alive){ particles.splice(i,1); continue; }
+
+    p.x += p.vx * speed;
+    p.y += p.vy * speed;
+
+    const alt = yToAlt(p.y);
+    if(alt < ALT_BOT || p.x < 0 || p.x > AC.width * SPLIT){ p.alive=false; continue; }
+
+    let excited = false;
+    for(const [k,sp] of Object.entries(SP)){
+      if(!enabled[k]) continue;
+      if(alt >= sp.altMin && alt <= sp.altMax){
+        if(Math.random() < spProb(k) * speed){
+          triggerEvent(p.x, p.y, k, alt);
+          p.alive = false;
+          excited = true;
+          break;
+        }
+      }
+    }
+
+    if(!excited){
+      ac.beginPath();
+      ac.arc(p.x, p.y, p.r, 0, Math.PI*2);
+      ac.shadowColor = '#aaccff';
+      ac.shadowBlur  = 5;
+      ac.fillStyle   = `rgba(175,215,255,${p.a})`;
+      ac.fill();
+      ac.shadowBlur = 0;
+    }
+  }
+}
+
+// ══════════════════════════════════════════════════════════════
+// EXCITATION EVENTS
+// ══════════════════════════════════════════════════════════════
+function triggerEvent(x, y, spKey, alt){
+  const sp = SP[spKey];
+  const now = performance.now()/1000;
+
+  let quenched = false;
+  if(spKey === 'O_green'){
+    // ¹S quenching: strong at low altitude (100km), negligible at 155km
+    const qChance = Math.max(0, 0.70 - (alt - 100) / (155 - 100) * 0.65);
+    if(Math.random() < qChance) quenched = true;
+  }
+  if(spKey === 'O_red'){
+    // ¹D quenching: only significant at lower altitudes (~200-230km)
+    // where density is still high enough for collisions during the 110s lifetime
+    const qChance = Math.max(0, 0.45 - (alt - 200) / (300 - 200) * 0.45);
+    if(Math.random() < qChance) quenched = true;
+  }
+
+  // Cap visual events per species to avoid pileup (max 2 at once)
+  const sameSpecies = events.filter(e => e.spKey === spKey);
+  if(sameSpecies.length >= 2) return;
+
+  events.push({ x, y, spKey, t:0, photons:[], quenched });
+  glowTarget[spKey] = Math.min(1, glowTarget[spKey] + (quenched ? 0.12 : 0.45));
+
+  // Update per-species diagram state
+  diagState[spKey] = { phase:'exciting', startT:now, deexcT:0, quenched };
+
+  // Info bar
+  activeEvt = { spKey };
+  setInfo(sp.infoExc, sp.color);
+
+  const excDelay  = Math.max(200, 1100 / speed);
+  const animDur   = 2500;   // ms — de-excitation arrow stays bright for this long
+  const idleDelay = excDelay + animDur + 400;
+
+  // Phase 1: exciting → deexciting
+  setTimeout(()=>{
+    if(diagState[spKey].phase === 'exciting' && diagState[spKey].startT === now){
+      diagState[spKey].phase  = 'deexciting';
+      diagState[spKey].deexcT = performance.now()/1000;
+    }
+    if(activeEvt && activeEvt.spKey === spKey)
+      setInfo(quenched ? sp.infoQ : sp.infoDe, quenched ? '#ffd93d' : sp.color);
+  }, excDelay);
+
+  // Phase 2: deexciting → idle
+  setTimeout(()=>{
+    if(diagState[spKey].phase === 'deexciting' && diagState[spKey].startT === now)
+      diagState[spKey].phase = 'idle';
+
+    // After ¹S → ¹D (green, not quenched), atom is now in ¹D.
+    // At low/moderate solar wind (below O_red threshold), ¹D → ³P always
+    // happens via collisional quenching — show this in the diagram.
+    if(spKey === 'O_green' && !quenched){
+      const cascDelay = Math.max(400, 2000 / speed);
+      setTimeout(()=>{
+        // Only trigger if O_red panel is not already busy
+        if(diagState['O_red'].phase !== 'idle') return;
+        const redSp = SP['O_red'];
+        const cascNow = performance.now()/1000;
+
+        // Mark as exciting briefly, then quench to 3P
+        diagState['O_red'] = { phase:'exciting', startT:cascNow, deexcT:0, quenched:true };
+        setInfo('Atom i ¹D-tilstand — collisional quenching: ¹D → ³P · varme · atom når grundtilstanden', redSp.color);
+
+        const cascExc = Math.max(100, 500 / speed);
+        setTimeout(()=>{
+          if(diagState['O_red'].phase === 'exciting' && diagState['O_red'].startT === cascNow){
+            diagState['O_red'].phase  = 'deexciting';
+            diagState['O_red'].deexcT = performance.now()/1000;
+          }
+        }, cascExc);
+
+        const cascIdle = cascExc + 600;  // clears quickly after squiggle
+        setTimeout(()=>{
+          if(diagState['O_red'].phase === 'deexciting' && diagState['O_red'].startT === cascNow)
+            diagState['O_red'].phase = 'idle';
+        }, cascIdle);
+
+      }, cascDelay);
+    }
+  }, idleDelay);
+}
+
+function drawEvents(dt){
+  for(let i=events.length-1; i>=0; i--){
+    const ev = events[i];
+    ev.t += dt * speed;
+    const sp = SP[ev.spKey];
+
+    // Excitation flash ring (0 → 0.28s)
+    if(ev.t < 0.28){
+      const pr = ev.t/0.28;
+      ac.beginPath();
+      ac.arc(ev.x, ev.y, pr*20, 0, Math.PI*2);
+      ac.strokeStyle = `rgba(255,255,180,${(1-pr)*0.85})`;
+      ac.lineWidth   = 1.5;
+      ac.shadowColor = '#ffffc0';
+      ac.shadowBlur  = 10;
+      ac.stroke();
+      ac.shadowBlur  = 0;
+    }
+
+    // Excited-molecule glow (0.08s → 0.78s)
+    if(ev.t > 0.08 && ev.t < 0.78){
+      const fIn  = Math.min(1,(ev.t-0.08)/0.15);
+      const fOut = 1 - Math.max(0,(ev.t-0.58)/0.2);
+      const a    = fIn * fOut;
+      const pulse = 3.5 + Math.sin(ev.t*28)*1.8;
+      ac.beginPath();
+      ac.arc(ev.x, ev.y, pulse, 0, Math.PI*2);
+      ac.fillStyle  = `${sp.glow}${a*0.85})`;
+      ac.shadowColor= sp.color;
+      ac.shadowBlur = 15;
+      ac.fill();
+      ac.shadowBlur = 0;
+      // white core dot
+      ac.beginPath();
+      ac.arc(ev.x, ev.y, 2, 0, Math.PI*2);
+      ac.fillStyle = `rgba(255,255,255,${a})`;
+      ac.fill();
+    }
+
+    // Spawn photon(s) at 0.78s
+    if(ev.t >= 0.78 && ev.photons.length === 0){
+      if(ev.quenched){
+        // Quenching: spawn 3 tiny heat-pulse rings, no directional photon
+        for(let j=0;j<3;j++){
+          const angle = Math.random()*Math.PI*2;
+          ev.photons.push({
+            x:ev.x, y:ev.y,
+            vx:Math.cos(angle)*0.9,
+            vy:Math.sin(angle)*0.9,
+            trail:[], alive:true, heat:true,
+          });
+        }
+      } else {
+        // Single photon in random direction
+        const angle = Math.random() * Math.PI * 2;
+        ev.photons.push({
+          x:ev.x, y:ev.y,
+          vx:Math.cos(angle)*2.5,
+          vy:Math.sin(angle)*2.5,
+          trail:[], alive:true, heat:false,
+        });
+      }
+    }
+
+    // Draw photons / heat pulses
+    for(const ph of ev.photons){
+      if(!ph.alive) continue;
+      const phAge = ev.t - 0.78;
+      ph.x += ph.vx * speed * 1.2;
+      ph.y += ph.vy * speed * 1.2;
+      ph.trail.push({x:ph.x, y:ph.y});
+      if(ph.trail.length > 10) ph.trail.shift();
+      const alpha = Math.max(0, 1 - phAge/(ph.heat ? 1.1 : 1.9));
+      if(alpha <= 0.01){ ph.alive=false; continue; }
+
+      if(ph.heat){
+        // Heat pulse: small orange/yellow expanding dot, no trail
+        ac.beginPath();
+        ac.arc(ph.x, ph.y, 2+phAge*8, 0, Math.PI*2);
+        ac.strokeStyle = `rgba(255,200,80,${alpha*0.5})`;
+        ac.lineWidth = 0.8;
+        ac.stroke();
+        ac.beginPath();
+        ac.arc(ph.x, ph.y, 1.5, 0, Math.PI*2);
+        ac.fillStyle = `rgba(255,180,60,${alpha*0.6})`;
+        ac.fill();
+      } else {
+        // Photon: colored trail + glowing ball
+        for(let ti=0;ti<ph.trail.length-1;ti++){
+          const ta=(ti/ph.trail.length)*alpha*0.55;
+          ac.beginPath();
+          ac.arc(ph.trail[ti].x, ph.trail[ti].y, 0.9+ti*0.18, 0, Math.PI*2);
+          ac.fillStyle = `${sp.glow}${ta})`;
+          ac.fill();
+        }
+        ac.beginPath();
+        ac.arc(ph.x, ph.y, 2.6, 0, Math.PI*2);
+        ac.fillStyle   = sp.color;
+        ac.shadowColor = sp.color;
+        ac.shadowBlur  = 12;
+        ac.globalAlpha = alpha;
+        ac.fill();
+        ac.globalAlpha = 1;
+        ac.shadowBlur  = 0;
+      }
+    }
+
+    if(ev.t > 3.5) events.splice(i,1);
+  }
+}
+
+// ══════════════════════════════════════════════════════════════
+// ENERGY LEVEL DIAGRAMS
+// ══════════════════════════════════════════════════════════════
+
+// Simple straight emission arrow (like hydrogen spectrum style)
+// progress = null → dim static; non-null → bright active (no moving dot — quantum jump)
+function drawPhotonArrow(ctx, x, yFrom, yTo, col, glowStr, progress, label){
+  const active = (progress !== null);
+  const dimCol = `${glowStr}0.40)`;
+
+  // Shaft
+  ctx.beginPath();
+  ctx.strokeStyle = active ? col : dimCol;
+  ctx.lineWidth   = active ? 2 : 1;
+  if(active){ ctx.shadowColor=col; ctx.shadowBlur=8; }
+  ctx.moveTo(x, yFrom);
+  ctx.lineTo(x, yTo - 6);
+  ctx.stroke();
+  ctx.shadowBlur = 0;
+
+  // Arrowhead pointing downward
+  ctx.beginPath();
+  ctx.moveTo(x,    yTo);
+  ctx.lineTo(x-5,  yTo-10);
+  ctx.lineTo(x+5,  yTo-10);
+  ctx.closePath();
+  ctx.fillStyle = active ? col : dimCol;
+  if(active){ ctx.shadowColor=col; ctx.shadowBlur=8; }
+  ctx.fill();
+  ctx.shadowBlur = 0;
+
+  // Wavelength label
+  ctx.fillStyle = active ? col : dimCol;
+  ctx.font      = 'bold 11px Courier New';
+  ctx.textAlign = 'left';
+  ctx.fillText(label, x + 8, (yFrom + yTo) / 2 + 4);
+}
+
+// Upward excitation arrow (straight dashed) for 'exciting' phase
+function drawExcArrow(ctx, x, yFrom, yTo, col, glow){
+  ctx.setLineDash([3,4]);
+  ctx.strokeStyle = `${glow}0.7)`;
+  ctx.lineWidth   = 1;
+  ctx.shadowColor = col;
+  ctx.shadowBlur  = 6;
+  ctx.beginPath();
+  ctx.moveTo(x, yFrom); ctx.lineTo(x, yTo);
+  ctx.stroke();
+  ctx.setLineDash([]);
+  ctx.shadowBlur = 0;
+  // Arrowhead upward
+  ctx.beginPath();
+  ctx.moveTo(x, yTo);
+  ctx.lineTo(x-4, yTo+8);
+  ctx.lineTo(x+4, yTo+8);
+  ctx.closePath();
+  ctx.fillStyle  = `${glow}0.7)`;
+  ctx.shadowColor= col;
+  ctx.shadowBlur = 6;
+  ctx.fill();
+  ctx.shadowBlur = 0;
+}
+
+function drawAxis(ctx, pL, pT, pB, H, eMax, steps){
+  ctx.strokeStyle = '#1a3a52';
+  ctx.lineWidth   = 1;
+  ctx.beginPath();
+  ctx.moveTo(pL, pT); ctx.lineTo(pL, H-pB);
+  ctx.stroke();
+  for(let e=0;e<=steps;e++){
+    const y = pT + (1-e/eMax)*(H-pT-pB);
+    ctx.strokeStyle='#1a3a52'; ctx.lineWidth=0.5;
+    ctx.beginPath(); ctx.moveTo(pL-4,y); ctx.lineTo(pL,y); ctx.stroke();
+    ctx.fillStyle='#5a8898'; ctx.font='7px Courier New'; ctx.textAlign='right';
+    ctx.fillText(e, pL-6, y+2.5);
+  }
+  ctx.fillStyle='#5a8898'; ctx.font='7px Courier New'; ctx.textAlign='right';
+  const topY = pT + (1-steps/eMax)*(H-pT-pB);
+  ctx.fillText('eV', pL-6, topY-4);
+}
+
+function drawLevel(ctx, y, xL, xR, label, sub, col, highlighted){
+  ctx.strokeStyle = highlighted ? '#ffffff' : (col+'70');
+  ctx.lineWidth   = highlighted ? 2 : 1;
+  if(highlighted){ ctx.shadowColor='#ffffff'; ctx.shadowBlur=9; }
+  ctx.beginPath(); ctx.moveTo(xL,y); ctx.lineTo(xR,y); ctx.stroke();
+  ctx.shadowBlur = 0;
+  ctx.fillStyle  = highlighted ? '#ffffff' : col;
+  ctx.font       = `${highlighted?'bold ':''}9px Courier New`;
+  ctx.textAlign  = 'right';
+  ctx.fillText(label, xR, y-3);
+  ctx.fillStyle  = '#5a8898'; ctx.font='7px Courier New';
+  ctx.fillText(sub, xR, y+10);
+}
+
+function drawQuenchArrow(ctx, x, yFrom, yTo, progress){
+  const dy   = yTo - yFrom;
+  const steps = Math.floor(progress * 24);
+  const col  = '#ffd93d';
+  ctx.strokeStyle = `rgba(255,217,61,0.75)`;
+  ctx.lineWidth   = 1;
+  ctx.shadowColor = col; ctx.shadowBlur = 5;
+  ctx.beginPath();
+  for(let i=0;i<=steps;i++){
+    const t  = i/24;
+    const px = x + (i%2===0 ? -5 : 5);
+    const py = yFrom + dy*t;
+    if(i===0) ctx.moveTo(px,py); else ctx.lineTo(px,py);
+  }
+  ctx.stroke();
+  ctx.shadowBlur = 0;
+  // Label
+  ctx.fillStyle = `rgba(255,217,61,${0.4+progress*0.5})`;
+  ctx.font = '8px Courier New'; ctx.textAlign = 'left';
+  ctx.fillText('quench (varme)', x+9, (yFrom+yTo)/2+3);
+}
+
+function drawODiagram(){
+  const W=OC.width, H=OC.height;
+  if(W<=0||H<=0) return;
+  oc.fillStyle='#040a12'; oc.fillRect(0,0,W,H);
+
+  const eMax=5.1, pL=33, pR=8, pT=16, pB=18;
+  const eH=H-pT-pB;
+  const ey = e => pT + (1-e/eMax)*eH;
+  drawAxis(oc, pL, pT, pB, H, eMax, 4);
+
+  const now = performance.now()/1000;
+  const xL2=pL+5, xR2=W-pR;
+  const xArG = pL + (W-pL-pR)*0.45;
+  const xArR = pL + (W-pL-pR)*0.70;
+
+  const dsG = diagState.O_green;
+  const dsR = diagState.O_red;
+
+  const exciting_G  = dsG.phase === 'exciting';
+  const exciting_R  = dsR.phase === 'exciting';
+  const deexc_G     = dsG.phase === 'deexciting';
+  const deexc_R     = dsR.phase === 'deexciting';
+  const quenched_G  = deexc_G && dsG.quenched;
+  const quenched_R  = deexc_R && dsR.quenched;
+
+  let progG = null, progR = null;
+  if(deexc_G && dsG.deexcT) progG = Math.min(1, (now - dsG.deexcT) / 2.5);
+  if(deexc_R && dsR.deexcT) progR = Math.min(1, (now - dsR.deexcT) / 2.5);
+
+  if(exciting_G) drawExcArrow(oc, xArG, ey(0), ey(4.19), '#00d45a','rgba(0,212,90,');
+  if(exciting_R) drawExcArrow(oc, xArR, ey(0), ey(1.97), '#ff4444','rgba(255,68,68,');
+
+  // ¹S → ¹D: photon or quench
+  if(!quenched_G)
+    drawPhotonArrow(oc, xArG, ey(4.19), ey(1.97), '#00d45a','rgba(0,212,90,', progG, '557,7 nm');
+  else {
+    const t_q = Math.min(1, (now - dsG.deexcT) / 0.5);
+    drawQuenchArrow(oc, xArG, ey(4.19), ey(1.97), t_q);
+  }
+
+  // ¹D → ³P: photon or quench
+  if(!quenched_R)
+    drawPhotonArrow(oc, xArR, ey(1.97), ey(0), '#ff4444','rgba(255,68,68,', progR, '630,0 nm');
+  else {
+    const t_q = Math.min(1, (now - dsR.deexcT) / 0.5);
+    drawQuenchArrow(oc, xArR, ey(1.97), ey(0), t_q);
+  }
+
+  // Levels — destination level highlights as soon as its arrow/squiggle appears
+  drawLevel(oc, ey(0),    xL2, xR2, '³P', '0 eV',     '#d0eef5', deexc_R);
+  drawLevel(oc, ey(1.97), xL2, xR2, '¹D', '1,97 eV',  '#ff4444', exciting_R || deexc_G);
+  drawLevel(oc, ey(4.19), xL2, xR2, '¹S', '4,19 eV',  '#00d45a', exciting_G);
+}
+
+function drawN2Diagram(){
+  const W=NC.width, H=NC.height;
+  if(W<=0||H<=0) return;
+  nc.fillStyle='#040a12'; nc.fillRect(0,0,W,H);
+
+  const eMax=3.7, pL=33, pR=8, pT=20, pB=20;
+  const eH=H-pT-pB;
+  const ey = e => pT + (1-e/eMax)*eH;
+  drawAxis(nc, pL, pT, pB, H, eMax, 3);
+
+  const now=performance.now()/1000;
+  const xL2=pL+5, xR2=W-pR;
+  const xAr=pL+(W-pL-pR)*0.52;
+
+  const ds      = diagState.N2plus;
+  const exc_N2  = ds.phase === 'exciting';
+  const deexc   = ds.phase === 'deexciting';
+  let prog = null;
+  if(deexc) prog = ds.deexcT ? Math.min(1, (now - ds.deexcT) / 2.5) : 0;
+
+  if(exc_N2) drawExcArrow(nc, xAr, ey(0), ey(2.90), '#9977ff', 'rgba(153,119,255,');
+  drawPhotonArrow(nc, xAr, ey(2.90), ey(0), '#9977ff', 'rgba(153,119,255,', prog, '428 nm');
+
+  drawLevel(nc, ey(0),    xL2, xR2, 'X²Σ⁺ᵍ', 'Grundtilstand', '#d0eef5', deexc);
+  drawLevel(nc, ey(2.90), xL2, xR2, 'B²Σ⁺ᵤ',  '2,90 eV',       '#9977ff', exc_N2);
+}
+
+// ══════════════════════════════════════════════════════════════
+// INFO PANEL
+// ══════════════════════════════════════════════════════════════
+const infoEl = document.getElementById('infoText');
+const dotEl  = document.getElementById('infoDot');
+function setInfo(text, color){
+  infoEl.textContent = text;
+  dotEl.style.background = color;
+  dotEl.style.boxShadow  = `0 0 7px ${color}`;
+}
+
+// ══════════════════════════════════════════════════════════════
+// MAIN LOOP
+// ══════════════════════════════════════════════════════════════
+function loop(ts){
+  const dt = Math.min((ts-lastTs)/1000, 0.1);
+  lastTs = ts;
+
+  auroraTime += running ? dt * speed : 0;
+
+  if(running){
+    lastSpawn += dt;
+    // Particle spawn rate and count scale strongly with solar wind
+    const si = (0.42 - solarWind * 0.30) / speed;
+    if(lastSpawn > si){
+      lastSpawn = 0;
+      const n = 1
+        + (Math.random() < 0.25 + solarWind * 0.45 ? 1 : 0)
+        + (Math.random() < solarWind * 0.50 ? 1 : 0)
+        + (Math.random() < solarWind * 0.30 ? 1 : 0);
+      for(let i=0;i<n;i++) spawnParticle();
+    }
+    // Max on-screen particles: 15 at Stille → 120 at Storm
+    const maxP = Math.round(15 + solarWind * 105);
+    while(particles.length > maxP) particles.shift();
+    // Smooth glow: fade target down slowly, move actual glow toward target gradually
+    for(const k of Object.keys(glow)){
+      glowTarget[k] = Math.max(0, glowTarget[k] - dt * 0.08);   // target fades slowly
+      const diff = glowTarget[k] - glow[k];
+      if(diff > 0) glow[k] = Math.min(glowTarget[k], glow[k] + dt * 0.15);  // rise: ~2s to full
+      else         glow[k] = Math.max(0, glow[k] - dt * 0.04);              // fall: very slow
+    }
+  }
+
+  // Draw aurora
+  drawBg();
+  drawStars();
+  drawAuroraColumn();
+  drawAltBands();
+  drawAltAxis();
+  if(running) updateParticles();
+  else {
+    for(const p of particles){
+      ac.beginPath(); ac.arc(p.x,p.y,p.r,0,Math.PI*2);
+      ac.fillStyle=`rgba(175,215,255,${p.a})`; ac.fill();
+    }
+  }
+  drawEvents(running ? dt : 0.016);
+
+  // Draw energy diagrams
+  drawODiagram();
+  drawN2Diagram();
+
+  requestAnimationFrame(loop);
+}
+
+// ══════════════════════════════════════════════════════════════
+// CONTROLS
+// ══════════════════════════════════════════════════════════════
+document.getElementById('playBtn').addEventListener('click', function(){
+  running = !running;
+  this.textContent = running ? '⏸ PAUSE' : '▶ AFSPIL';
+});
+
+document.getElementById('resetBtn').addEventListener('click', ()=>{
+  running = false;
+  document.getElementById('playBtn').textContent = '▶ AFSPIL';
+  particles.length = 0;
+  events.length = 0;
+  for(const k of Object.keys(glow)){ glow[k] = 0; glowTarget[k] = 0; }
+  for(const k of Object.keys(diagState)) diagState[k] = { phase:'idle', startT:0, deexcT:0, quenched:false };
+  activeEvt = null;
+  auroraTime = 0;
+  lastSpawn = 0;
+  setInfo('Simulering nulstillet — tryk AFSPIL for at starte igen.', '#8ec8d8');
+  dotEl.style.background = '#1a3a52';
+  dotEl.style.boxShadow = 'none';
+});
+
+document.getElementById('copyBtn').addEventListener('click', function(){
+  fetch(location.href)
+    .then(r => r.text())
+    .then(html => {
+      navigator.clipboard.writeText(html).then(()=>{
+        const orig = this.textContent;
+        this.textContent = '✓ KOPIERET';
+        setTimeout(()=>{ this.textContent = orig; }, 2000);
+      });
+    })
+    .catch(()=>{
+      // Fallback: copy page source via textarea
+      const ta = document.createElement('textarea');
+      ta.value = document.documentElement.outerHTML;
+      document.body.appendChild(ta);
+      ta.select();
+      document.execCommand('copy');
+      document.body.removeChild(ta);
+      const orig = this.textContent;
+      this.textContent = '✓ KOPIERET';
+      setTimeout(()=>{ this.textContent = orig; }, 2000);
+    });
+});
+document.getElementById('speedSlider').addEventListener('input', e=>{
+  speed = parseFloat(e.target.value);
+});
+const solarSlider = document.getElementById('solarSlider');
+const solarLabel  = document.getElementById('solarLabel');
+const solarSteps  = ['Stille', 'Svag', 'Moderat', 'Kraftig', 'Storm'];
+const solarVals   = [0, 0.22, 0.52, 0.76, 1.0];
+function updateSolarLabel(){
+  const step = parseInt(solarSlider.value);
+  solarWind = solarVals[step];
+  solarLabel.textContent = solarSteps[step];
+}
+solarSlider.addEventListener('input', updateSolarLabel);
+updateSolarLabel();
+document.querySelectorAll('.tog').forEach(btn=>{
+  btn.addEventListener('click', ()=>{
+    const sp = btn.dataset.sp;
+    enabled[sp] = !enabled[sp];
+    btn.classList.toggle('on', enabled[sp]);
+  });
+});
+
+// ══════════════════════════════════════════════════════════════
+// MODAL
+// ══════════════════════════════════════════════════════════════
+const overlay = document.getElementById('modalOverlay');
+document.getElementById('faktaBtn').addEventListener('click', ()=>{
+  overlay.classList.add('open');
+});
+document.getElementById('modalClose').addEventListener('click', ()=>{
+  overlay.classList.remove('open');
+});
+overlay.addEventListener('click', e=>{
+  if(e.target === overlay) overlay.classList.remove('open');
+});
+document.addEventListener('keydown', e=>{
+  if(e.key==='Escape') overlay.classList.remove('open');
+});
+
+// ══════════════════════════════════════════════════════════════
+// START
+// ══════════════════════════════════════════════════════════════
+requestAnimationFrame(ts=>{ lastTs=ts; requestAnimationFrame(loop); });
+</script>
+</body>
+</html>
