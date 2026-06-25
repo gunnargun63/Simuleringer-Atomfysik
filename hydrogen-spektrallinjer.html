@@ -3,112 +3,211 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>Bohr-modellen & Spektrallinjer</title>
+<title>Bohr-modellen – Spektrallinjer</title>
 <style>
 *,*::before,*::after{box-sizing:border-box;margin:0;padding:0}
 
 :root{
-  --bg:#05050e;--bg2:#0a0a1c;--border:rgba(0,229,255,.22);
-  --ac:#00e5ff;--ac2:#ff2d78;--ac3:#39ff14;
-  --tx:#ddeeff;--dm:#6a8aaa;--dm2:#99bbdd;
+  --bg0:#030810; --bg1:#060e18; --bg2:#0a1622; --bg3:#0f1e2d;
+  --border:#1a3a52;
+  --green:#00ff9f; --cyan:#00cfff; --yellow:#ffd93d;
+  --pink:#ff2d78;
+  --text:#d0eef5; --dim:#8ec8d8;
+  --font:'Courier New','Lucida Console',monospace;
+  --tr:0.15s ease;
 }
-.light{
-  --bg:#f0f4ff;--bg2:#e4e8ff;--border:rgba(0,50,170,.22);
-  --ac:#0044cc;--ac2:#cc0055;--ac3:#006633;
-  --tx:#00112a;--dm:#334466;--dm2:#5577aa;
+[data-theme="light"]{
+  --bg0:#e8e0d2; --bg1:#f4eee3; --bg2:#fdfaf4; --bg3:#fdfaf4;
+  --border:#d6cbb8;
+  --green:#1D9E75; --cyan:#378ADD; --yellow:#c07800;
+  --pink:#c0306a;
+  --text:#1a1a1a; --dim:#333333;
 }
 
 body{
-  background:var(--bg);color:var(--tx);
-  font-family:'Courier New',Courier,monospace;
-  display:flex;justify-content:center;align-items:flex-start;
-  min-height:100vh;padding:10px;
-  transition:background .3s,color .3s;
+  background:var(--bg0); color:var(--text);
+  font-family:var(--font);
+  display:flex; justify-content:center; align-items:flex-start;
+  min-height:100vh; padding:10px;
+  transition:background .3s, color .3s;
 }
-.sim{width:986px;max-width:100%}
+.sim{width:986px; max-width:100%}
 
+/* ── Header (left-aligned, atom icon + two-color title) ── */
 .hd{
-  text-align:center;padding-bottom:8px;
-  border-bottom:1px solid var(--border);margin-bottom:8px;
-  position:relative;
+  display:flex; align-items:center; gap:12px;
+  padding:6px 4px 10px;
+  border-bottom:1px solid var(--border);
+  margin-bottom:10px;
 }
-.hd-title{font-size:15px;letter-spacing:4px;color:var(--ac);font-weight:bold;text-shadow:0 0 16px rgba(0,229,255,.5)}
-.light .hd-title{text-shadow:0 0 10px rgba(0,68,204,.3)}
-.hd-sub{font-size:11px;letter-spacing:2px;color:var(--dm2);margin-top:3px}
-.hd-crn{position:absolute;top:0;font-size:10px;color:var(--border)}
-.hd-crn-l{left:0}.hd-crn-r{right:0}
+.atom-icon{
+  width:26px; height:26px; color:var(--green);
+  display:inline-flex; flex-shrink:0;
+  animation:apulse 2.5s ease-in-out infinite;
+}
+.atom-icon svg{display:block; width:100%; height:100%}
+@keyframes apulse{
+  0%,100%{opacity:1; filter:drop-shadow(0 0 6px var(--green))}
+  50%    {opacity:.55; filter:none}
+}
+[data-theme="light"] .atom-icon{animation:apulse-l 2.5s ease-in-out infinite}
+@keyframes apulse-l{
+  0%,100%{opacity:1}
+  50%    {opacity:.55}
+}
+.hd-titles{display:flex; flex-direction:column; gap:2px; min-width:0}
+.hd-title{
+  font-size:15px; letter-spacing:.18em; font-weight:700;
+  text-shadow:0 0 12px rgba(0,255,159,.18);
+}
+[data-theme="light"] .hd-title{text-shadow:none}
+.t-green{color:var(--green)}
+.t-cyan {color:var(--cyan)}
+.t-dash {color:var(--green); margin:0 .15em}
+.hd-sub{
+  font-size:11px; letter-spacing:.16em; color:var(--dim);
+}
+[data-theme="light"] .hd-sub{font-weight:700; color:#333}
 
-.main{display:flex;gap:8px;margin-bottom:8px}
-canvas{display:block;border:1px solid var(--border);transition:border-color .3s}
-#aC{flex:1;min-width:0}
-#eC{width:294px;flex-shrink:0}
+/* ── Main canvases ── */
+.main{display:flex; gap:8px; margin-bottom:8px}
+canvas{display:block; border:1px solid var(--border); transition:border-color .3s; background:var(--bg1)}
+#aC{flex:1; min-width:0}
+#eC{width:294px; flex-shrink:0}
 
-.ctrl{background:var(--bg2);border:1px solid var(--border);padding:10px 13px;transition:background .3s}
+/* ── Control panel ── */
+.ctrl{
+  background:var(--bg1); border:1px solid var(--border);
+  padding:10px 13px; transition:background .3s, border-color .3s;
+}
 
-.st-row{display:flex;justify-content:space-between;align-items:center;margin-bottom:8px;gap:8px;min-height:24px}
-.st-txt{font-size:12px;color:var(--dm2);letter-spacing:.5px;flex:1;min-width:0;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
-.badge{font-size:11px;letter-spacing:1.5px;padding:2px 9px;border:1px solid;flex-shrink:0;white-space:nowrap}
-.b-yes{border-color:var(--ac3);color:var(--ac3);background:rgba(57,255,20,.07)}
-.b-no {border-color:var(--ac2);color:var(--ac2);background:rgba(255,45,120,.07)}
-.b-ion{border-color:#ffaa00;color:#ffaa00;background:rgba(255,170,0,.08)}
+.st-row{display:flex; justify-content:space-between; align-items:center;
+        margin-bottom:8px; gap:8px; min-height:24px}
+.st-txt{
+  font-size:12px; color:var(--dim); letter-spacing:.5px;
+  flex:1; min-width:0; overflow:hidden; text-overflow:ellipsis; white-space:nowrap;
+}
+[data-theme="light"] .st-txt{color:#1a1a1a; font-weight:700}
 
-.sl-row{display:flex;align-items:center;gap:10px;margin-bottom:8px}
-.sl-lbl{font-size:11px;color:var(--ac);letter-spacing:2px;width:108px;flex-shrink:0}
-input[type=range]{flex:1;accent-color:var(--ac);cursor:pointer;height:3px}
-.sl-val{font-size:13px;min-width:68px;text-align:right;color:var(--tx);white-space:nowrap}
-.sl-ev{font-size:12px;color:var(--ac3);min-width:60px;text-align:right;white-space:nowrap}
+.badge{
+  font-size:11px; letter-spacing:1.5px; padding:2px 9px;
+  border:1px solid; flex-shrink:0; white-space:nowrap;
+}
+.b-yes{border-color:var(--green); color:var(--green); background:rgba(0,255,159,.07)}
+.b-no {border-color:var(--pink);  color:var(--pink);  background:rgba(255,45,120,.07)}
+.b-ion{border-color:var(--yellow);color:var(--yellow);background:rgba(255,217,61,.09)}
+[data-theme="light"] .b-yes{background:rgba(29,158,117,.09); font-weight:700}
+[data-theme="light"] .b-no {background:rgba(192,48,106,.08); font-weight:700}
+[data-theme="light"] .b-ion{background:rgba(192,120,0,.10); font-weight:700}
 
-.swatch-row{display:flex;align-items:center;gap:10px;margin-bottom:9px}
-.swatch-lbl{font-size:11px;color:var(--dm2);letter-spacing:2px;width:108px;flex-shrink:0}
-.swatch-bar{flex:1;height:8px;position:relative;overflow:visible}
-.swatch-marker{position:absolute;top:-3px;width:3px;height:14px;background:var(--tx);transform:translateX(-50%);box-shadow:0 0 5px rgba(255,255,255,.6);transition:left .08s}
-.swatch-tag{font-size:11px;min-width:62px;text-align:right;white-space:nowrap}
+.sl-row{display:flex; align-items:center; gap:10px; margin-bottom:8px}
+.sl-lbl{font-size:11px; color:var(--cyan); letter-spacing:2px; width:108px; flex-shrink:0}
+input[type=range]{flex:1; accent-color:var(--cyan); cursor:pointer; height:3px}
+.sl-val{font-size:13px; min-width:68px; text-align:right; color:var(--text); white-space:nowrap}
+.sl-ev{font-size:12px; color:var(--green); min-width:60px; text-align:right; white-space:nowrap}
+[data-theme="light"] .sl-lbl{font-weight:700}
+[data-theme="light"] .sl-val{font-weight:700}
+[data-theme="light"] .sl-ev{font-weight:700}
 
-/* START LEVEL SELECTOR */
-.nl-row{display:flex;align-items:center;gap:10px;margin-bottom:9px}
-.nl-lbl{font-size:11px;color:var(--ac);letter-spacing:2px;width:108px;flex-shrink:0}
-.nl-btns{display:flex;gap:4px;flex:1}
+.swatch-row{display:flex; align-items:center; gap:10px; margin-bottom:9px}
+.swatch-lbl{font-size:11px; color:var(--dim); letter-spacing:2px; width:108px; flex-shrink:0}
+[data-theme="light"] .swatch-lbl{color:#1a1a1a; font-weight:700}
+.swatch-bar{flex:1; height:8px; position:relative; overflow:visible; border:1px solid var(--border)}
+.swatch-marker{
+  position:absolute; top:-4px; width:3px; height:16px;
+  background:var(--text); transform:translateX(-50%);
+  box-shadow:0 0 5px rgba(255,255,255,.6); transition:left .08s;
+}
+[data-theme="light"] .swatch-marker{background:#000; box-shadow:0 0 4px rgba(0,0,0,.4)}
+.swatch-tag{font-size:11px; min-width:62px; text-align:right; white-space:nowrap; font-weight:700}
+
+/* ── Akkumuleret spektrum-række (erstatter FOTONFARVE i akkumulerings-mode) ── */
+.spec-row{display:none; align-items:flex-end; gap:10px; margin-bottom:9px}
+.spec-row.on{display:flex}
+.swatch-row.off{display:none}
+.spec-lbl{font-size:11px; color:var(--cyan); letter-spacing:2px; width:108px; flex-shrink:0; padding-bottom:2px}
+[data-theme="light"] .spec-lbl{font-weight:700}
+.spec-canvas{flex:1; height:62px; display:block; border:1px solid var(--border); background:#000}
+[data-theme="light"] .spec-canvas{background:#1a1a1a; border-color:#888}
+.spec-tag{font-size:10px; min-width:62px; text-align:right; white-space:nowrap; color:var(--dim); padding-bottom:2px; line-height:1.3}
+[data-theme="light"] .spec-tag{color:#1a1a1a; font-weight:700}
+
+/* ── Start-level selector ── */
+.nl-row{display:flex; align-items:center; gap:10px; margin-bottom:9px}
+.nl-lbl{font-size:11px; color:var(--cyan); letter-spacing:2px; width:108px; flex-shrink:0}
+[data-theme="light"] .nl-lbl{font-weight:700}
+.nl-btns{display:flex; gap:4px; flex:1}
 .nl-btn{
-  flex:1;background:transparent;border:1px solid var(--dm);color:var(--dm2);
-  font-family:'Courier New',monospace;font-size:11px;letter-spacing:1px;
-  padding:4px 0;cursor:pointer;text-align:center;transition:all .15s;
+  flex:1; background:transparent; border:1px solid var(--dim); color:var(--dim);
+  font-family:var(--font); font-size:11px; letter-spacing:1px;
+  padding:4px 0; cursor:pointer; text-align:center; transition:all var(--tr);
   text-transform:none;
 }
-.nl-btn:hover{border-color:var(--ac);color:var(--ac)}
+.nl-btn:hover{border-color:var(--cyan); color:var(--cyan)}
 .nl-btn.nl-on{
-  border-color:var(--ac);color:var(--ac);
-  background:rgba(0,229,255,.13);
-  box-shadow:0 0 8px rgba(0,229,255,.35);
+  border-color:var(--cyan); color:var(--cyan);
+  background:rgba(0,207,255,.13);
+  box-shadow:0 0 8px rgba(0,207,255,.35);
 }
-.light .nl-btn.nl-on{background:rgba(0,68,204,.1);box-shadow:0 0 8px rgba(0,68,204,.25)}
+[data-theme="light"] .nl-btn{color:#1a1a1a; border-color:#a89c88; font-weight:700}
+[data-theme="light"] .nl-btn:hover{border-color:var(--cyan); color:var(--cyan); background:rgba(55,138,221,.06)}
+[data-theme="light"] .nl-btn.nl-on{
+  background:var(--cyan); border-color:var(--cyan); color:#fff;
+  box-shadow:none;
+}
 
-.btn-row{display:flex;gap:7px;justify-content:center;flex-wrap:wrap}
+/* ── Buttons ── */
+.btn-row{display:flex; gap:7px; justify-content:center; flex-wrap:wrap}
 button{
-  background:transparent;border:1px solid var(--ac);color:var(--ac);
-  font-family:'Courier New',monospace;font-size:11px;letter-spacing:2px;
-  padding:6px 13px;cursor:pointer;transition:background .15s,box-shadow .15s;
+  background:transparent; border:1px solid var(--cyan); color:var(--cyan);
+  font-family:var(--font); font-size:11px; letter-spacing:2px;
+  padding:6px 13px; cursor:pointer; transition:background var(--tr), box-shadow var(--tr);
   text-transform:uppercase;
 }
-button:hover{background:rgba(0,229,255,.1);box-shadow:0 0 12px rgba(0,229,255,.3)}
-.light button:hover{background:rgba(0,68,204,.08);box-shadow:0 0 10px rgba(0,68,204,.25)}
-button.on{background:rgba(0,229,255,.15)}
-/* NOTE: Nulstil now has same style as Afspil (no b2 class) */
-.bm{border-color:var(--dm);color:var(--dm)}
-.bm:hover{background:rgba(60,90,120,.18)!important;box-shadow:none!important}
+button:hover{background:rgba(0,207,255,.1); box-shadow:0 0 12px rgba(0,207,255,.3)}
+button.on{background:rgba(0,207,255,.18)}
+.bm{border-color:var(--dim); color:var(--dim)}
+.bm:hover{background:rgba(140,180,200,.10)!important; box-shadow:none!important}
+
+[data-theme="light"] button{color:#1a1a1a; border-color:var(--cyan); font-weight:700}
+[data-theme="light"] button:hover{background:rgba(55,138,221,.08); box-shadow:none}
+[data-theme="light"] button.on{background:var(--cyan); color:#fff}
+[data-theme="light"] .bm{color:#1a1a1a; border-color:#a89c88}
+[data-theme="light"] .bm:hover{background:rgba(0,0,0,.05)!important}
 </style>
 </head>
 <body>
 <div class="sim">
   <div class="hd">
-    <div class="hd-crn hd-crn-l">╔═</div>
-    <div class="hd-crn hd-crn-r">═╗</div>
-    <div class="hd-title">{ BOHR-MODELLEN &amp; SPEKTRALLINJER }</div>
-    <div class="hd-sub">HYDROGEN · ENERGINIVEAUER n=1..6 · DIPOLTRANSITIONER</div>
+    <span class="atom-icon" aria-hidden="true">
+      <svg viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
+        <defs>
+          <radialGradient id="acloud" cx="50%" cy="50%" r="50%">
+            <stop offset="0%"   stop-color="currentColor" stop-opacity="0.55"/>
+            <stop offset="55%"  stop-color="currentColor" stop-opacity="0.20"/>
+            <stop offset="100%" stop-color="currentColor" stop-opacity="0"/>
+          </radialGradient>
+        </defs>
+        <!-- s-orbital probability cloud -->
+        <circle cx="12" cy="12" r="9" fill="url(#acloud)"/>
+        <!-- p-orbital lobes (crossed) -->
+        <ellipse cx="12" cy="12" rx="10.5" ry="3.4" fill="none" stroke="currentColor" stroke-width="0.8" opacity="0.7"/>
+        <ellipse cx="12" cy="12" rx="3.4" ry="10.5" fill="none" stroke="currentColor" stroke-width="0.8" opacity="0.7"/>
+        <!-- nucleus -->
+        <circle cx="12" cy="12" r="1.7" fill="currentColor"/>
+      </svg>
+    </span>
+    <div class="hd-titles">
+      <div class="hd-title"><span class="t-green">BOHR-MODELLEN</span><span class="t-dash">–</span><span class="t-cyan">SPEKTRALLINJER</span></div>
+      <div class="hd-sub">HYDROGEN · ENERGINIVEAUER n=1..6 · DIPOLTRANSITIONER</div>
+    </div>
   </div>
+
   <div class="main">
     <canvas id="aC" width="659" height="448"></canvas>
     <canvas id="eC" width="294" height="448"></canvas>
   </div>
+
   <div class="ctrl">
     <div class="st-row">
       <span class="st-txt" id="stTxt">KLAR — VÆLG BØLGELÆNGDE OG KLIK AFSPIL</span>
@@ -118,10 +217,11 @@ button.on{background:rgba(0,229,255,.15)}
       <span class="nl-lbl">STARTTILSTAND</span>
       <div class="nl-btns" id="nlBtns">
         <button class="nl-btn nl-on" data-n="1">n=1</button>
-        <button class="nl-btn" data-n="2">n=2</button>
-        <button class="nl-btn" data-n="3">n=3</button>
-        <button class="nl-btn" data-n="4">n=4</button>
-        <button class="nl-btn" data-n="5">n=5</button>
+        <button class="nl-btn"        data-n="2">n=2</button>
+        <button class="nl-btn"        data-n="3">n=3</button>
+        <button class="nl-btn"        data-n="4">n=4</button>
+        <button class="nl-btn"        data-n="5">n=5</button>
+        <button class="nl-btn"        data-n="6">n=6</button>
       </div>
     </div>
     <div class="sl-row">
@@ -130,16 +230,22 @@ button.on{background:rgba(0,229,255,.15)}
       <span class="sl-val"><span id="wlv">121.6</span> nm</span>
       <span class="sl-ev"><span id="ev">10.20</span> eV</span>
     </div>
-    <div class="swatch-row">
+    <div class="swatch-row" id="swatchRow">
       <span class="swatch-lbl">FOTONFARVE</span>
       <div class="swatch-bar" id="swatchBar">
         <div class="swatch-marker" id="swatchMark"></div>
       </div>
       <span class="swatch-tag" id="swatchTag" style="color:#dd55ff">UV / 122 nm</span>
     </div>
+    <div class="spec-row" id="specRow">
+      <span class="spec-lbl">SPEKTRUM</span>
+      <canvas class="spec-canvas" id="specCanvas" width="770" height="62"></canvas>
+      <span class="spec-tag" id="specTag">0 fotoner</span>
+    </div>
     <div class="btn-row">
       <button id="playBtn">▶ AFSPIL</button>
       <button id="resetBtn">↺ NULSTIL</button>
+      <button id="clearBtn" class="bm">✕ RYD SPEKTRUM</button>
       <button id="copyBtn">⎘ KOPIER KODE</button>
       <button id="modeBtn" class="bm">☀ LYS TILSTAND</button>
     </div>
@@ -170,17 +276,38 @@ function findAbs(lam) {
   return null;
 }
 
-// Wavelength → bright glowing color
+// Wavelength → color. Theme-aware. Pædagogisk farvelogik:
+//   • UV (<380 nm) tegnes som blåhvid — signalere "usynlig for øjet, kort λ".
+//   • Synligt område (380-700 nm) får ægte regnbuefarver: H-α 656 → rød,
+//     H-β 486 → cyan-blå, H-γ 434 → blå-violet, H-δ 410 → violet.
+//   • IR (>700 nm) tegnes som lysegrå — signalere "usynlig, lang λ".
+// Effekt: i spektrum og energidiagram er Balmer-linjerne de eneste farvede,
+// mens Lyman og Paschen står som neutrale, så man visuelt ser hvad et menneske
+// kan se vs. hvad et instrument måler.
 function wlCol(nm) {
-  if (nm < 380) return '#ee66ff';
-  if (nm < 450) return '#aa44ff';
-  if (nm < 490) return '#4466ff';
-  if (nm < 510) return '#00bbff';
-  if (nm < 560) return '#00ff77';
-  if (nm < 590) return '#bbff00';
-  if (nm < 625) return '#ffee00';
-  if (nm < 700) return '#ff6600';
-  return '#dd2200';
+  if (dark) {
+    if (nm < 380) return '#dde6ff';   // UV — blåhvid
+    if (nm < 425) return '#9040ff';   // violet (H-δ 410)
+    if (nm < 460) return '#5060ff';   // blå-violet (H-γ 434)
+    if (nm < 500) return '#2090ff';   // cyan-blå (H-β 486)
+    if (nm < 520) return '#00ccdd';   // cyan
+    if (nm < 560) return '#00cc55';   // grøn
+    if (nm < 590) return '#aacc00';   // gul-grøn
+    if (nm < 620) return '#ffaa00';   // gul/amber
+    if (nm < 700) return '#ff2222';   // rød (H-α 656)
+    return '#b8b8b8';                  // IR — lysegrå
+  } else {
+    if (nm < 380) return '#3a4880';   // UV — kølig mørk blå-grå
+    if (nm < 425) return '#5030b0';
+    if (nm < 460) return '#3030a0';
+    if (nm < 500) return '#205090';
+    if (nm < 520) return '#107070';
+    if (nm < 560) return '#1D9E75';
+    if (nm < 590) return '#7a8800';
+    if (nm < 620) return '#a05000';
+    if (nm < 700) return '#b00010';   // rød (H-α)
+    return '#707070';                  // IR — mørk grå
+  }
 }
 const seriesName = lo => (['','Lyman','Balmer','Paschen','Brackett','Pfund'][lo]||'');
 const wlLabel = nm => nm < 380 ? `UV / ${nm.toFixed(0)} nm` : nm > 700 ? `IR / ${nm.toFixed(0)} nm` : `${nm.toFixed(0)} nm`;
@@ -193,45 +320,43 @@ const ec = eEl.getContext('2d');
 const AW = aEl.width, AH = aEl.height;
 const EW = eEl.width, EH = eEl.height;
 const CX = AW * 0.46, CY = AH * 0.5;
-const R = n => 34 * n;   // orbit radius px
+const R = n => 34 * n;
 
 // ── State ─────────────────────────────────────────────────────────────────
 let dark = true;
 let startN = 1;
-let ss = 'READY';   // READY|SHOOTING|PASSING|ABSORBING|EXCITED|DECAYING|IONIZING|IONIZED
+let ss = 'READY';
 let eN = 1;
-let pX = 0, pCol = '#00e5ff';
+let pX = 0, pCol = '#00cfff';
 let matched = false, tgtN = 1, pendingIon = false;
 let dPath = [], dStep = 0;
 let flash = 0, tmr = 0;
-let decayWait = 0;   // stochastic wait time (frames) drawn from exponential distribution
+let decayWait = 0;
 let selWL = 121.6;
 let paused = false;
 let ePh = [], elog = [];
 let lastTs = 0;
 let ionAngle = 0, ionProgress = 0;
-let ionBallX = 0, ionBallY = 0;   // flying electron ball during ionization
+let ionBallX = 0, ionBallY = 0;
+let absorbedE = 0;        // energi absorberet i nuværende skud (eV)
+let hoverN = null;        // hvilket niveau hover'es over i energidiagrammet
 
-// ── Electron cloud — analytical ring method (perfectly smooth) ────────────
-// No random dots. We sample the Gaussian probability density at each radius
-// and stroke a concentric ring with matching opacity. Result is rotationally
-// symmetric and mathematically smooth.
+// ── Electron cloud ────────────────────────────────────────────────────────
 let lastCloudN = -1;
-let cloudRings = [];   // [{r, alpha}]
+let cloudRings = [];
 
 function buildCloud(n) {
   if (n === lastCloudN) return;
   lastCloudN = n;
   cloudRings = [];
   const r0 = R(n);
-  const sigma = 5 + n * 2.8;   // ring width grows with n
+  const sigma = 5 + n * 2.8;
   const rMin = Math.max(2, r0 - sigma * 3.2);
   const rMax = r0 + sigma * 3.2;
-  const steps = 180;            // number of concentric rings
+  const steps = 180;
   for (let i = 0; i <= steps; i++) {
     const r = rMin + (rMax - rMin) * i / steps;
     const dr = r - r0;
-    // Gaussian probability density at this radius
     const density = Math.exp(-(dr * dr) / (2 * sigma * sigma));
     cloudRings.push({ r, alpha: density });
   }
@@ -244,39 +369,52 @@ function drawCloudAt(ctx, cx, cy, t, fadeAlpha) {
     ctx.globalAlpha = ring.alpha * peakAlpha * fadeAlpha;
     ctx.strokeStyle = t.eCol;
     ctx.lineWidth = (rMax(lastCloudN) - rMin(lastCloudN)) / 180 + 0.5;
-    ctx.shadowColor = t.eCol;
-    ctx.shadowBlur = 2 + ring.alpha * 5;
+    if (dark) { ctx.shadowColor = t.eCol; ctx.shadowBlur = 2 + ring.alpha * 5; }
     ctx.beginPath();
     ctx.arc(cx, cy, ring.r, 0, Math.PI * 2);
     ctx.stroke();
   }
   ctx.restore();
 }
-
-// Helper to compute rMin / rMax for a given n (needed for lineWidth)
 function rMin(n) { const sigma = 5 + n * 2.8; return Math.max(2, R(n) - sigma * 3.2); }
 function rMax(n) { const sigma = 5 + n * 2.8; return R(n) + sigma * 3.2; }
 
-// ── Theme ─────────────────────────────────────────────────────────────────
+// ── Theme (canvas colors — hardcoded per skabelon §3) ─────────────────────
 const T = () => dark ? {
-  bg:'#05050e', grid:'rgba(255,255,255,.03)',
-  orb:'rgba(0,229,255,.12)', orbHi:'rgba(0,229,255,.5)',
+  bg:'#060e18',
+  grid:'rgba(29,58,82,.55)',
+  orb:'rgba(0,207,255,.18)', orbHi:'rgba(0,207,255,.55)',
   nuc:'#ff6600', nucGlow:'#ff4400',
-  eCol:'#00e5ff', eSh:'#00e5ff',
-  tx:'#ddeeff', tx2:'#ffffff', dm:'#6a8aaa', dm2:'#99bbdd',
-  ac:'#00e5ff', ac3:'#39ff14',
+  eCol:'#00cfff', eSh:'#00cfff',
+  tx:'#eaf6fa',
+  tx2:'#ffffff',
+  tick:'#bfe2ef',
+  dim:'#8ec8d8',
+  ac:'#00cfff',
+  green:'#00ff9f',
+  axis:'#5a7a90',
+  wire:'#3a6a88',
+  corner:'rgba(0,207,255,.20)',
 } : {
-  bg:'#f0f4ff', grid:'rgba(0,0,0,.04)',
-  orb:'rgba(0,50,170,.11)', orbHi:'rgba(0,50,170,.5)',
-  nuc:'#cc3300', nucGlow:'#aa2200',
-  eCol:'#0044cc', eSh:'#0044cc',
-  tx:'#00112a', tx2:'#00112a', dm:'#334466', dm2:'#5577aa',
-  ac:'#0044cc', ac3:'#005522',
+  bg:'#f4eee3',
+  grid:'rgba(214,203,184,.85)',
+  orb:'rgba(55,138,221,.20)', orbHi:'rgba(55,138,221,.70)',
+  nuc:'#bf4020', nucGlow:'#902010',
+  eCol:'#378ADD', eSh:'#378ADD',
+  tx:'#111111',
+  tx2:'#000000',
+  tick:'#1a1a1a',
+  dim:'#444444',
+  ac:'#378ADD',
+  green:'#1D9E75',
+  axis:'#888888',
+  wire:'#888888',
+  corner:'rgba(55,138,221,.30)',
 };
 
-// ── Non-linear energy → y mapping (log scale so n=4,5,6 are spread out) ──
+// ── Non-linear energy → y mapping ─────────────────────────────────────────
 const EPS = 0.20;
-const LOG_MAX = Math.log(13.6 / EPS + 1); // ≈ 4.234
+const LOG_MAX = Math.log(13.6 / EPS + 1);
 
 function e2y(e, PB, PH) {
   const be = Math.max(0, -e);
@@ -284,16 +422,20 @@ function e2y(e, PB, PH) {
   return PB - Math.max(0, Math.min(1, frac)) * PH;
 }
 
-// ── Draw utilities ────────────────────────────────────────────────────────
+// ── Draw helpers ──────────────────────────────────────────────────────────
 function drawGrid(ctx, w, h) {
   ctx.strokeStyle = T().grid; ctx.lineWidth = 1; const s = 40;
   for (let x = s; x < w; x += s) { ctx.beginPath(); ctx.moveTo(x,0); ctx.lineTo(x,h); ctx.stroke(); }
   for (let y = s; y < h; y += s) { ctx.beginPath(); ctx.moveTo(0,y); ctx.lineTo(w,y); ctx.stroke(); }
 }
-function glw(ctx, col, b) { ctx.shadowColor = col; ctx.shadowBlur = b; }
+// Glow helper — skabelon: ingen glød i lyst tema
+function glw(ctx, col, b) {
+  if (!dark) { ctx.shadowBlur = 0; return; }
+  ctx.shadowColor = col; ctx.shadowBlur = b;
+}
 function noglw(ctx) { ctx.shadowBlur = 0; ctx.globalAlpha = 1; }
 function corners(ctx, w, h, sz) {
-  ctx.strokeStyle = dark ? 'rgba(0,229,255,.18)' : 'rgba(0,50,170,.15)';
+  ctx.strokeStyle = T().corner;
   ctx.lineWidth = 1;
   [[0,0,1,1],[w,0,-1,1],[0,h,1,-1],[w,h,-1,-1]].forEach(([cx,cy,sx,sy]) => {
     ctx.beginPath(); ctx.moveTo(cx+sx*sz,cy); ctx.lineTo(cx,cy); ctx.lineTo(cx,cy+sy*sz); ctx.stroke();
@@ -320,7 +462,7 @@ function waveArrow(ctx, x1, y1, x2, y2, col, amp) {
   ctx.closePath(); ctx.fill(); noglw(ctx);
 }
 
-// ── Draw atom canvas ──────────────────────────────────────────────────────
+// ── Atom canvas ───────────────────────────────────────────────────────────
 function drawAtom() {
   const t = T();
   ac.fillStyle = t.bg; ac.fillRect(0, 0, AW, AH);
@@ -334,34 +476,31 @@ function drawAtom() {
     ac.setLineDash([5, 5]);
     ac.beginPath(); ac.arc(CX, CY, r, 0, Math.PI * 2); ac.stroke();
     ac.setLineDash([]);
-    ac.fillStyle = act ? t.eCol : t.dm2;
-    ac.font = (act ? 'bold ' : '') + '12px Courier New';
+    ac.fillStyle = act ? t.eCol : t.tick;
+    ac.font = (act ? 'bold ' : 'bold ') + '12px Courier New';
     ac.textAlign = 'left';
     ac.fillText('n=' + n, CX + r + 6, CY + 4);
   }
 
-  // Nucleus halo + core
+  // Nucleus
   const ng = ac.createRadialGradient(CX,CY,0,CX,CY,26);
-  ng.addColorStop(0, dark?'rgba(255,100,0,.35)':'rgba(200,50,0,.25)');
+  ng.addColorStop(0, dark?'rgba(255,100,0,.35)':'rgba(180,40,0,.22)');
   ng.addColorStop(1,'transparent');
   ac.fillStyle = ng; ac.beginPath(); ac.arc(CX,CY,26,0,Math.PI*2); ac.fill();
   glw(ac, t.nucGlow, 15);
   ac.fillStyle = t.nuc; ac.beginPath(); ac.arc(CX,CY,10,0,Math.PI*2); ac.fill();
   noglw(ac);
-  // H⁺ label when ionized, else p⁺
-  ac.fillStyle = ss === 'IONIZED' ? '#ffaa00' : '#fff';
+  ac.fillStyle = ss === 'IONIZED' ? (dark?'#ffaa00':'#9c5e00') : '#fff';
   ac.font = 'bold 9px Courier New';
   ac.textAlign = 'center'; ac.textBaseline = 'middle';
   ac.fillText(ss === 'IONIZED' ? 'H⁺' : 'p⁺', CX, CY);
   ac.textBaseline = 'alphabetic';
 
-  // ── Electron cloud / ionization ──
+  // Electron cloud / ionization
   buildCloud(eN);
   if (ss === 'IONIZING') {
-    // Cloud fades out at nucleus as electron departs
     const cloudFade = Math.max(0, 1 - ionProgress * 2.5);
     if (cloudFade > 0) drawCloudAt(ac, CX, CY, t, cloudFade);
-    // Free electron drawn as a glowing ball
     glw(ac, t.eCol, 16);
     ac.fillStyle = t.eCol;
     ac.beginPath(); ac.arc(ionBallX, ionBallY, 6, 0, Math.PI * 2); ac.fill();
@@ -370,19 +509,19 @@ function drawAtom() {
     ac.fillText('e⁻', ionBallX, ionBallY - 10);
     ac.textAlign = 'left';
   } else if (ss === 'IONIZED') {
-    // Cloud gone; show message
-    glw(ac, '#ffaa00', 14);
-    ac.fillStyle = '#ffaa00'; ac.font = 'bold 16px Courier New'; ac.textAlign = 'center';
+    const ionCol = dark ? '#ffaa00' : '#9c5e00';
+    glw(ac, ionCol, 14);
+    ac.fillStyle = ionCol; ac.font = 'bold 16px Courier New'; ac.textAlign = 'center';
     ac.fillText('IONISERET', CX, CY - 38);
     noglw(ac);
-    ac.fillStyle = t.dm2; ac.font = '11px Courier New';
+    ac.fillStyle = t.tx; ac.font = 'bold 11px Courier New';
     ac.fillText('Elektronen er frigjort fra atomet', CX, CY - 20);
     ac.textAlign = 'left';
   } else {
     drawCloudAt(ac, CX, CY, t, 1);
   }
 
-  // Emission photons flying outward
+  // Emission photons
   for (const p of ePh) {
     const alpha = Math.max(0, 1 - p.life / 75);
     ac.globalAlpha = alpha;
@@ -401,39 +540,82 @@ function drawAtom() {
     if (pX > sx + 5) waveArrow(ac, sx, CY, pX, CY, pCol);
   }
 
-  // Flash overlay
-  if (flash > 0) { ac.fillStyle = `rgba(255,255,255,${flash})`; ac.fillRect(0,0,AW,AH); }
+  if (flash > 0) {
+    ac.fillStyle = dark ? `rgba(255,255,255,${flash})` : `rgba(255,250,235,${flash*1.1})`;
+    ac.fillRect(0,0,AW,AH);
+  }
 
-  // ── Info text (top-left) ── RETTELSE: λ-symbol
+  // Info text (top-left)
   ac.fillStyle = t.tx2; ac.font = 'bold 14px Courier New'; ac.textAlign = 'left';
   ac.fillText(`λ = ${selWL.toFixed(1)} nm     E = ${(HC/selWL).toFixed(2)} eV`, 10, 24);
-  ac.fillStyle = t.dm2; ac.font = '12px Courier New';
+  ac.fillStyle = t.tx; ac.font = 'bold 12px Courier New';
   if (ss !== 'IONIZED') {
     ac.fillText(`ELEKTRONNIVEAU: n = ${eN}   (${En(eN).toFixed(2)} eV)`, 10, 44);
   }
 
-  // ── Emission log (bottom-left) ── RETTELSE: glow + god luft
+  // Emission log + energiregnskab (bottom-left)
   if (elog.length > 0) {
-    const LH = 20;
+    const LH = 17;
     const BOTTOM = AH - 10;
-    const headerY = BOTTOM - elog.length * LH - 14;
-    ac.fillStyle = t.dm2; ac.font = 'bold 11px Courier New';
+    // Antal linjer: 1 header + N emissioner + 1 divider + 1 sum + 1 absorberet = N+4
+    const totalLines = elog.length + 4;
+    const headerY = BOTTOM - totalLines * LH;
+
+    // Header
+    ac.fillStyle = t.tx; ac.font = 'bold 11px Courier New';
+    ac.textAlign = 'left'; ac.textBaseline = 'alphabetic';
     ac.fillText('EMITTEREDE FOTONER:', 10, headerY);
+
+    // Hjælpefunktioner til pæn tabelopstilling i Courier
+    const dec = (x, d) => x.toFixed(d).replace('.', ',');
+    const padL = (s, n) => { while (s.length < n) s = ' ' + s; return s; };
+    const padR = (s, n) => { while (s.length < n) s = s + ' '; return s; };
+
+    // Emissions-linjer
+    let sumEmit = 0;
     elog.forEach((e, i) => {
+      const dE = En(e.hi) - En(e.lo);
+      sumEmit += dE;
       const col = wlCol(e.lam);
       const tag = e.lam < 380 ? 'UV' : e.lam > 700 ? 'IR' : 'synlig';
-      // RETTELSE: glødende farve på emissionstekst
-      ac.shadowColor = col; ac.shadowBlur = 12;
-      ac.fillStyle = col; ac.font = '12px Courier New';
-      ac.fillText(`n=${e.hi}→${e.lo}:  λ=${e.lam.toFixed(0)} nm   ${seriesName(e.lo)}  (${tag})`,
-                  10, headerY + 12 + (i + 1) * LH);
+      const y = headerY + (i + 1) * LH + 4;
+      if (dark) { ac.shadowColor = col; ac.shadowBlur = 10; }
+      ac.fillStyle = col; ac.font = 'bold 11px Courier New';
+      const txt = `n=${e.hi}→${e.lo}:  E = ${padL(dec(dE,2),5)} eV    λ = ${padL(e.lam.toFixed(0),4)} nm    ${padR(seriesName(e.lo),8)} (${tag})`;
+      ac.fillText(txt, 10, y);
     });
     ac.shadowBlur = 0;
+
+    // Divider-streg
+    const divY = headerY + (elog.length + 1) * LH + 4;
+    ac.strokeStyle = t.dim;
+    ac.lineWidth = 1;
+    ac.beginPath(); ac.moveTo(10, divY - 2); ac.lineTo(440, divY - 2); ac.stroke();
+
+    // Σ-linje med eksplicit addition
+    const sumY = headerY + (elog.length + 2) * LH + 4;
+    const parts = elog.map(e => dec(En(e.hi) - En(e.lo), 2));
+    const sumStr = parts.length === 1
+      ? `${parts[0]} eV`
+      : `${parts.join(' + ')} = ${dec(sumEmit, 2)} eV`;
+    ac.fillStyle = t.tx; ac.font = 'bold 11px Courier New';
+    ac.fillText(`Σ E_emit  = ${sumStr}`, 10, sumY);
+
+    // E_absorberet-linje med ✓ når energibevarelse er opfyldt
+    const absY = headerY + (elog.length + 3) * LH + 4;
+    const complete = Math.abs(sumEmit - absorbedE) < 0.01;
+    ac.fillStyle = t.tx;
+    ac.fillText(`E_absorb. = ${dec(absorbedE, 2)} eV`, 10, absY);
+    if (complete) {
+      if (dark) { ac.shadowColor = t.green; ac.shadowBlur = 8; }
+      ac.fillStyle = t.green;
+      ac.fillText('  ✓ energibevarelse', 230, absY);
+      ac.shadowBlur = 0;
+    }
   }
 
-  // Pause overlay
   if (paused && ss !== 'READY') {
-    ac.fillStyle = dark ? 'rgba(5,5,14,.65)' : 'rgba(240,244,255,.65)';
+    ac.fillStyle = dark ? 'rgba(6,14,24,.70)' : 'rgba(244,238,227,.75)';
     ac.fillRect(0, 0, AW, AH);
     glw(ac, t.ac, 18);
     ac.fillStyle = t.ac; ac.font = 'bold 20px Courier New'; ac.textAlign = 'center';
@@ -442,7 +624,7 @@ function drawAtom() {
   }
 }
 
-// ── Draw energy diagram ───────────────────────────────────────────────────
+// ── Energy diagram ────────────────────────────────────────────────────────
 function drawEnergy() {
   const t = T();
   ec.fillStyle = t.bg; ec.fillRect(0, 0, EW, EH);
@@ -451,7 +633,7 @@ function drawEnergy() {
   // Title
   ec.fillStyle = t.ac; ec.font = 'bold 12px Courier New'; ec.textAlign = 'center';
   ec.fillText('ENERGINIVEAUER', EW/2, 20);
-  ec.fillStyle = t.dm2; ec.font = '11px Courier New';
+  ec.fillStyle = t.tx; ec.font = 'bold 11px Courier New';
   ec.fillText('HYDROGEN (eV)', EW/2, 33);
 
   // Plot bounds
@@ -461,36 +643,40 @@ function drawEnergy() {
 
   // Ionization limit
   const yInf = PT;
-  ec.strokeStyle = t.dm + '44'; ec.setLineDash([3,5]); ec.lineWidth = 1;
+  ec.strokeStyle = dark ? 'rgba(142,200,216,.45)' : 'rgba(80,80,80,.55)';
+  ec.setLineDash([3,5]); ec.lineWidth = 1;
   ec.beginPath(); ec.moveTo(LX, yInf); ec.lineTo(RX, yInf); ec.stroke();
   ec.setLineDash([]);
-  ec.fillStyle = t.dm2; ec.font = '10px Courier New'; ec.textBaseline = 'middle';
+  ec.fillStyle = t.tick; ec.font = 'bold 10px Courier New'; ec.textBaseline = 'middle';
   ec.textAlign = 'right'; ec.fillText('n=∞', LX-3, yInf);
   ec.textAlign = 'right'; ec.fillText('0.00', RX, yInf - 10);
   ec.textBaseline = 'alphabetic';
-  ec.fillStyle = t.dm; ec.font = '8px Courier New'; ec.textAlign = 'center';
+  ec.fillStyle = t.dim; ec.font = 'bold 9px Courier New'; ec.textAlign = 'center';
   ec.fillText('(log skala)', EW/2, yInf + 11);
 
   // Energy levels n=1..6
   for (let n = 1; n <= 6; n++) {
     const e = En(n), y = yOf(e), act = n === eN && ss !== 'IONIZED';
-    ec.strokeStyle = act ? t.orbHi : t.orb;
-    ec.lineWidth = act ? 2 : 1;
+    const hov = n === hoverN;
+    ec.strokeStyle = hov ? (dark ? '#ffffff' : '#000000') : (act ? t.orbHi : t.orb);
+    ec.lineWidth = hov ? 2.5 : (act ? 2 : 1);
+    if (hov && dark) { ec.shadowColor = '#ffffff'; ec.shadowBlur = 8; }
     ec.beginPath(); ec.moveTo(LX, y); ec.lineTo(RX, y); ec.stroke();
+    ec.shadowBlur = 0;
     // n= label (left)
-    ec.fillStyle = act ? t.tx2 : t.dm2;
-    ec.font = (act ? 'bold ' : '') + '12px Courier New';
+    ec.fillStyle = hov ? (dark ? '#ffffff' : '#000000') : (act ? t.tx2 : t.tick);
+    ec.font = 'bold 12px Courier New';
     ec.textBaseline = 'middle'; ec.textAlign = 'right';
     ec.fillText('n='+n, LX-3, y);
     // energy value (right, above line)
-    ec.fillStyle = act ? t.tx2 : t.dm;
-    ec.font = (act ? 'bold ' : '') + '11px Courier New';
+    ec.fillStyle = hov ? (dark ? '#ffffff' : '#000000') : (act ? t.tx2 : t.tick);
+    ec.font = 'bold 11px Courier New';
     ec.textBaseline = 'alphabetic'; ec.textAlign = 'right';
     ec.fillText(e.toFixed(2), RX, y - 4);
     ec.textBaseline = 'alphabetic';
   }
 
-  // ── STEP 1: Emission arrows (behind) ──
+  // STEP 1: Emission arrows (behind)
   if (dStep > 0 && dPath.length > 1) {
     for (let i = 0; i < dStep && i < dPath.length - 1; i++) {
       const fN = dPath[i], tN = dPath[i+1];
@@ -499,13 +685,13 @@ function drawEnergy() {
       const col = wlCol(lam);
       const y1 = yOf(En(fN)), y2 = yOf(En(tN));
       const x = LX + 14 + i * 11;
-      ec.strokeStyle = col + 'cc'; ec.lineWidth = 2;
+      ec.strokeStyle = col; ec.lineWidth = 2;
+      if (dark) ec.globalAlpha = 0.85;
       ec.beginPath(); ec.moveTo(x,y1); ec.lineTo(x,y2); ec.stroke();
-      // Arrowhead (emission = downward)
-      ec.fillStyle = col + 'cc';
+      ec.fillStyle = col;
       ec.beginPath(); ec.moveTo(x,y2); ec.lineTo(x-5,y2-9); ec.lineTo(x+5,y2-9); ec.closePath(); ec.fill();
-      // RETTELSE: glødende bølgelængde + enhed nm
-      ec.shadowColor = col; ec.shadowBlur = 10;
+      ec.globalAlpha = 1;
+      if (dark) { ec.shadowColor = col; ec.shadowBlur = 10; }
       ec.fillStyle = col; ec.font = 'bold 11px Courier New';
       ec.textBaseline = 'middle'; ec.textAlign = 'left';
       ec.fillText(lam.toFixed(0) + ' nm', x + 5, (y1 + y2) / 2);
@@ -513,30 +699,28 @@ function drawEnergy() {
     }
   }
 
-  // ── STEP 2: Absorption / ionization arrow (on top, only before decay) ──
+  // STEP 2: Absorption / ionization arrow
   if ((ss === 'READY' || ss === 'SHOOTING') && dStep === 0) {
     const pE = HC / selWL;
     const y1 = yOf(En(startN));
     const isIon = pE >= ionE(startN) * 0.999;
     const y2 = isIon ? PT - 8 : yOf(En(startN) + pE);
-    const col = isIon ? '#ffaa00' : wlCol(selWL);
+    const ionCol = dark ? '#ffaa00' : '#9c5e00';
+    const col = isIon ? ionCol : wlCol(selWL);
     const ax = MX + 20;
 
     ec.strokeStyle = col; ec.lineWidth = 2; ec.setLineDash([6, 3]);
     ec.beginPath(); ec.moveTo(ax, y1); ec.lineTo(ax, y2); ec.stroke();
     ec.setLineDash([]);
-    // Arrowhead (absorption/ionization = upward)
     ec.fillStyle = col;
     ec.beginPath(); ec.moveTo(ax,y2); ec.lineTo(ax-6,y2+10); ec.lineTo(ax+6,y2+10); ec.closePath(); ec.fill();
     if (isIon) {
-      // Label above ionization line
       glw(ec, col, 6);
       ec.fillStyle = col; ec.font = 'bold 10px Courier New';
       ec.textBaseline = 'bottom'; ec.textAlign = 'left';
       ec.fillText('ION.', ax + 7, PT - 6);
       noglw(ec); ec.textBaseline = 'alphabetic';
     }
-    // Energy label
     glw(ec, col, 5);
     ec.fillStyle = col; ec.font = 'bold 11px Courier New';
     ec.textBaseline = 'middle'; ec.textAlign = 'left';
@@ -544,18 +728,18 @@ function drawEnergy() {
     noglw(ec); ec.textBaseline = 'alphabetic';
   }
 
-  // Ionized state: electron dot above ionization line
+  // Electron dot
   if (ss === 'IONIZED') {
-    glw(ec, '#ffaa00', 14);
-    ec.fillStyle = '#ffaa00';
+    const ionCol = dark ? '#ffaa00' : '#9c5e00';
+    glw(ec, ionCol, 14);
+    ec.fillStyle = ionCol;
     ec.beginPath(); ec.arc(MX, PT - 16, 5, 0, Math.PI*2); ec.fill();
     noglw(ec);
-    ec.fillStyle = '#ffaa00'; ec.font = 'bold 11px Courier New';
+    ec.fillStyle = ionCol; ec.font = 'bold 11px Courier New';
     ec.textBaseline = 'middle'; ec.textAlign = 'left';
     ec.fillText('e⁻ fri', MX + 9, PT - 16);
     ec.textBaseline = 'alphabetic';
   } else {
-    // Electron dot at current level
     const edy = yOf(En(eN));
     glw(ec, t.eSh, 12);
     ec.fillStyle = t.eCol;
@@ -567,12 +751,130 @@ function drawEnergy() {
     ec.textBaseline = 'alphabetic';
   }
 
-  // Axis label
-  ec.fillStyle = t.dm2; ec.font = '11px Courier New'; ec.textAlign = 'center';
-  ec.fillText('Energi (eV)', EW/2, EH - 8);
+  // Axis label / hover hint
+  ec.fillStyle = t.tx; ec.font = 'bold 11px Courier New'; ec.textAlign = 'center';
+  if (hoverN !== null) {
+    if (dark) { ec.shadowColor = '#ffffff'; ec.shadowBlur = 6; }
+    ec.fillStyle = dark ? '#ffffff' : '#000000';
+    ec.fillText(`klik for at vælge n=${hoverN}`, EW/2, EH - 8);
+    ec.shadowBlur = 0;
+  } else {
+    ec.fillText('Energi (eV)', EW/2, EH - 8);
+  }
 }
 
 // ── Decay helper ──────────────────────────────────────────────────────────
+// ── Spektrum-akkumulator ──────────────────────────────────────────────────
+// Spektret fyldes udelukkende op af enkelt-shots: hver gang elektronen henfalder
+// fra et exciteret niveau, registreres emissionen som en bjælke. Panelet vises
+// automatisk når første emission sker. Sqrt-skala bruges på bjælkehøjderne så
+// svage linjer (H-γ, H-δ) er synlige selvom Ly-α er væsentligt hyppigere.
+const spectrum = new Map();    // λ (rounded to 1 nm) → count
+let totalPhotons = 0;
+
+function recordEmission(lam) {
+  // Filtrer linjer udenfor 80-2000 nm vinduet (Brackett 4→3 ved 1875 nm slipper
+  // ind, men Brackett 5→4 ved 4051 nm, Pfund osv. holdes ude — de vises alligevel
+  // aldrig, og oprydningen gør spektrum-datastrukturen kompakt).
+  if (lam < 80 || lam > 2000) return;
+  const key = Math.round(lam);
+  spectrum.set(key, (spectrum.get(key) || 0) + 1);
+  totalPhotons++;
+  // Vis spektrum-panelet automatisk ved første emission
+  if (!document.getElementById('specRow').classList.contains('on')) {
+    activateSpectrumView();
+  }
+}
+function activateSpectrumView() {
+  document.getElementById('swatchRow').classList.add('off');
+  document.getElementById('specRow').classList.add('on');
+}
+function clearSpectrum() {
+  spectrum.clear();
+  totalPhotons = 0;
+  document.getElementById('swatchRow').classList.remove('off');
+  document.getElementById('specRow').classList.remove('on');
+  drawSpectrum();
+}
+
+// ── Spektrum-tegning ──────────────────────────────────────────────────────
+const specCanvas = document.getElementById('specCanvas');
+const specCtx = specCanvas.getContext('2d');
+const SPEC_W = specCanvas.width, SPEC_H = specCanvas.height;
+const SPEC_LAM_MIN = 80, SPEC_LAM_MAX = 2000;
+const lamToSpecX = lam => (lam - SPEC_LAM_MIN) / (SPEC_LAM_MAX - SPEC_LAM_MIN) * SPEC_W;
+
+function drawSpectrum() {
+  const ctx = specCtx;
+  // Baggrund (fotografisk-mørk i begge temaer for kontrast med farvelinjer)
+  ctx.fillStyle = dark ? '#000000' : '#141414';
+  ctx.fillRect(0, 0, SPEC_W, SPEC_H);
+
+  // Synligt vindue (380-700 nm) — let lysere baggrund
+  const vL = lamToSpecX(380), vR = lamToSpecX(700);
+  ctx.fillStyle = 'rgba(255,255,255,.07)';
+  ctx.fillRect(vL, 0, vR - vL, SPEC_H);
+  // Top- og bundkant af det synlige vindue
+  ctx.strokeStyle = 'rgba(255,255,255,.18)';
+  ctx.lineWidth = 1;
+  ctx.beginPath();
+  ctx.moveTo(vL, 0); ctx.lineTo(vL, SPEC_H);
+  ctx.moveTo(vR, 0); ctx.lineTo(vR, SPEC_H);
+  ctx.stroke();
+
+  // Find max-count til normalisering (sqrt-skala, så svage linjer er synlige)
+  let maxCount = 1;
+  for (const c of spectrum.values()) if (c > maxCount) maxCount = c;
+  const maxSqrt = Math.sqrt(maxCount);
+
+  // Plot-område for søjlerne
+  const PLOT_TOP = 14, PLOT_BOT = SPEC_H - 11;
+  const PLOT_H = PLOT_BOT - PLOT_TOP;
+
+  // Linjer (tegnes FØR teksten så labels lægges ovenpå)
+  for (const [lam, count] of spectrum) {
+    if (lam < SPEC_LAM_MIN || lam > SPEC_LAM_MAX) continue;
+    const x = lamToSpecX(lam);
+    // sqrt-skala: høj sensitivitet for svage linjer, lav dominans af Ly-α
+    const h = Math.max(2, (Math.sqrt(count) / maxSqrt) * PLOT_H);
+    const col = wlCol(lam);
+    ctx.fillStyle = col;
+    if (dark) { ctx.shadowColor = col; ctx.shadowBlur = 5; }
+    ctx.fillRect(x - 1, PLOT_BOT - h, 2, h);
+  }
+  ctx.shadowBlur = 0;
+
+  // Serie-labels langs toppen — hvid med tynd mørk skygge for kontrast
+  ctx.font = 'bold 10px Courier New';
+  ctx.textAlign = 'center'; ctx.textBaseline = 'top';
+  ctx.shadowColor = 'rgba(0,0,0,.85)'; ctx.shadowBlur = 3;
+  ctx.fillStyle = '#ffffff';
+  ctx.fillText('Lyman',   lamToSpecX(122),  2);
+  ctx.fillText('Balmer',  lamToSpecX(500),  2);
+  ctx.fillText('Paschen', lamToSpecX(1400), 2);
+  ctx.shadowBlur = 0;
+
+  // Bølgelængde-ticks nederst — hvid med skygge
+  ctx.font = 'bold 9px Courier New';
+  ctx.textBaseline = 'bottom';
+  ctx.fillStyle = '#ffffff';
+  ctx.shadowColor = 'rgba(0,0,0,.85)'; ctx.shadowBlur = 3;
+  for (const lam of [100, 250, 500, 750, 1000, 1500, 2000]) {
+    if (lam > SPEC_LAM_MAX) continue;
+    const x = lamToSpecX(lam);
+    ctx.shadowBlur = 0;
+    ctx.strokeStyle = 'rgba(255,255,255,.45)';
+    ctx.lineWidth = 1;
+    ctx.beginPath(); ctx.moveTo(x, SPEC_H - 9); ctx.lineTo(x, SPEC_H - 4); ctx.stroke();
+    ctx.shadowColor = 'rgba(0,0,0,.85)'; ctx.shadowBlur = 3;
+    ctx.fillText(lam, x, SPEC_H);
+  }
+  ctx.shadowBlur = 0;
+
+  // Opdater tag
+  document.getElementById('specTag').textContent = totalPhotons + ' fotoner';
+}
+
 function randDecay(from) {
   const path = [from]; let cur = from;
   while (cur > 1) {
@@ -586,19 +888,20 @@ function randDecay(from) {
   return path;
 }
 
-// ── Animation loop ────────────────────────────────────────────────────────
 // ── Stochastic lifetimes ──────────────────────────────────────────────────
-// Physical mean lifetimes τ (ns): n=2: 1.6, n=3: 5.3, n=4: 12, n=5: 23, n=6: 40
-// Scaled for visibility (sqrt-compressed so animation stays watchable):
-// τ_anim(n) = 22 * sqrt(τ_phys(n) / τ_phys(2)) frames at 60 fps
-const TAU_PHYS_NS = [0, 0, 1.6, 5.3, 12.0, 23.0, 40.0]; // index = n
-const TAU_BASE_FRAMES = 22;
+// Pædagogisk tids-skala. Ægte hydrogen-levetider (TAU_PHYS_NS) bruges som
+// indbyrdes forhold, så højere n har synligt længere middel-levetid.
+// TAU_BASE_FRAMES sat så middel-τ for n=6 ≈ 1s (var 1.83s — for langt).
+// drawWait klipper de værste 7% af eksponential-halen: u_min = 0.07 giver
+// max-vente ≈ 2.66 × middel-τ (var ubegrænset — kunne give 12+ sekunder for n=6).
+const TAU_PHYS_NS = [0, 0, 1.6, 5.3, 12.0, 23.0, 40.0];
+const TAU_BASE_FRAMES = 12;
 function tauFrames(n) {
   return TAU_BASE_FRAMES * Math.sqrt(TAU_PHYS_NS[n] / TAU_PHYS_NS[2]);
 }
-// Draw a random wait time from exponential distribution: P(t) = (1/τ)·e^(−t/τ)
 function drawWait(n) {
-  return -tauFrames(n) * Math.log(Math.random());
+  const u = Math.max(0.07, Math.random());
+  return -tauFrames(n) * Math.log(u);
 }
 
 const SPD = 3.8;
@@ -618,7 +921,6 @@ function tick(ts) {
       pX += SPD * dt;
       if (pX >= CX - R(startN) - 8) {
         if (pendingIon) {
-          // IONIZATION — ball starts at orbit edge in flight direction
           ss = 'IONIZING'; ionAngle = -Math.PI/2 + (Math.random()-0.5)*1.2;
           ionBallX = CX + Math.cos(ionAngle) * R(eN);
           ionBallY = CY + Math.sin(ionAngle) * R(eN);
@@ -640,14 +942,13 @@ function tick(ts) {
     case 'ABSORBING':
       if (tmr > 20) {
         eN = tgtN; buildCloud(eN); dPath = randDecay(tgtN); dStep = 0;
-        decayWait = drawWait(tgtN);   // draw lifetime for the excited state
+        decayWait = drawWait(tgtN);
         ss = 'EXCITED'; tmr = 0;
         setSt(`ELEKTRON I n=${tgtN}  (τ ≈ ${TAU_PHYS_NS[tgtN].toFixed(1)} ns) — VENTER PÅ SPONTANT HENFALD...`);
       }
       break;
     case 'EXCITED':
-      // Show a countdown-style progress in status while waiting
-      if (tmr % 8 < 1) {   // update status text periodically
+      if (tmr % 8 < 1) {
         const pct = Math.min(100, Math.round(tmr / decayWait * 100));
         setSt(`ELEKTRON I n=${eN}  (τ ≈ ${TAU_PHYS_NS[eN].toFixed(1)} ns) — VENTER PÅ SPONTANT HENFALD... ${pct}%`);
       }
@@ -660,8 +961,8 @@ function tick(ts) {
           const fN = dPath[dStep], tN = dPath[dStep+1];
           const lam = HC / (En(fN) - En(tN));
           elog.push({ lo:tN, hi:fN, lam });
+          recordEmission(lam);
           eN = tN; buildCloud(eN); flash = 0.16; dStep++;
-          // Draw new stochastic lifetime for the next level (if not ground state)
           decayWait = eN > 1 ? drawWait(eN) : 0;
           const ang = Math.random() * Math.PI * 2;
           ePh.push({ x:CX+R(fN)*Math.cos(ang), y:CY+R(fN)*Math.sin(ang),
@@ -676,18 +977,18 @@ function tick(ts) {
       break;
     case 'IONIZING':
       ionProgress = Math.min(1, ionProgress + dt * 0.013);
-      ionBallX += Math.cos(ionAngle) * 5.5 * dt;   // ball flies outward
+      ionBallX += Math.cos(ionAngle) * 5.5 * dt;
       ionBallY += Math.sin(ionAngle) * 5.5 * dt;
       if (ionProgress >= 1) {
         ss = 'IONIZED'; setPlay(false);
         setSt('ATOM IONISERET — ELEKTRONEN ER FRIGJORT  |  KLIK NULSTIL');
       }
       break;
-    case 'IONIZED':
-      break;
+    case 'IONIZED': break;
   }
 
   drawAtom(); drawEnergy();
+  if (document.getElementById('specRow').classList.contains('on')) drawSpectrum();
   requestAnimationFrame(tick);
 }
 
@@ -702,17 +1003,19 @@ function setPlay(on) {
 
 function buildSwatch() {
   const total = 700 - 90, pct = nm => ((nm-90)/total*100).toFixed(1)+'%';
+  // UV-zonen (90-380): kølig blå-grå → blåhvid (signalere usynlig UV).
+  // Synligt vindue (380-700): regnbue matchende wlCol — H-α 656 ender rød.
   document.getElementById('swatchBar').style.background =
     `linear-gradient(to right,
-      #660088 0%,#aa22cc ${pct(200)},
-      #cc44ff ${pct(380)},
-      #8833ee ${pct(420)},#8833ee ${pct(450)},
-      #3355ff ${pct(450)},#3355ff ${pct(490)},
-      #00aaff ${pct(490)},#00aaff ${pct(510)},
-      #00ee66 ${pct(510)},#00ee66 ${pct(560)},
-      #aaff00 ${pct(560)},#aaff00 ${pct(590)},
-      #ffee00 ${pct(590)},#ffee00 ${pct(625)},
-      #ff5500 ${pct(625)},#ff5500 100%)`;
+      #4a5878 0%, #8090c0 ${pct(280)}, #c8d4f0 ${pct(380)},
+      #9040ff ${pct(380)}, #9040ff ${pct(425)},
+      #5060ff ${pct(425)}, #5060ff ${pct(460)},
+      #2090ff ${pct(460)}, #2090ff ${pct(500)},
+      #00ccdd ${pct(500)}, #00ccdd ${pct(520)},
+      #00cc55 ${pct(520)}, #00cc55 ${pct(560)},
+      #aacc00 ${pct(560)}, #aacc00 ${pct(590)},
+      #ffaa00 ${pct(590)}, #ffaa00 ${pct(620)},
+      #ff2222 ${pct(620)}, #ff2222 100%)`;
 }
 
 function updateSwatch(nm) {
@@ -775,6 +1078,13 @@ document.getElementById('playBtn').addEventListener('click', () => {
     const ab = pendingIon ? null : findAbs(selWL);
     matched = !!ab;
     tgtN = ab ? ab.hi : startN;
+    // Ved match: atomet absorberer på resonans — den faktiske absorberede
+    // energi er overgangsenergien, ikke HC/selWL (slideren tillader 0,5%
+    // afvigelse for at gøre det nemt at ramme resonans). Ved ionisering
+    // absorberes hele fotonens energi (overskud → kinetisk energi af e⁻).
+    if (matched)        absorbedE = En(tgtN) - En(startN);
+    else if (pendingIon) absorbedE = pE;
+    else                 absorbedE = 0;
     pX = -10; pCol = wlCol(selWL);
     ss = 'SHOOTING'; tmr = 0; paused = false;
     setSt('FOTON SENDT MOD ATOMET...');
@@ -787,17 +1097,56 @@ document.getElementById('playBtn').addEventListener('click', () => {
 
 document.getElementById('resetBtn').addEventListener('click', doReset);
 
+document.getElementById('clearBtn').addEventListener('click', clearSpectrum);
+
+// ── Klik-på-niveau i energidiagrammet ─────────────────────────────────────
+// Find det nærmeste energiniveau ved en given canvas-y-koordinat. Returnerer
+// null hvis ingen niveauer er inden for hit-radius (12 px).
+function findLevelAtY(mouseY) {
+  const PT = 46, PB = EH - 24, PH = PB - PT;
+  let bestN = null, bestDist = 12;
+  for (let n = 1; n <= 6; n++) {
+    const y = e2y(En(n), PB, PH);
+    const d = Math.abs(mouseY - y);
+    if (d < bestDist) { bestDist = d; bestN = n; }
+  }
+  return bestN;
+}
+function eEl_eventY(e) {
+  const rect = eEl.getBoundingClientRect();
+  return (e.clientY - rect.top) * (EH / rect.height);
+}
+eEl.addEventListener('mousemove', e => {
+  const newHover = findLevelAtY(eEl_eventY(e));
+  if (newHover !== hoverN) {
+    hoverN = newHover;
+    eEl.style.cursor = hoverN !== null ? 'pointer' : 'default';
+  }
+});
+eEl.addEventListener('mouseleave', () => {
+  if (hoverN !== null) { hoverN = null; eEl.style.cursor = 'default'; }
+});
+eEl.addEventListener('click', e => {
+  const n = findLevelAtY(eEl_eventY(e));
+  if (n === null) return;
+  document.querySelectorAll('.nl-btn').forEach(b => b.classList.toggle('nl-on', parseInt(b.dataset.n) === n));
+  startN = n;
+  absTransitions = calcAbsTrans(startN);
+  doReset();
+});
+
 document.getElementById('copyBtn').addEventListener('click', () => {
   navigator.clipboard.writeText(document.documentElement.outerHTML).then(() => {
     const b = document.getElementById('copyBtn');
     b.textContent = '✓ KOPIERET!';
-    setTimeout(() => b.textContent = '{ } KOPIER KODE', 2200);
+    setTimeout(() => b.textContent = '⎘ KOPIER KODE', 2200);
   });
 });
 
 document.getElementById('modeBtn').addEventListener('click', () => {
   dark = !dark;
-  document.body.classList.toggle('light', !dark);
+  if (dark) document.documentElement.removeAttribute('data-theme');
+  else      document.documentElement.setAttribute('data-theme','light');
   document.getElementById('modeBtn').textContent = dark ? '☀ LYS TILSTAND' : '🌙 MØRK TILSTAND';
   updSlider();
 });
