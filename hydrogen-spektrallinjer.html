@@ -2,16 +2,16 @@
 <html lang="da">
 <head>
 <meta charset="UTF-8">
-<meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>Bohr-modellen – Spektrallinjer</title>
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Bohr-modellen — Spektrallinjer</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Orbitron:wght@700&display=swap" rel="stylesheet">
 <style>
-*,*::before,*::after{box-sizing:border-box;margin:0;padding:0}
-
 :root{
   --bg0:#030810; --bg1:#060e18; --bg2:#0a1622; --bg3:#0f1e2d;
   --border:#1a3a52;
-  --green:#00ff9f; --cyan:#00cfff; --yellow:#ffd93d;
-  --pink:#ff2d78;
+  --green:#00ff9f; --cyan:#00cfff; --yellow:#ffd93d; --red:#ff4466;
   --text:#d0eef5; --dim:#8ec8d8;
   --font:'Courier New','Lucida Console',monospace;
   --tr:0.15s ease;
@@ -19,166 +19,263 @@
 [data-theme="light"]{
   --bg0:#e8e0d2; --bg1:#f4eee3; --bg2:#fdfaf4; --bg3:#fdfaf4;
   --border:#d6cbb8;
-  --green:#1D9E75; --cyan:#378ADD; --yellow:#c07800;
-  --pink:#c0306a;
+  --green:#1D9E75; --cyan:#378ADD; --yellow:#c07800; --red:#c0306a;
   --text:#1a1a1a; --dim:#333333;
 }
-
+*{box-sizing:border-box}
+html,body{margin:0;padding:0}
 body{
+  padding:16px;
   background:var(--bg0); color:var(--text);
   font-family:var(--font);
-  display:flex; justify-content:center; align-items:flex-start;
-  min-height:100vh; padding:10px;
-  transition:background .3s, color .3s;
+  min-height:100vh;
 }
-.sim{width:986px; max-width:100%}
 
-/* ── Header (left-aligned, atom icon + two-color title) ── */
-.hd{
-  display:flex; align-items:center; gap:12px;
-  padding:6px 4px 10px;
-  border-bottom:1px solid var(--border);
-  margin-bottom:10px;
+/* ── Header ─────────────────────────────────────────────────────────────── */
+header{
+  display:flex; align-items:center; justify-content:space-between;
+  margin-bottom:14px; max-width:1200px; margin-left:auto; margin-right:auto;
+  gap:12px; flex-wrap:wrap;
 }
+.title-wrap{ display:flex; align-items:center; gap:10px; }
 .atom-icon{
-  width:26px; height:26px; color:var(--green);
-  display:inline-flex; flex-shrink:0;
-  animation:apulse 2.5s ease-in-out infinite;
+  width:24px; height:24px; color:var(--green); display:inline-flex;
+  animation:apulse 2.5s ease-in-out infinite; flex-shrink:0;
 }
-.atom-icon svg{display:block; width:100%; height:100%}
+.atom-icon svg{ display:block; width:100%; height:100%; }
 @keyframes apulse{
-  0%,100%{opacity:1; filter:drop-shadow(0 0 6px var(--green))}
-  50%    {opacity:.55; filter:none}
+  0%,100%{ opacity:1;   filter:drop-shadow(0 0 6px var(--green)); }
+  50%    { opacity:.55; filter:none; }
 }
-[data-theme="light"] .atom-icon{animation:apulse-l 2.5s ease-in-out infinite}
+[data-theme="light"] .atom-icon{ animation:apulse-l 2.5s ease-in-out infinite; }
 @keyframes apulse-l{
-  0%,100%{opacity:1}
-  50%    {opacity:.55}
+  0%,100%{ opacity:1; }
+  50%    { opacity:.55; }
 }
-.hd-titles{display:flex; flex-direction:column; gap:2px; min-width:0}
-.hd-title{
-  font-size:15px; letter-spacing:.18em; font-weight:700;
-  text-shadow:0 0 12px rgba(0,255,159,.18);
+h1{
+  font-family:'Orbitron',sans-serif; font-weight:700;
+  font-size:15px; letter-spacing:.20em; text-transform:uppercase;
+  margin:0;
+  text-shadow:0 0 8px rgba(0,255,159,0.35);
 }
-[data-theme="light"] .hd-title{text-shadow:none}
-.t-green{color:var(--green)}
-.t-cyan {color:var(--cyan)}
-.t-dash {color:var(--green); margin:0 .15em}
-.hd-sub{
-  font-size:11px; letter-spacing:.16em; color:var(--dim);
+[data-theme="light"] h1{ text-shadow:none; }
+.h-green{ color:var(--green); }
+.h-cyan { color:var(--cyan); }
+.h-dash { color:var(--green); margin:0 .18em; }
+.header-btns{ display:flex; gap:8px; }
+.btn-util{
+  background:var(--bg2); color:var(--dim);
+  border:1px solid var(--dim);
+  padding:7px 14px; font-family:var(--font); font-size:.8rem;
+  cursor:pointer; transition:var(--tr); font-weight:700;
+  letter-spacing:.08em; text-transform:uppercase;
 }
-[data-theme="light"] .hd-sub{font-weight:700; color:#333}
+.btn-util:hover{
+  border-color:var(--green); color:var(--green);
+  box-shadow:0 0 8px var(--green);
+}
+[data-theme="light"] .btn-util:hover{ box-shadow:none; }
 
-/* ── Main canvases ── */
-.main{display:flex; gap:8px; margin-bottom:8px}
-canvas{display:block; border:1px solid var(--border); transition:border-color .3s; background:var(--bg1)}
-#aC{flex:1; min-width:0}
-#eC{width:294px; flex-shrink:0}
+/* ── Main grid ──────────────────────────────────────────────────────────── */
+main{
+  display:grid; gap:14px;
+  grid-template-columns:1fr;
+  max-width:1200px; margin:0 auto;
+}
+.row{ display:grid; gap:14px; }
+.row.split{ grid-template-columns:320px 1fr; align-items:start; }
+.left-col{ display:flex; flex-direction:column; gap:14px; }
+.right-col{ display:flex; flex-direction:column; gap:14px; }
 
-/* ── Control panel ── */
-.ctrl{
+.box{
   background:var(--bg1); border:1px solid var(--border);
-  padding:10px 13px; transition:background .3s, border-color .3s;
+  border-radius:6px; padding:14px;
+}
+.sec-title{
+  color:var(--green); font-weight:700;
+  letter-spacing:.22em; text-transform:uppercase;
+  font-size:.78rem; padding-bottom:6px; margin-bottom:12px;
+  border-bottom:1px solid var(--border);
+  display:flex; justify-content:space-between; align-items:baseline;
+}
+.sec-title .st-info{
+  color:var(--dim); font-weight:700; letter-spacing:.08em;
+  text-transform:none; font-size:.72rem;
+}
+[data-theme="light"] .sec-title .st-info{ color:#1a1a1a; }
+
+/* ── Controls ───────────────────────────────────────────────────────────── */
+.ctrl{ margin-bottom:14px; }
+.ctrl:last-child{ margin-bottom:0; }
+.ctrl-row{
+  display:flex; justify-content:space-between; align-items:center;
+  margin-bottom:6px; gap:6px;
+}
+.ctrl-label{ color:var(--dim); font-size:.85rem; font-weight:700; }
+[data-theme="light"] .ctrl-label{ color:#1a1a1a; }
+.ctrl-val{
+  color:var(--cyan); font-weight:700;
+  font-size:.95rem; font-family:'Courier New',monospace;
+  white-space:nowrap;
+}
+.ctrl-val .ev{ color:var(--green); margin-left:8px; }
+
+input[type=range]{
+  width:100%; -webkit-appearance:none; background:transparent;
+  margin:4px 0; cursor:pointer;
+}
+input[type=range]::-webkit-slider-runnable-track{
+  height:6px; background:var(--bg3); border-radius:3px;
+  border:1px solid var(--border);
+}
+input[type=range]::-webkit-slider-thumb{
+  -webkit-appearance:none; width:18px; height:18px; border-radius:50%;
+  background:var(--cyan); margin-top:-7px; cursor:pointer;
+  border:2px solid var(--bg0);
+}
+input[type=range]::-moz-range-track{
+  height:6px; background:var(--bg3); border-radius:3px;
+  border:1px solid var(--border);
+}
+input[type=range]::-moz-range-thumb{
+  width:18px; height:18px; border-radius:50%;
+  background:var(--cyan); cursor:pointer; border:2px solid var(--bg0);
 }
 
-.st-row{display:flex; justify-content:space-between; align-items:center;
-        margin-bottom:8px; gap:8px; min-height:24px}
-.st-txt{
-  font-size:12px; color:var(--dim); letter-spacing:.5px;
-  flex:1; min-width:0; overflow:hidden; text-overflow:ellipsis; white-space:nowrap;
+/* Small selection buttons (n=1..6) */
+.btn-grp{ display:flex; gap:4px; flex-wrap:wrap; }
+.btn-sm{
+  flex:1; min-width:38px;
+  background:var(--bg3); color:var(--text);
+  border:1px solid var(--border);
+  padding:7px 4px; font-family:var(--font); font-size:.82rem;
+  cursor:pointer; transition:var(--tr); font-weight:700;
+  letter-spacing:.03em;
 }
-[data-theme="light"] .st-txt{color:#1a1a1a; font-weight:700}
-
-.badge{
-  font-size:11px; letter-spacing:1.5px; padding:2px 9px;
-  border:1px solid; flex-shrink:0; white-space:nowrap;
+.btn-sm:hover{ background:var(--bg2); }
+.btn-sm.active{
+  background:var(--cyan); color:var(--bg0);
+  border-color:var(--cyan);
 }
-.b-yes{border-color:var(--green); color:var(--green); background:rgba(0,255,159,.07)}
-.b-no {border-color:var(--pink);  color:var(--pink);  background:rgba(255,45,120,.07)}
-.b-ion{border-color:var(--yellow);color:var(--yellow);background:rgba(255,217,61,.09)}
-[data-theme="light"] .b-yes{background:rgba(29,158,117,.09); font-weight:700}
-[data-theme="light"] .b-no {background:rgba(192,48,106,.08); font-weight:700}
-[data-theme="light"] .b-ion{background:rgba(192,120,0,.10); font-weight:700}
+[data-theme="light"] .btn-sm{ color:#1a1a1a; }
+[data-theme="light"] .btn-sm.active{ color:#fff; }
 
-.sl-row{display:flex; align-items:center; gap:10px; margin-bottom:8px}
-.sl-lbl{font-size:11px; color:var(--cyan); letter-spacing:2px; width:108px; flex-shrink:0}
-input[type=range]{flex:1; accent-color:var(--cyan); cursor:pointer; height:3px}
-.sl-val{font-size:13px; min-width:68px; text-align:right; color:var(--text); white-space:nowrap}
-.sl-ev{font-size:12px; color:var(--green); min-width:60px; text-align:right; white-space:nowrap}
-[data-theme="light"] .sl-lbl{font-weight:700}
-[data-theme="light"] .sl-val{font-weight:700}
-[data-theme="light"] .sl-ev{font-weight:700}
-
-.swatch-row{display:flex; align-items:center; gap:10px; margin-bottom:9px}
-.swatch-lbl{font-size:11px; color:var(--dim); letter-spacing:2px; width:108px; flex-shrink:0}
-[data-theme="light"] .swatch-lbl{color:#1a1a1a; font-weight:700}
-.swatch-bar{flex:1; height:8px; position:relative; overflow:visible; border:1px solid var(--border)}
-.swatch-marker{
-  position:absolute; top:-4px; width:3px; height:16px;
-  background:var(--text); transform:translateX(-50%);
-  box-shadow:0 0 5px rgba(255,255,255,.6); transition:left .08s;
-}
-[data-theme="light"] .swatch-marker{background:#000; box-shadow:0 0 4px rgba(0,0,0,.4)}
-.swatch-tag{font-size:11px; min-width:62px; text-align:right; white-space:nowrap; font-weight:700}
-
-/* ── Akkumuleret spektrum-række (erstatter FOTONFARVE i akkumulerings-mode) ── */
-.spec-row{display:none; align-items:flex-end; gap:10px; margin-bottom:9px}
-.spec-row.on{display:flex}
-.swatch-row.off{display:none}
-.spec-lbl{font-size:11px; color:var(--cyan); letter-spacing:2px; width:108px; flex-shrink:0; padding-bottom:2px}
-[data-theme="light"] .spec-lbl{font-weight:700}
-.spec-canvas{flex:1; height:62px; display:block; border:1px solid var(--border); background:#000}
-[data-theme="light"] .spec-canvas{background:#1a1a1a; border-color:#888}
-.spec-tag{font-size:10px; min-width:62px; text-align:right; white-space:nowrap; color:var(--dim); padding-bottom:2px; line-height:1.3}
-[data-theme="light"] .spec-tag{color:#1a1a1a; font-weight:700}
-
-/* ── Start-level selector ── */
-.nl-row{display:flex; align-items:center; gap:10px; margin-bottom:9px}
-.nl-lbl{font-size:11px; color:var(--cyan); letter-spacing:2px; width:108px; flex-shrink:0}
-[data-theme="light"] .nl-lbl{font-weight:700}
-.nl-btns{display:flex; gap:4px; flex:1}
-.nl-btn{
-  flex:1; background:transparent; border:1px solid var(--dim); color:var(--dim);
-  font-family:var(--font); font-size:11px; letter-spacing:1px;
-  padding:4px 0; cursor:pointer; text-align:center; transition:all var(--tr);
-  text-transform:none;
-}
-.nl-btn:hover{border-color:var(--cyan); color:var(--cyan)}
-.nl-btn.nl-on{
-  border-color:var(--cyan); color:var(--cyan);
-  background:rgba(0,207,255,.13);
-  box-shadow:0 0 8px rgba(0,207,255,.35);
-}
-[data-theme="light"] .nl-btn{color:#1a1a1a; border-color:#a89c88; font-weight:700}
-[data-theme="light"] .nl-btn:hover{border-color:var(--cyan); color:var(--cyan); background:rgba(55,138,221,.06)}
-[data-theme="light"] .nl-btn.nl-on{
-  background:var(--cyan); border-color:var(--cyan); color:#fff;
-  box-shadow:none;
-}
-
-/* ── Buttons ── */
-.btn-row{display:flex; gap:7px; justify-content:center; flex-wrap:wrap}
-button{
-  background:transparent; border:1px solid var(--cyan); color:var(--cyan);
-  font-family:var(--font); font-size:11px; letter-spacing:2px;
-  padding:6px 13px; cursor:pointer; transition:background var(--tr), box-shadow var(--tr);
+/* Big action buttons */
+.btn-row{ display:flex; gap:8px; flex-wrap:wrap; margin-top:10px; }
+.btn-big{
+  flex:1; min-width:90px;
+  background:var(--green); color:var(--bg0);
+  border:none; padding:10px 12px;
+  font-family:var(--font); font-size:.85rem; font-weight:700;
+  cursor:pointer; transition:var(--tr); letter-spacing:.08em;
   text-transform:uppercase;
 }
-button:hover{background:rgba(0,207,255,.1); box-shadow:0 0 12px rgba(0,207,255,.3)}
-button.on{background:rgba(0,207,255,.18)}
-.bm{border-color:var(--dim); color:var(--dim)}
-.bm:hover{background:rgba(140,180,200,.10)!important; box-shadow:none!important}
+.btn-big:hover:not(:disabled){ filter:brightness(1.12); }
+.btn-big:disabled{ opacity:.35; cursor:not-allowed; }
+.btn-big.reset  { background:var(--yellow); }
+.btn-big.clear  { background:var(--cyan);  }
+[data-theme="light"] .btn-big{ color:#fff; }
 
-[data-theme="light"] button{color:#1a1a1a; border-color:var(--cyan); font-weight:700}
-[data-theme="light"] button:hover{background:rgba(55,138,221,.08); box-shadow:none}
-[data-theme="light"] button.on{background:var(--cyan); color:#fff}
-[data-theme="light"] .bm{color:#1a1a1a; border-color:#a89c88}
-[data-theme="light"] .bm:hover{background:rgba(0,0,0,.05)!important}
+/* Status + match badge */
+.status-box{
+  background:var(--bg2); border:1px solid var(--border);
+  border-radius:4px; padding:8px 10px; margin-top:2px;
+}
+.status-txt{
+  font-size:.82rem; color:var(--text); line-height:1.4;
+  min-height:1.6em;
+}
+[data-theme="light"] .status-txt{ color:#1a1a1a; }
+.badge{
+  display:inline-block;
+  font-size:.72rem; letter-spacing:.08em; padding:3px 9px;
+  border:1px solid; border-radius:3px;
+  font-weight:700;
+  margin-top:6px;
+}
+.b-yes{ border-color:var(--green); color:var(--green); background:rgba(0,255,159,.08); }
+.b-no { border-color:var(--red);   color:var(--red);   background:rgba(255,68,102,.08); }
+.b-ion{ border-color:var(--yellow);color:var(--yellow);background:rgba(255,217,61,.10); }
+[data-theme="light"] .b-yes{ background:rgba(29,158,117,.10); }
+[data-theme="light"] .b-no { background:rgba(192,48,106,.10); }
+[data-theme="light"] .b-ion{ background:rgba(192,120,0,.12); }
+
+/* ── Visualization box ──────────────────────────────────────────────────── */
+.viz-row{
+  display:grid; grid-template-columns:1fr 260px; gap:12px;
+  margin-bottom:14px;
+}
+canvas{ display:block; width:100%; background:var(--bg1); border:1px solid var(--border); border-radius:4px; }
+
+/* ── Emission log (HTML text — crisp!) ──────────────────────────────────── */
+.log-area{
+  background:var(--bg2); border:1px solid var(--border);
+  border-radius:4px; padding:12px 14px;
+  min-height:80px;
+  font-family:'Courier New',monospace;
+}
+.log-empty{
+  color:var(--dim); font-size:.85rem; font-style:italic;
+  line-height:1.5;
+}
+[data-theme="light"] .log-empty{ color:#333; font-style:italic; font-weight:700; }
+.log-line{
+  display:grid;
+  grid-template-columns: 72px 1fr;
+  gap:8px; align-items:baseline;
+  font-size:.92rem; font-weight:700;
+  line-height:1.75; letter-spacing:.02em;
+}
+.log-line span{ white-space:nowrap; }
+.log-transition{ text-align:left; }
+.log-energy   { text-align:left; }
+.log-divider{
+  height:1px; background:var(--border);
+  margin:8px 0;
+}
+.log-sum{
+  font-size:.88rem; font-weight:700;
+  line-height:1.6; color:var(--text);
+  overflow-wrap:break-word;
+  margin-bottom:3px;
+}
+.log-sum .lbl{ color:var(--dim); margin-right:4px; }
+[data-theme="light"] .log-sum .lbl{ color:#1a1a1a; }
+.log-check{
+  display:inline-block;
+  color:var(--green); margin-left:8px;
+  text-shadow:0 0 8px rgba(0,255,159,.5);
+  animation:checkfade .5s ease-in;
+}
+[data-theme="light"] .log-check{ text-shadow:none; }
+@keyframes checkfade{
+  from{ opacity:0; transform:translateX(-6px); }
+  to  { opacity:1; transform:translateX(0); }
+}
+
+/* ── Spectrum ───────────────────────────────────────────────────────────── */
+#specBox.hide{ display:none; }
+.spec-wrap{
+  position:relative;
+}
+#specCanvas{
+  width:100%; height:60px;
+  background:#000; border:1px solid var(--border);
+  border-radius:4px;
+}
+[data-theme="light"] #specCanvas{ background:#141414; }
+
+/* ── Responsive ─────────────────────────────────────────────────────────── */
+@media (max-width:900px){
+  .row.split{ grid-template-columns:1fr; }
+  .viz-row  { grid-template-columns:1fr; }
+}
 </style>
 </head>
 <body>
-<div class="sim">
-  <div class="hd">
+
+<header>
+  <div class="title-wrap">
     <span class="atom-icon" aria-hidden="true">
       <svg viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
         <defs>
@@ -188,77 +285,161 @@ button.on{background:rgba(0,207,255,.18)}
             <stop offset="100%" stop-color="currentColor" stop-opacity="0"/>
           </radialGradient>
         </defs>
-        <!-- s-orbital probability cloud -->
         <circle cx="12" cy="12" r="9" fill="url(#acloud)"/>
-        <!-- p-orbital lobes (crossed) -->
         <ellipse cx="12" cy="12" rx="10.5" ry="3.4" fill="none" stroke="currentColor" stroke-width="0.8" opacity="0.7"/>
         <ellipse cx="12" cy="12" rx="3.4" ry="10.5" fill="none" stroke="currentColor" stroke-width="0.8" opacity="0.7"/>
-        <!-- nucleus -->
         <circle cx="12" cy="12" r="1.7" fill="currentColor"/>
       </svg>
     </span>
-    <div class="hd-titles">
-      <div class="hd-title"><span class="t-green">BOHR-MODELLEN</span><span class="t-dash">–</span><span class="t-cyan">SPEKTRALLINJER</span></div>
-      <div class="hd-sub">HYDROGEN · ENERGINIVEAUER n=1..6 · DIPOLTRANSITIONER</div>
+    <h1><span class="h-green">BOHR-MODELLEN</span><span class="h-dash">—</span><span class="h-cyan">SPEKTRALLINJER</span></h1>
+  </div>
+  <div class="header-btns">
+    <button class="btn-util" id="copyBtn">Kopier kode</button>
+    <button class="btn-util" id="themeBtn">Lyst tema</button>
+  </div>
+</header>
+
+<main>
+  <div class="row split">
+
+    <!-- ═══ LEFT: Controls + Emissions log ═══ -->
+    <div class="left-col">
+      <div class="box">
+        <div class="sec-title">Indstillinger</div>
+
+        <div class="ctrl">
+          <div class="ctrl-row">
+            <span class="ctrl-label">Starttilstand</span>
+          </div>
+          <div class="btn-grp" id="nBtns">
+            <button class="btn-sm active" data-n="1">n=1</button>
+            <button class="btn-sm"        data-n="2">n=2</button>
+            <button class="btn-sm"        data-n="3">n=3</button>
+            <button class="btn-sm"        data-n="4">n=4</button>
+            <button class="btn-sm"        data-n="5">n=5</button>
+            <button class="btn-sm"        data-n="6">n=6</button>
+          </div>
+        </div>
+
+        <div class="ctrl">
+          <div class="ctrl-row">
+            <span class="ctrl-label">Bølgelængde</span>
+            <span class="ctrl-val"><span id="wlv">121.6</span> nm<span class="ev"><span id="ev">10.20</span> eV</span></span>
+          </div>
+          <input type="range" id="sl" min="90" max="700" step="0.1" value="121.6">
+        </div>
+
+        <div class="ctrl">
+          <div class="status-box">
+            <div class="status-txt" id="stTxt">Klar — vælg bølgelængde og klik Afspil.</div>
+            <span class="badge b-no" id="badge">Ingen match</span>
+          </div>
+        </div>
+
+        <div class="btn-row">
+          <button class="btn-big"       id="playBtn">▶ Afspil</button>
+          <button class="btn-big reset" id="resetBtn">↺ Nulstil</button>
+        </div>
+        <div class="btn-row">
+          <button class="btn-big clear" id="clearBtn" disabled>✕ Ryd spektrum</button>
+        </div>
+      </div>
+
+      <div class="box">
+        <div class="sec-title">
+          Emitterede fotoner
+          <span class="st-info" id="logStateInfo">— venter</span>
+        </div>
+        <div class="log-area" id="logArea">
+          <div class="log-empty">Ingen emissioner endnu. Vælg en resonans-bølgelængde (fx 121,6 nm for n=1→2) og tryk Afspil.</div>
+        </div>
+      </div>
+    </div>
+
+    <!-- ═══ RIGHT: Atom + Energy diagram, and Spectrum bar ═══ -->
+    <div class="right-col">
+      <div class="box">
+        <div class="viz-row">
+          <canvas id="aC"></canvas>
+          <canvas id="eC"></canvas>
+        </div>
+      </div>
+      <div class="box hide" id="specBox">
+        <div class="sec-title">
+          Akkumuleret spektrum
+          <span class="st-info" id="specTag">0 fotoner</span>
+        </div>
+        <div class="spec-wrap">
+          <canvas id="specCanvas"></canvas>
+        </div>
+      </div>
     </div>
   </div>
 
-  <div class="main">
-    <canvas id="aC" width="659" height="448"></canvas>
-    <canvas id="eC" width="294" height="448"></canvas>
-  </div>
-
-  <div class="ctrl">
-    <div class="st-row">
-      <span class="st-txt" id="stTxt">KLAR — VÆLG BØLGELÆNGDE OG KLIK AFSPIL</span>
-      <span class="badge b-no" id="badge">INGEN MATCH</span>
-    </div>
-    <div class="nl-row">
-      <span class="nl-lbl">STARTTILSTAND</span>
-      <div class="nl-btns" id="nlBtns">
-        <button class="nl-btn nl-on" data-n="1">n=1</button>
-        <button class="nl-btn"        data-n="2">n=2</button>
-        <button class="nl-btn"        data-n="3">n=3</button>
-        <button class="nl-btn"        data-n="4">n=4</button>
-        <button class="nl-btn"        data-n="5">n=5</button>
-        <button class="nl-btn"        data-n="6">n=6</button>
-      </div>
-    </div>
-    <div class="sl-row">
-      <span class="sl-lbl">BØLGELÆNGDE</span>
-      <input type="range" id="sl" min="90" max="700" step="0.1" value="121.6">
-      <span class="sl-val"><span id="wlv">121.6</span> nm</span>
-      <span class="sl-ev"><span id="ev">10.20</span> eV</span>
-    </div>
-    <div class="swatch-row" id="swatchRow">
-      <span class="swatch-lbl">FOTONFARVE</span>
-      <div class="swatch-bar" id="swatchBar">
-        <div class="swatch-marker" id="swatchMark"></div>
-      </div>
-      <span class="swatch-tag" id="swatchTag" style="color:#dd55ff">UV / 122 nm</span>
-    </div>
-    <div class="spec-row" id="specRow">
-      <span class="spec-lbl">SPEKTRUM</span>
-      <canvas class="spec-canvas" id="specCanvas" width="770" height="62"></canvas>
-      <span class="spec-tag" id="specTag">0 fotoner</span>
-    </div>
-    <div class="btn-row">
-      <button id="playBtn">▶ AFSPIL</button>
-      <button id="resetBtn">↺ NULSTIL</button>
-      <button id="clearBtn" class="bm">✕ RYD SPEKTRUM</button>
-      <button id="copyBtn">⎘ KOPIER KODE</button>
-      <button id="modeBtn" class="bm">☀ LYS TILSTAND</button>
-    </div>
-  </div>
-</div>
+</main>
 
 <script>
 'use strict';
 
+// ── DOM ───────────────────────────────────────────────────────────────────
+const aEl = document.getElementById('aC');
+const eEl = document.getElementById('eC');
+const specEl = document.getElementById('specCanvas');
+
+// ── DPR-aware canvas init (crisp text on retina) ─────────────────────────
+function initCanvas(canvas, cssW, cssH) {
+  const dpr = window.devicePixelRatio || 1;
+  canvas.width = Math.round(cssW * dpr);
+  canvas.height = Math.round(cssH * dpr);
+  canvas.style.width = cssW + 'px';
+  canvas.style.height = cssH + 'px';
+  const ctx = canvas.getContext('2d');
+  ctx.setTransform(1, 0, 0, 1, 0, 0);
+  ctx.scale(dpr, dpr);
+  return ctx;
+}
+
+// Logical (CSS) canvas sizes
+const AW = 540, AH = 490;
+const EW = 260, EH = 490;
+const SPEC_W = 1140, SPEC_H = 60;
+
+// Compute atom canvas actual width based on layout so it can flex properly.
+// We set width via layout, then set bitmap+scale on load.
+function resizeCanvases() {
+  const doOne = (canvas, minW, cssH, ctxKey) => {
+    const rect = canvas.getBoundingClientRect();
+    if (rect.width < 10) return;   // hidden or not laid out yet
+    const cssW = Math.max(minW, Math.floor(rect.width));
+    canvas.__logicalW = cssW;
+    window[ctxKey] = initCanvasFlex(canvas, cssW, cssH);
+  };
+  doOne(aEl,    300, AH,      '__ac');
+  doOne(eEl,    220, EH,      '__ec');
+  doOne(specEl, 600, SPEC_H,  '__sc');
+}
+function initCanvasFlex(canvas, cssW, cssH) {
+  const dpr = window.devicePixelRatio || 1;
+  canvas.width = Math.round(cssW * dpr);
+  canvas.height = Math.round(cssH * dpr);
+  canvas.style.height = cssH + 'px';
+  const ctx = canvas.getContext('2d');
+  ctx.setTransform(dpr, 0, 0, dpr, 0, 0);
+  return ctx;
+}
+
+// Logical drawing dimensions (updated on resize)
+function getAW(){ return aEl.__logicalW || AW; }
+function getAH(){ return AH; }
+function getEW(){ return eEl.__logicalW || EW; }
+function getEH(){ return EH; }
+function getSW(){ return specEl.__logicalW || SPEC_W; }
+function getSH(){ return SPEC_H; }
+
 // ── Physics ───────────────────────────────────────────────────────────────
-const HC = 1240;                           // eV·nm
-const En = n => -13.6 / (n * n);          // energy of level n (eV)
-const ionE = n => Math.abs(En(n));         // ionization energy from n (eV)
+const HC = 1240;                          // eV·nm
+const En = n => -13.6 / (n * n);
+const ionE = n => Math.abs(En(n));
 
 function calcAbsTrans(fromN) {
   const res = [];
@@ -276,28 +457,21 @@ function findAbs(lam) {
   return null;
 }
 
-// Wavelength → color. Theme-aware. Pædagogisk farvelogik:
-//   • UV (<380 nm) tegnes som blåhvid — signalere "usynlig for øjet, kort λ".
-//   • Synligt område (380-700 nm) får ægte regnbuefarver: H-α 656 → rød,
-//     H-β 486 → cyan-blå, H-γ 434 → blå-violet, H-δ 410 → violet.
-//   • IR (>700 nm) tegnes som lysegrå — signalere "usynlig, lang λ".
-// Effekt: i spektrum og energidiagram er Balmer-linjerne de eneste farvede,
-// mens Lyman og Paschen står som neutrale, så man visuelt ser hvad et menneske
-// kan se vs. hvad et instrument måler.
+// Wavelength → color.
 function wlCol(nm) {
   if (dark) {
-    if (nm < 380) return '#dde6ff';   // UV — blåhvid
-    if (nm < 425) return '#9040ff';   // violet (H-δ 410)
-    if (nm < 460) return '#5060ff';   // blå-violet (H-γ 434)
-    if (nm < 500) return '#2090ff';   // cyan-blå (H-β 486)
-    if (nm < 520) return '#00ccdd';   // cyan
-    if (nm < 560) return '#00cc55';   // grøn
-    if (nm < 590) return '#aacc00';   // gul-grøn
-    if (nm < 620) return '#ffaa00';   // gul/amber
-    if (nm < 700) return '#ff2222';   // rød (H-α 656)
-    return '#b8b8b8';                  // IR — lysegrå
+    if (nm < 380) return '#dde6ff';
+    if (nm < 425) return '#9040ff';
+    if (nm < 460) return '#5060ff';
+    if (nm < 500) return '#2090ff';
+    if (nm < 520) return '#00ccdd';
+    if (nm < 560) return '#00cc55';
+    if (nm < 590) return '#aacc00';
+    if (nm < 620) return '#ffaa00';
+    if (nm < 700) return '#ff2222';
+    return '#b8b8b8';
   } else {
-    if (nm < 380) return '#3a4880';   // UV — kølig mørk blå-grå
+    if (nm < 380) return '#3a4880';
     if (nm < 425) return '#5030b0';
     if (nm < 460) return '#3030a0';
     if (nm < 500) return '#205090';
@@ -305,22 +479,11 @@ function wlCol(nm) {
     if (nm < 560) return '#1D9E75';
     if (nm < 590) return '#7a8800';
     if (nm < 620) return '#a05000';
-    if (nm < 700) return '#b00010';   // rød (H-α)
-    return '#707070';                  // IR — mørk grå
+    if (nm < 700) return '#b00010';
+    return '#707070';
   }
 }
 const seriesName = lo => (['','Lyman','Balmer','Paschen','Brackett','Pfund'][lo]||'');
-const wlLabel = nm => nm < 380 ? `UV / ${nm.toFixed(0)} nm` : nm > 700 ? `IR / ${nm.toFixed(0)} nm` : `${nm.toFixed(0)} nm`;
-
-// ── Canvas ────────────────────────────────────────────────────────────────
-const aEl = document.getElementById('aC');
-const eEl = document.getElementById('eC');
-const ac = aEl.getContext('2d');
-const ec = eEl.getContext('2d');
-const AW = aEl.width, AH = aEl.height;
-const EW = eEl.width, EH = eEl.height;
-const CX = AW * 0.46, CY = AH * 0.5;
-const R = n => 34 * n;
 
 // ── State ─────────────────────────────────────────────────────────────────
 let dark = true;
@@ -338,13 +501,43 @@ let ePh = [], elog = [];
 let lastTs = 0;
 let ionAngle = 0, ionProgress = 0;
 let ionBallX = 0, ionBallY = 0;
-let absorbedE = 0;        // energi absorberet i nuværende skud (eV)
-let hoverN = null;        // hvilket niveau hover'es over i energidiagrammet
+let absorbedE = 0;
+let hoverN = null;
+
+// Atom center — recomputed each frame from current logical AW/AH
+function CX(){ return getAW() * 0.50; }
+function CY(){ return getAH() * 0.50; }
+const R = n => 34 * n;
+
+// ── Spectrum accumulator ─────────────────────────────────────────────────
+const spectrum = new Map();
+let totalPhotons = 0;
+
+function recordEmission(lam) {
+  if (lam < 80 || lam > 2000) return;
+  const key = Math.round(lam);
+  spectrum.set(key, (spectrum.get(key) || 0) + 1);
+  totalPhotons++;
+  if (document.getElementById('specBox').classList.contains('hide')) {
+    activateSpectrumView();
+  }
+  document.getElementById('clearBtn').disabled = false;
+}
+function activateSpectrumView() {
+  document.getElementById('specBox').classList.remove('hide');
+  requestAnimationFrame(resizeCanvases);
+}
+function clearSpectrum() {
+  spectrum.clear();
+  totalPhotons = 0;
+  document.getElementById('specBox').classList.add('hide');
+  document.getElementById('clearBtn').disabled = true;
+  drawSpectrum();
+}
 
 // ── Electron cloud ────────────────────────────────────────────────────────
 let lastCloudN = -1;
 let cloudRings = [];
-
 function buildCloud(n) {
   if (n === lastCloudN) return;
   lastCloudN = n;
@@ -361,14 +554,13 @@ function buildCloud(n) {
     cloudRings.push({ r, alpha: density });
   }
 }
-
 function drawCloudAt(ctx, cx, cy, t, fadeAlpha) {
   ctx.save();
   const peakAlpha = dark ? 0.38 : 0.28;
   for (const ring of cloudRings) {
     ctx.globalAlpha = ring.alpha * peakAlpha * fadeAlpha;
     ctx.strokeStyle = t.eCol;
-    ctx.lineWidth = (rMax(lastCloudN) - rMin(lastCloudN)) / 180 + 0.5;
+    ctx.lineWidth = 1;
     if (dark) { ctx.shadowColor = t.eCol; ctx.shadowBlur = 2 + ring.alpha * 5; }
     ctx.beginPath();
     ctx.arc(cx, cy, ring.r, 0, Math.PI * 2);
@@ -376,10 +568,8 @@ function drawCloudAt(ctx, cx, cy, t, fadeAlpha) {
   }
   ctx.restore();
 }
-function rMin(n) { const sigma = 5 + n * 2.8; return Math.max(2, R(n) - sigma * 3.2); }
-function rMax(n) { const sigma = 5 + n * 2.8; return R(n) + sigma * 3.2; }
 
-// ── Theme (canvas colors — hardcoded per skabelon §3) ─────────────────────
+// ── Theme (canvas colors) ─────────────────────────────────────────────────
 const T = () => dark ? {
   bg:'#060e18',
   grid:'rgba(29,58,82,.55)',
@@ -415,7 +605,6 @@ const T = () => dark ? {
 // ── Non-linear energy → y mapping ─────────────────────────────────────────
 const EPS = 0.20;
 const LOG_MAX = Math.log(13.6 / EPS + 1);
-
 function e2y(e, PB, PH) {
   const be = Math.max(0, -e);
   const frac = 1 - Math.log(be / EPS + 1) / LOG_MAX;
@@ -428,7 +617,6 @@ function drawGrid(ctx, w, h) {
   for (let x = s; x < w; x += s) { ctx.beginPath(); ctx.moveTo(x,0); ctx.lineTo(x,h); ctx.stroke(); }
   for (let y = s; y < h; y += s) { ctx.beginPath(); ctx.moveTo(0,y); ctx.lineTo(w,y); ctx.stroke(); }
 }
-// Glow helper — skabelon: ingen glød i lyst tema
 function glw(ctx, col, b) {
   if (!dark) { ctx.shadowBlur = 0; return; }
   ctx.shadowColor = col; ctx.shadowBlur = b;
@@ -464,9 +652,12 @@ function waveArrow(ctx, x1, y1, x2, y2, col, amp) {
 
 // ── Atom canvas ───────────────────────────────────────────────────────────
 function drawAtom() {
+  const ac = window.__ac;
+  if (!ac) return;
   const t = T();
-  ac.fillStyle = t.bg; ac.fillRect(0, 0, AW, AH);
-  drawGrid(ac, AW, AH); corners(ac, AW, AH, 20);
+  const aw = getAW(), ah = getAH(), cx = CX(), cy = CY();
+  ac.fillStyle = t.bg; ac.fillRect(0, 0, aw, ah);
+  drawGrid(ac, aw, ah); corners(ac, aw, ah, 20);
 
   // Orbits + n-labels
   for (let n = 1; n <= 6; n++) {
@@ -474,33 +665,33 @@ function drawAtom() {
     ac.strokeStyle = act ? t.orbHi : t.orb;
     ac.lineWidth = act ? 1.5 : 1;
     ac.setLineDash([5, 5]);
-    ac.beginPath(); ac.arc(CX, CY, r, 0, Math.PI * 2); ac.stroke();
+    ac.beginPath(); ac.arc(cx, cy, r, 0, Math.PI * 2); ac.stroke();
     ac.setLineDash([]);
     ac.fillStyle = act ? t.eCol : t.tick;
-    ac.font = (act ? 'bold ' : 'bold ') + '12px Courier New';
+    ac.font = 'bold 12px Courier New';
     ac.textAlign = 'left';
-    ac.fillText('n=' + n, CX + r + 6, CY + 4);
+    ac.fillText('n=' + n, cx + r + 6, cy + 4);
   }
 
   // Nucleus
-  const ng = ac.createRadialGradient(CX,CY,0,CX,CY,26);
+  const ng = ac.createRadialGradient(cx,cy,0,cx,cy,26);
   ng.addColorStop(0, dark?'rgba(255,100,0,.35)':'rgba(180,40,0,.22)');
   ng.addColorStop(1,'transparent');
-  ac.fillStyle = ng; ac.beginPath(); ac.arc(CX,CY,26,0,Math.PI*2); ac.fill();
+  ac.fillStyle = ng; ac.beginPath(); ac.arc(cx,cy,26,0,Math.PI*2); ac.fill();
   glw(ac, t.nucGlow, 15);
-  ac.fillStyle = t.nuc; ac.beginPath(); ac.arc(CX,CY,10,0,Math.PI*2); ac.fill();
+  ac.fillStyle = t.nuc; ac.beginPath(); ac.arc(cx,cy,10,0,Math.PI*2); ac.fill();
   noglw(ac);
   ac.fillStyle = ss === 'IONIZED' ? (dark?'#ffaa00':'#9c5e00') : '#fff';
   ac.font = 'bold 9px Courier New';
   ac.textAlign = 'center'; ac.textBaseline = 'middle';
-  ac.fillText(ss === 'IONIZED' ? 'H⁺' : 'p⁺', CX, CY);
+  ac.fillText(ss === 'IONIZED' ? 'H⁺' : 'p⁺', cx, cy);
   ac.textBaseline = 'alphabetic';
 
   // Electron cloud / ionization
   buildCloud(eN);
   if (ss === 'IONIZING') {
     const cloudFade = Math.max(0, 1 - ionProgress * 2.5);
-    if (cloudFade > 0) drawCloudAt(ac, CX, CY, t, cloudFade);
+    if (cloudFade > 0) drawCloudAt(ac, cx, cy, t, cloudFade);
     glw(ac, t.eCol, 16);
     ac.fillStyle = t.eCol;
     ac.beginPath(); ac.arc(ionBallX, ionBallY, 6, 0, Math.PI * 2); ac.fill();
@@ -512,13 +703,13 @@ function drawAtom() {
     const ionCol = dark ? '#ffaa00' : '#9c5e00';
     glw(ac, ionCol, 14);
     ac.fillStyle = ionCol; ac.font = 'bold 16px Courier New'; ac.textAlign = 'center';
-    ac.fillText('IONISERET', CX, CY - 38);
+    ac.fillText('IONISERET', cx, cy - 44);
     noglw(ac);
     ac.fillStyle = t.tx; ac.font = 'bold 11px Courier New';
-    ac.fillText('Elektronen er frigjort fra atomet', CX, CY - 20);
+    ac.fillText('Elektronen er frigjort fra atomet', cx, cy - 26);
     ac.textAlign = 'left';
   } else {
-    drawCloudAt(ac, CX, CY, t, 1);
+    drawCloudAt(ac, cx, cy, t, 1);
   }
 
   // Emission photons
@@ -531,114 +722,49 @@ function drawAtom() {
 
   // Incoming photon
   if (ss === 'SHOOTING') {
-    const stopX = CX - R(startN) - 8;
+    const stopX = cx - R(startN) - 8;
     const sx = Math.max(-15, pX - 90), ex2 = Math.min(pX, stopX);
-    if (ex2 > sx + 5) waveArrow(ac, sx, CY, ex2, CY, pCol);
+    if (ex2 > sx + 5) waveArrow(ac, sx, cy, ex2, cy, pCol);
   }
   if (ss === 'PASSING') {
     const sx = Math.max(-15, pX - 90);
-    if (pX > sx + 5) waveArrow(ac, sx, CY, pX, CY, pCol);
+    if (pX > sx + 5) waveArrow(ac, sx, cy, pX, cy, pCol);
   }
 
   if (flash > 0) {
     ac.fillStyle = dark ? `rgba(255,255,255,${flash})` : `rgba(255,250,235,${flash*1.1})`;
-    ac.fillRect(0,0,AW,AH);
+    ac.fillRect(0,0,aw,ah);
   }
 
-  // Info text (top-left)
-  ac.fillStyle = t.tx2; ac.font = 'bold 14px Courier New'; ac.textAlign = 'left';
-  ac.fillText(`λ = ${selWL.toFixed(1)} nm     E = ${(HC/selWL).toFixed(2)} eV`, 10, 24);
-  ac.fillStyle = t.tx; ac.font = 'bold 12px Courier New';
-  if (ss !== 'IONIZED') {
-    ac.fillText(`ELEKTRONNIVEAU: n = ${eN}   (${En(eN).toFixed(2)} eV)`, 10, 44);
-  }
-
-  // Emission log + energiregnskab (bottom-left)
-  if (elog.length > 0) {
-    const LH = 17;
-    const BOTTOM = AH - 10;
-    // Antal linjer: 1 header + N emissioner + 1 divider + 1 sum + 1 absorberet = N+4
-    const totalLines = elog.length + 4;
-    const headerY = BOTTOM - totalLines * LH;
-
-    // Header
-    ac.fillStyle = t.tx; ac.font = 'bold 11px Courier New';
-    ac.textAlign = 'left'; ac.textBaseline = 'alphabetic';
-    ac.fillText('EMITTEREDE FOTONER:', 10, headerY);
-
-    // Hjælpefunktioner til pæn tabelopstilling i Courier
-    const dec = (x, d) => x.toFixed(d).replace('.', ',');
-    const padL = (s, n) => { while (s.length < n) s = ' ' + s; return s; };
-    const padR = (s, n) => { while (s.length < n) s = s + ' '; return s; };
-
-    // Emissions-linjer
-    let sumEmit = 0;
-    elog.forEach((e, i) => {
-      const dE = En(e.hi) - En(e.lo);
-      sumEmit += dE;
-      const col = wlCol(e.lam);
-      const tag = e.lam < 380 ? 'UV' : e.lam > 700 ? 'IR' : 'synlig';
-      const y = headerY + (i + 1) * LH + 4;
-      if (dark) { ac.shadowColor = col; ac.shadowBlur = 10; }
-      ac.fillStyle = col; ac.font = 'bold 11px Courier New';
-      const txt = `n=${e.hi}→${e.lo}:  E = ${padL(dec(dE,2),5)} eV    λ = ${padL(e.lam.toFixed(0),4)} nm    ${padR(seriesName(e.lo),8)} (${tag})`;
-      ac.fillText(txt, 10, y);
-    });
-    ac.shadowBlur = 0;
-
-    // Divider-streg
-    const divY = headerY + (elog.length + 1) * LH + 4;
-    ac.strokeStyle = t.dim;
-    ac.lineWidth = 1;
-    ac.beginPath(); ac.moveTo(10, divY - 2); ac.lineTo(440, divY - 2); ac.stroke();
-
-    // Σ-linje med eksplicit addition
-    const sumY = headerY + (elog.length + 2) * LH + 4;
-    const parts = elog.map(e => dec(En(e.hi) - En(e.lo), 2));
-    const sumStr = parts.length === 1
-      ? `${parts[0]} eV`
-      : `${parts.join(' + ')} = ${dec(sumEmit, 2)} eV`;
-    ac.fillStyle = t.tx; ac.font = 'bold 11px Courier New';
-    ac.fillText(`Σ E_emit  = ${sumStr}`, 10, sumY);
-
-    // E_absorberet-linje med ✓ når energibevarelse er opfyldt
-    const absY = headerY + (elog.length + 3) * LH + 4;
-    const complete = Math.abs(sumEmit - absorbedE) < 0.01;
-    ac.fillStyle = t.tx;
-    ac.fillText(`E_absorb. = ${dec(absorbedE, 2)} eV`, 10, absY);
-    if (complete) {
-      if (dark) { ac.shadowColor = t.green; ac.shadowBlur = 8; }
-      ac.fillStyle = t.green;
-      ac.fillText('  ✓ energibevarelse', 230, absY);
-      ac.shadowBlur = 0;
-    }
-  }
-
+  // Pause overlay
   if (paused && ss !== 'READY') {
     ac.fillStyle = dark ? 'rgba(6,14,24,.70)' : 'rgba(244,238,227,.75)';
-    ac.fillRect(0, 0, AW, AH);
+    ac.fillRect(0, 0, aw, ah);
     glw(ac, t.ac, 18);
     ac.fillStyle = t.ac; ac.font = 'bold 20px Courier New'; ac.textAlign = 'center';
-    ac.fillText('[ PAUSE ]', AW/2, AH/2);
+    ac.fillText('[ PAUSE ]', aw/2, ah/2);
     noglw(ac); ac.textAlign = 'left';
   }
 }
 
 // ── Energy diagram ────────────────────────────────────────────────────────
 function drawEnergy() {
+  const ec = window.__ec;
+  if (!ec) return;
   const t = T();
-  ec.fillStyle = t.bg; ec.fillRect(0, 0, EW, EH);
-  drawGrid(ec, EW, EH); corners(ec, EW, EH, 16);
+  const ew = getEW(), eh = getEH();
+  ec.fillStyle = t.bg; ec.fillRect(0, 0, ew, eh);
+  drawGrid(ec, ew, eh); corners(ec, ew, eh, 16);
 
   // Title
   ec.fillStyle = t.ac; ec.font = 'bold 12px Courier New'; ec.textAlign = 'center';
-  ec.fillText('ENERGINIVEAUER', EW/2, 20);
+  ec.fillText('ENERGINIVEAUER', ew/2, 20);
   ec.fillStyle = t.tx; ec.font = 'bold 11px Courier New';
-  ec.fillText('HYDROGEN (eV)', EW/2, 33);
+  ec.fillText('HYDROGEN (eV)', ew/2, 33);
 
   // Plot bounds
-  const PT = 46, PB = EH - 24, PH = PB - PT;
-  const LX = 38, RX = EW - 8, MX = (LX + RX) / 2;
+  const PT = 46, PB = eh - 24, PH = PB - PT;
+  const LX = 38, RX = ew - 8, MX = (LX + RX) / 2;
   const yOf = e => e2y(e, PB, PH);
 
   // Ionization limit
@@ -652,7 +778,7 @@ function drawEnergy() {
   ec.textAlign = 'right'; ec.fillText('0.00', RX, yInf - 10);
   ec.textBaseline = 'alphabetic';
   ec.fillStyle = t.dim; ec.font = 'bold 9px Courier New'; ec.textAlign = 'center';
-  ec.fillText('(log skala)', EW/2, yInf + 11);
+  ec.fillText('(log skala)', ew/2, yInf + 11);
 
   // Energy levels n=1..6
   for (let n = 1; n <= 6; n++) {
@@ -663,12 +789,10 @@ function drawEnergy() {
     if (hov && dark) { ec.shadowColor = '#ffffff'; ec.shadowBlur = 8; }
     ec.beginPath(); ec.moveTo(LX, y); ec.lineTo(RX, y); ec.stroke();
     ec.shadowBlur = 0;
-    // n= label (left)
     ec.fillStyle = hov ? (dark ? '#ffffff' : '#000000') : (act ? t.tx2 : t.tick);
     ec.font = 'bold 12px Courier New';
     ec.textBaseline = 'middle'; ec.textAlign = 'right';
     ec.fillText('n='+n, LX-3, y);
-    // energy value (right, above line)
     ec.fillStyle = hov ? (dark ? '#ffffff' : '#000000') : (act ? t.tx2 : t.tick);
     ec.font = 'bold 11px Courier New';
     ec.textBaseline = 'alphabetic'; ec.textAlign = 'right';
@@ -676,7 +800,7 @@ function drawEnergy() {
     ec.textBaseline = 'alphabetic';
   }
 
-  // STEP 1: Emission arrows (behind)
+  // Emission arrows behind
   if (dStep > 0 && dPath.length > 1) {
     for (let i = 0; i < dStep && i < dPath.length - 1; i++) {
       const fN = dPath[i], tN = dPath[i+1];
@@ -699,7 +823,7 @@ function drawEnergy() {
     }
   }
 
-  // STEP 2: Absorption / ionization arrow
+  // Absorption / ionization arrow
   if ((ss === 'READY' || ss === 'SHOOTING') && dStep === 0) {
     const pE = HC / selWL;
     const y1 = yOf(En(startN));
@@ -756,125 +880,120 @@ function drawEnergy() {
   if (hoverN !== null) {
     if (dark) { ec.shadowColor = '#ffffff'; ec.shadowBlur = 6; }
     ec.fillStyle = dark ? '#ffffff' : '#000000';
-    ec.fillText(`klik for at vælge n=${hoverN}`, EW/2, EH - 8);
+    ec.fillText(`klik for at vælge n=${hoverN}`, ew/2, eh - 8);
     ec.shadowBlur = 0;
   } else {
-    ec.fillText('Energi (eV)', EW/2, EH - 8);
+    ec.fillText('Energi (eV)', ew/2, eh - 8);
   }
 }
 
-// ── Decay helper ──────────────────────────────────────────────────────────
-// ── Spektrum-akkumulator ──────────────────────────────────────────────────
-// Spektret fyldes udelukkende op af enkelt-shots: hver gang elektronen henfalder
-// fra et exciteret niveau, registreres emissionen som en bjælke. Panelet vises
-// automatisk når første emission sker. Sqrt-skala bruges på bjælkehøjderne så
-// svage linjer (H-γ, H-δ) er synlige selvom Ly-α er væsentligt hyppigere.
-const spectrum = new Map();    // λ (rounded to 1 nm) → count
-let totalPhotons = 0;
-
-function recordEmission(lam) {
-  // Filtrer linjer udenfor 80-2000 nm vinduet (Brackett 4→3 ved 1875 nm slipper
-  // ind, men Brackett 5→4 ved 4051 nm, Pfund osv. holdes ude — de vises alligevel
-  // aldrig, og oprydningen gør spektrum-datastrukturen kompakt).
-  if (lam < 80 || lam > 2000) return;
-  const key = Math.round(lam);
-  spectrum.set(key, (spectrum.get(key) || 0) + 1);
-  totalPhotons++;
-  // Vis spektrum-panelet automatisk ved første emission
-  if (!document.getElementById('specRow').classList.contains('on')) {
-    activateSpectrumView();
-  }
-}
-function activateSpectrumView() {
-  document.getElementById('swatchRow').classList.add('off');
-  document.getElementById('specRow').classList.add('on');
-}
-function clearSpectrum() {
-  spectrum.clear();
-  totalPhotons = 0;
-  document.getElementById('swatchRow').classList.remove('off');
-  document.getElementById('specRow').classList.remove('on');
-  drawSpectrum();
-}
-
-// ── Spektrum-tegning ──────────────────────────────────────────────────────
-const specCanvas = document.getElementById('specCanvas');
-const specCtx = specCanvas.getContext('2d');
-const SPEC_W = specCanvas.width, SPEC_H = specCanvas.height;
+// ── Spectrum panel ────────────────────────────────────────────────────────
 const SPEC_LAM_MIN = 80, SPEC_LAM_MAX = 2000;
-const lamToSpecX = lam => (lam - SPEC_LAM_MIN) / (SPEC_LAM_MAX - SPEC_LAM_MIN) * SPEC_W;
-
 function drawSpectrum() {
-  const ctx = specCtx;
-  // Baggrund (fotografisk-mørk i begge temaer for kontrast med farvelinjer)
-  ctx.fillStyle = dark ? '#000000' : '#141414';
-  ctx.fillRect(0, 0, SPEC_W, SPEC_H);
+  const sc = window.__sc;
+  if (!sc) return;
+  const sw = getSW(), sh = getSH();
+  sc.fillStyle = dark ? '#000000' : '#141414';
+  sc.fillRect(0, 0, sw, sh);
+  const lamToX = lam => (lam - SPEC_LAM_MIN) / (SPEC_LAM_MAX - SPEC_LAM_MIN) * sw;
 
-  // Synligt vindue (380-700 nm) — let lysere baggrund
-  const vL = lamToSpecX(380), vR = lamToSpecX(700);
-  ctx.fillStyle = 'rgba(255,255,255,.07)';
-  ctx.fillRect(vL, 0, vR - vL, SPEC_H);
-  // Top- og bundkant af det synlige vindue
-  ctx.strokeStyle = 'rgba(255,255,255,.18)';
-  ctx.lineWidth = 1;
-  ctx.beginPath();
-  ctx.moveTo(vL, 0); ctx.lineTo(vL, SPEC_H);
-  ctx.moveTo(vR, 0); ctx.lineTo(vR, SPEC_H);
-  ctx.stroke();
+  // Visible window (380-700 nm)
+  const vL = lamToX(380), vR = lamToX(700);
+  sc.fillStyle = 'rgba(255,255,255,.07)';
+  sc.fillRect(vL, 0, vR - vL, sh);
+  sc.strokeStyle = 'rgba(255,255,255,.18)';
+  sc.lineWidth = 1;
+  sc.beginPath();
+  sc.moveTo(vL, 0); sc.lineTo(vL, sh);
+  sc.moveTo(vR, 0); sc.lineTo(vR, sh);
+  sc.stroke();
 
-  // Find max-count til normalisering (sqrt-skala, så svage linjer er synlige)
+  // Max count for normalization (sqrt scale)
   let maxCount = 1;
   for (const c of spectrum.values()) if (c > maxCount) maxCount = c;
   const maxSqrt = Math.sqrt(maxCount);
 
-  // Plot-område for søjlerne
-  const PLOT_TOP = 14, PLOT_BOT = SPEC_H - 11;
+  const PLOT_TOP = 12, PLOT_BOT = sh - 11;
   const PLOT_H = PLOT_BOT - PLOT_TOP;
 
-  // Linjer (tegnes FØR teksten så labels lægges ovenpå)
+  // Draw lines
   for (const [lam, count] of spectrum) {
     if (lam < SPEC_LAM_MIN || lam > SPEC_LAM_MAX) continue;
-    const x = lamToSpecX(lam);
-    // sqrt-skala: høj sensitivitet for svage linjer, lav dominans af Ly-α
+    const x = lamToX(lam);
     const h = Math.max(2, (Math.sqrt(count) / maxSqrt) * PLOT_H);
     const col = wlCol(lam);
-    ctx.fillStyle = col;
-    if (dark) { ctx.shadowColor = col; ctx.shadowBlur = 5; }
-    ctx.fillRect(x - 1, PLOT_BOT - h, 2, h);
+    sc.fillStyle = col;
+    if (dark) { sc.shadowColor = col; sc.shadowBlur = 5; }
+    sc.fillRect(x - 1, PLOT_BOT - h, 2, h);
   }
-  ctx.shadowBlur = 0;
+  sc.shadowBlur = 0;
 
-  // Serie-labels langs toppen — hvid med tynd mørk skygge for kontrast
-  ctx.font = 'bold 10px Courier New';
-  ctx.textAlign = 'center'; ctx.textBaseline = 'top';
-  ctx.shadowColor = 'rgba(0,0,0,.85)'; ctx.shadowBlur = 3;
-  ctx.fillStyle = '#ffffff';
-  ctx.fillText('Lyman',   lamToSpecX(122),  2);
-  ctx.fillText('Balmer',  lamToSpecX(500),  2);
-  ctx.fillText('Paschen', lamToSpecX(1400), 2);
-  ctx.shadowBlur = 0;
+  // Series labels
+  sc.font = 'bold 10px Courier New';
+  sc.textAlign = 'center'; sc.textBaseline = 'top';
+  sc.shadowColor = 'rgba(0,0,0,.85)'; sc.shadowBlur = 3;
+  sc.fillStyle = '#ffffff';
+  sc.fillText('Lyman',   lamToX(122), 2);
+  sc.fillText('Balmer',  lamToX(500), 2);
+  sc.fillText('Paschen', lamToX(1400), 2);
+  sc.shadowBlur = 0;
 
-  // Bølgelængde-ticks nederst — hvid med skygge
-  ctx.font = 'bold 9px Courier New';
-  ctx.textBaseline = 'bottom';
-  ctx.fillStyle = '#ffffff';
-  ctx.shadowColor = 'rgba(0,0,0,.85)'; ctx.shadowBlur = 3;
+  // Wavelength ticks
+  sc.font = 'bold 9px Courier New';
+  sc.textBaseline = 'bottom';
+  sc.fillStyle = '#ffffff';
   for (const lam of [100, 250, 500, 750, 1000, 1500, 2000]) {
     if (lam > SPEC_LAM_MAX) continue;
-    const x = lamToSpecX(lam);
-    ctx.shadowBlur = 0;
-    ctx.strokeStyle = 'rgba(255,255,255,.45)';
-    ctx.lineWidth = 1;
-    ctx.beginPath(); ctx.moveTo(x, SPEC_H - 9); ctx.lineTo(x, SPEC_H - 4); ctx.stroke();
-    ctx.shadowColor = 'rgba(0,0,0,.85)'; ctx.shadowBlur = 3;
-    ctx.fillText(lam, x, SPEC_H);
+    const x = lamToX(lam);
+    sc.strokeStyle = 'rgba(255,255,255,.45)';
+    sc.lineWidth = 1;
+    sc.beginPath(); sc.moveTo(x, sh - 9); sc.lineTo(x, sh - 4); sc.stroke();
+    sc.shadowColor = 'rgba(0,0,0,.85)'; sc.shadowBlur = 3;
+    sc.fillText(lam, x, sh);
+    sc.shadowBlur = 0;
   }
-  ctx.shadowBlur = 0;
 
-  // Opdater tag
   document.getElementById('specTag').textContent = totalPhotons + ' fotoner';
 }
 
+// ── HTML Emission log (crisp text!) ───────────────────────────────────────
+const dec = (x, d) => x.toFixed(d).replace('.', ',');
+function renderLog() {
+  const el = document.getElementById('logArea');
+  const info = document.getElementById('logStateInfo');
+  if (elog.length === 0) {
+    el.innerHTML = '<div class="log-empty">Ingen emissioner endnu. Vælg en resonans-bølgelængde (fx 121,6 nm for n=1→2) og tryk Afspil.</div>';
+    info.textContent = '— venter';
+    return;
+  }
+  let sumEmit = 0;
+  const rows = [];
+  elog.forEach(e => {
+    const dE = En(e.hi) - En(e.lo);
+    sumEmit += dE;
+    const col = wlCol(e.lam);
+    const glow = dark ? `text-shadow:0 0 8px ${col}66;` : '';
+    rows.push(
+      `<div class="log-line" style="color:${col};${glow}">
+         <span class="log-transition">n=${e.hi}→${e.lo}:</span>
+         <span class="log-energy">E = ${dec(dE,2)} eV</span>
+       </div>`
+    );
+  });
+  const parts = elog.map(e => dec(En(e.hi) - En(e.lo), 2));
+  const sumExpr = parts.length === 1 ? `${parts[0]} eV` :
+                  `${parts.join(' + ')} = ${dec(sumEmit, 2)} eV`;
+  const complete = Math.abs(sumEmit - absorbedE) < 0.01 && ss === 'READY';
+  const checkHtml = complete
+    ? `<span class="log-check">✓ energibevarelse</span>` : '';
+  el.innerHTML = rows.join('') +
+    `<div class="log-divider"></div>
+     <div class="log-sum"><span class="lbl">Σ E_emit =</span>${sumExpr}</div>
+     <div class="log-sum"><span class="lbl">E_absorb. =</span>${dec(absorbedE, 2)} eV${checkHtml}</div>`;
+  info.textContent = complete ? '— kaskade afsluttet' : (ss === 'DECAYING' || ss === 'EXCITED' ? '— kaskade i gang' : '— venter');
+}
+
+// ── Decay & lifetimes ─────────────────────────────────────────────────────
 function randDecay(from) {
   const path = [from]; let cur = from;
   while (cur > 1) {
@@ -888,12 +1007,6 @@ function randDecay(from) {
   return path;
 }
 
-// ── Stochastic lifetimes ──────────────────────────────────────────────────
-// Pædagogisk tids-skala. Ægte hydrogen-levetider (TAU_PHYS_NS) bruges som
-// indbyrdes forhold, så højere n har synligt længere middel-levetid.
-// TAU_BASE_FRAMES sat så middel-τ for n=6 ≈ 1s (var 1.83s — for langt).
-// drawWait klipper de værste 7% af eksponential-halen: u_min = 0.07 giver
-// max-vente ≈ 2.66 × middel-τ (var ubegrænset — kunne give 12+ sekunder for n=6).
 const TAU_PHYS_NS = [0, 0, 1.6, 5.3, 12.0, 23.0, 40.0];
 const TAU_BASE_FRAMES = 12;
 function tauFrames(n) {
@@ -904,53 +1017,64 @@ function drawWait(n) {
   return -tauFrames(n) * Math.log(u);
 }
 
+// Photon speed — CONSTANT for shooting, passing, and beyond.
+// (Bug fix: earlier version had PASSING speed = 1.9× SHOOTING, giving the
+// visual illusion of the atom accelerating the photon after transit.)
 const SPD = 3.8;
 
 function tick(ts) {
   const dt = Math.min((ts - lastTs) / 16.667, 3); lastTs = ts;
 
-  if (paused && ss !== 'READY') { drawAtom(); drawEnergy(); requestAnimationFrame(tick); return; }
+  // Defensive: retry canvas init if layout wasn't ready at first call.
+  if (!window.__ac || !window.__ec) resizeCanvases();
+
+  if (paused && ss !== 'READY') { drawAtom(); drawEnergy(); if (!document.getElementById('specBox').classList.contains('hide')) drawSpectrum(); requestAnimationFrame(tick); return; }
 
   flash = Math.max(0, flash - dt * 0.045);
   for (const p of ePh) { p.x+=p.vx*dt; p.y+=p.vy*dt; p.life+=dt; }
   ePh = ePh.filter(p => p.life < 75);
   tmr += dt;
 
+  const aw = getAW();
+  const cx = CX();
+
   switch (ss) {
     case 'SHOOTING':
       pX += SPD * dt;
-      if (pX >= CX - R(startN) - 8) {
+      if (pX >= cx - R(startN) - 8) {
         if (pendingIon) {
           ss = 'IONIZING'; ionAngle = -Math.PI/2 + (Math.random()-0.5)*1.2;
-          ionBallX = CX + Math.cos(ionAngle) * R(eN);
-          ionBallY = CY + Math.sin(ionAngle) * R(eN);
+          ionBallX = cx + Math.cos(ionAngle) * R(eN);
+          ionBallY = CY() + Math.sin(ionAngle) * R(eN);
           ionProgress = 0; flash = 0.9; tmr = 0;
-          setSt('IONISERING! — FOTONEN HAR NOK ENERGI TIL AT FRIGØRE ELEKTRONEN');
+          setSt('Ionisering! — fotonen har nok energi til at frigøre elektronen.');
         } else if (matched) {
           ss = 'ABSORBING'; flash = 0.55; tmr = 0;
-          setSt('FOTON ABSORBERET — RESONANS!  ELEKTRON EXCITERES');
+          setSt('Foton absorberet — resonans! Elektron exciteres.');
         } else {
           ss = 'PASSING'; tmr = 0;
-          setSt('INGEN RESONANS — FOTON PASSERER IGENNEM UABSORBERET');
+          setSt('Ingen resonans — foton passerer uabsorberet igennem atomet.');
         }
       }
       break;
     case 'PASSING':
-      pX += SPD * 1.9 * dt;
-      if (pX > AW + 110) { ss = 'READY'; setSt('KLAR'); setPlay(false); }
+      pX += SPD * dt;  // same speed as SHOOTING — no unphysical acceleration
+      if (pX > aw + 110) { ss = 'READY'; setSt('Klar.'); setPlay(false); }
       break;
     case 'ABSORBING':
       if (tmr > 20) {
         eN = tgtN; buildCloud(eN); dPath = randDecay(tgtN); dStep = 0;
         decayWait = drawWait(tgtN);
         ss = 'EXCITED'; tmr = 0;
-        setSt(`ELEKTRON I n=${tgtN}  (τ ≈ ${TAU_PHYS_NS[tgtN].toFixed(1)} ns) — VENTER PÅ SPONTANT HENFALD...`);
+        setSt(`Elektron i n=${tgtN} (τ ≈ ${TAU_PHYS_NS[tgtN].toFixed(1)} ns) — venter på spontant henfald...`);
+        renderLog();
       }
       break;
     case 'EXCITED':
-      if (tmr % 8 < 1) {
+      // Update progress % periodically for pedagogical feedback
+      if (Math.floor(tmr) % 12 === 0 && Math.floor(tmr) !== Math.floor(tmr - dt)) {
         const pct = Math.min(100, Math.round(tmr / decayWait * 100));
-        setSt(`ELEKTRON I n=${eN}  (τ ≈ ${TAU_PHYS_NS[eN].toFixed(1)} ns) — VENTER PÅ SPONTANT HENFALD... ${pct}%`);
+        setSt(`Elektron i n=${eN} (τ ≈ ${TAU_PHYS_NS[eN].toFixed(1)} ns) — venter på henfald... ${pct}%`);
       }
       if (tmr > decayWait) { ss = 'DECAYING'; tmr = 0; }
       break;
@@ -965,13 +1089,15 @@ function tick(ts) {
           eN = tN; buildCloud(eN); flash = 0.16; dStep++;
           decayWait = eN > 1 ? drawWait(eN) : 0;
           const ang = Math.random() * Math.PI * 2;
-          ePh.push({ x:CX+R(fN)*Math.cos(ang), y:CY+R(fN)*Math.sin(ang),
+          ePh.push({ x:cx+R(fN)*Math.cos(ang), y:CY()+R(fN)*Math.sin(ang),
                      vx:Math.cos(ang)*2.6, vy:Math.sin(ang)*2.6, col:wlCol(lam), life:0 });
           const tag = lam<380?'UV':lam>700?'IR':'synlig';
-          setSt(`HENFALD n=${fN}→${tN}: λ=${lam.toFixed(0)} nm   ${seriesName(tN)}  (${tag})`);
+          setSt(`Henfald n=${fN}→${tN}: λ=${lam.toFixed(0)} nm ${seriesName(tN)} (${tag}).`);
+          renderLog();
         } else {
           ss = 'READY'; setPlay(false);
-          setSt('HENFALD AFSLUTTET — ELEKTRONEN ER TILBAGE I GRUNDTILSTANDEN');
+          setSt('Henfald afsluttet — elektronen er tilbage i grundtilstanden.');
+          renderLog();
         }
       }
       break;
@@ -981,55 +1107,28 @@ function tick(ts) {
       ionBallY += Math.sin(ionAngle) * 5.5 * dt;
       if (ionProgress >= 1) {
         ss = 'IONIZED'; setPlay(false);
-        setSt('ATOM IONISERET — ELEKTRONEN ER FRIGJORT  |  KLIK NULSTIL');
+        setSt('Atom ioniseret — elektronen er frigjort. Klik Nulstil.');
       }
       break;
     case 'IONIZED': break;
   }
 
   drawAtom(); drawEnergy();
-  if (document.getElementById('specRow').classList.contains('on')) drawSpectrum();
+  if (!document.getElementById('specBox').classList.contains('hide')) drawSpectrum();
   requestAnimationFrame(tick);
 }
 
 // ── UI helpers ────────────────────────────────────────────────────────────
 function setSt(msg) { document.getElementById('stTxt').textContent = msg; }
-
 function setPlay(on) {
   const b = document.getElementById('playBtn');
-  b.textContent = (on && !paused) ? '⏸ PAUSE' : '▶ AFSPIL';
-  b.classList.toggle('on', on && !paused);
-}
-
-function buildSwatch() {
-  const total = 700 - 90, pct = nm => ((nm-90)/total*100).toFixed(1)+'%';
-  // UV-zonen (90-380): kølig blå-grå → blåhvid (signalere usynlig UV).
-  // Synligt vindue (380-700): regnbue matchende wlCol — H-α 656 ender rød.
-  document.getElementById('swatchBar').style.background =
-    `linear-gradient(to right,
-      #4a5878 0%, #8090c0 ${pct(280)}, #c8d4f0 ${pct(380)},
-      #9040ff ${pct(380)}, #9040ff ${pct(425)},
-      #5060ff ${pct(425)}, #5060ff ${pct(460)},
-      #2090ff ${pct(460)}, #2090ff ${pct(500)},
-      #00ccdd ${pct(500)}, #00ccdd ${pct(520)},
-      #00cc55 ${pct(520)}, #00cc55 ${pct(560)},
-      #aacc00 ${pct(560)}, #aacc00 ${pct(590)},
-      #ffaa00 ${pct(590)}, #ffaa00 ${pct(620)},
-      #ff2222 ${pct(620)}, #ff2222 100%)`;
-}
-
-function updateSwatch(nm) {
-  const p = (nm-90)/(700-90)*100;
-  document.getElementById('swatchMark').style.left = p + '%';
-  const col = wlCol(nm), tag = document.getElementById('swatchTag');
-  tag.textContent = wlLabel(nm); tag.style.color = col;
+  b.textContent = (on && !paused) ? '⏸ Pause' : '▶ Afspil';
 }
 
 function updSlider() {
   selWL = parseFloat(document.getElementById('sl').value);
   document.getElementById('wlv').textContent = selWL.toFixed(1);
   document.getElementById('ev').textContent = (HC/selWL).toFixed(2);
-  updateSwatch(selWL);
 
   const pE = HC / selWL;
   const isIon = pE >= ionE(startN) * 0.999;
@@ -1038,13 +1137,13 @@ function updSlider() {
 
   if (isIon) {
     badge.className = 'badge b-ion';
-    badge.textContent = `IONISERING  E=${pE.toFixed(2)} > ${ionE(startN).toFixed(2)} eV`;
+    badge.textContent = `Ionisering  E=${pE.toFixed(2)} > ${ionE(startN).toFixed(2)} eV`;
   } else if (ab) {
     badge.className = 'badge b-yes';
-    badge.textContent = `MATCH: n=${startN}→${ab.hi}  (${ab.lam.toFixed(1)} nm)`;
+    badge.textContent = `Match: n=${startN}→${ab.hi} (${ab.lam.toFixed(1)} nm)`;
   } else {
     badge.className = 'badge b-no';
-    badge.textContent = 'INGEN MATCH';
+    badge.textContent = 'Ingen match';
   }
 }
 
@@ -1053,18 +1152,20 @@ function doReset() {
   buildCloud(startN); lastCloudN = startN;
   ePh = []; elog = []; dPath = []; dStep = 0;
   ionProgress = 0; paused = false; decayWait = 0;
+  absorbedE = 0;
   setPlay(false); updSlider();
-  setSt('NULSTILLET — VÆLG BØLGELÆNGDE OG KLIK AFSPIL');
+  setSt('Nulstillet — vælg bølgelængde og klik Afspil.');
+  renderLog();
 }
 
 // ── Event listeners ───────────────────────────────────────────────────────
 document.getElementById('sl').addEventListener('input', updSlider);
 
-document.getElementById('nlBtns').addEventListener('click', e => {
-  const btn = e.target.closest('.nl-btn');
+document.getElementById('nBtns').addEventListener('click', e => {
+  const btn = e.target.closest('.btn-sm');
   if (!btn) return;
-  document.querySelectorAll('.nl-btn').forEach(b => b.classList.remove('nl-on'));
-  btn.classList.add('nl-on');
+  document.querySelectorAll('#nBtns .btn-sm').forEach(b => b.classList.remove('active'));
+  btn.classList.add('active');
   startN = parseInt(btn.dataset.n);
   absTransitions = calcAbsTrans(startN);
   doReset();
@@ -1078,32 +1179,45 @@ document.getElementById('playBtn').addEventListener('click', () => {
     const ab = pendingIon ? null : findAbs(selWL);
     matched = !!ab;
     tgtN = ab ? ab.hi : startN;
-    // Ved match: atomet absorberer på resonans — den faktiske absorberede
-    // energi er overgangsenergien, ikke HC/selWL (slideren tillader 0,5%
-    // afvigelse for at gøre det nemt at ramme resonans). Ved ionisering
-    // absorberes hele fotonens energi (overskud → kinetisk energi af e⁻).
-    if (matched)        absorbedE = En(tgtN) - En(startN);
+    if (matched)         absorbedE = En(tgtN) - En(startN);
     else if (pendingIon) absorbedE = pE;
     else                 absorbedE = 0;
     pX = -10; pCol = wlCol(selWL);
     ss = 'SHOOTING'; tmr = 0; paused = false;
-    setSt('FOTON SENDT MOD ATOMET...');
+    setSt('Foton sendt mod atomet...');
     setPlay(true);
+    renderLog();
   } else if (ss !== 'READY' && ss !== 'IONIZED') {
     paused = !paused; setPlay(!paused);
-    if (paused) setSt('PAUSE — KLIK AFSPIL FOR AT FORTSÆTTE');
+    if (paused) setSt('Pause — klik Afspil for at fortsætte.');
   }
 });
 
 document.getElementById('resetBtn').addEventListener('click', doReset);
-
 document.getElementById('clearBtn').addEventListener('click', clearSpectrum);
 
-// ── Klik-på-niveau i energidiagrammet ─────────────────────────────────────
-// Find det nærmeste energiniveau ved en given canvas-y-koordinat. Returnerer
-// null hvis ingen niveauer er inden for hit-radius (12 px).
+document.getElementById('copyBtn').addEventListener('click', () => {
+  navigator.clipboard.writeText(document.documentElement.outerHTML).then(() => {
+    const b = document.getElementById('copyBtn');
+    const original = b.textContent;
+    b.textContent = '✓ Kopieret!';
+    setTimeout(() => b.textContent = original, 2200);
+  });
+});
+
+document.getElementById('themeBtn').addEventListener('click', () => {
+  dark = !dark;
+  if (dark) document.documentElement.removeAttribute('data-theme');
+  else      document.documentElement.setAttribute('data-theme','light');
+  document.getElementById('themeBtn').textContent = dark ? 'Lyst tema' : 'Mørkt tema';
+  updSlider();
+  renderLog();
+});
+
+// Click-on-level in energy diagram
 function findLevelAtY(mouseY) {
-  const PT = 46, PB = EH - 24, PH = PB - PT;
+  const eh = getEH();
+  const PT = 46, PB = eh - 24, PH = PB - PT;
   let bestN = null, bestDist = 12;
   for (let n = 1; n <= 6; n++) {
     const y = e2y(En(n), PB, PH);
@@ -1114,7 +1228,7 @@ function findLevelAtY(mouseY) {
 }
 function eEl_eventY(e) {
   const rect = eEl.getBoundingClientRect();
-  return (e.clientY - rect.top) * (EH / rect.height);
+  return (e.clientY - rect.top) * (getEH() / rect.height);
 }
 eEl.addEventListener('mousemove', e => {
   const newHover = findLevelAtY(eEl_eventY(e));
@@ -1129,32 +1243,29 @@ eEl.addEventListener('mouseleave', () => {
 eEl.addEventListener('click', e => {
   const n = findLevelAtY(eEl_eventY(e));
   if (n === null) return;
-  document.querySelectorAll('.nl-btn').forEach(b => b.classList.toggle('nl-on', parseInt(b.dataset.n) === n));
+  document.querySelectorAll('#nBtns .btn-sm').forEach(b => b.classList.toggle('active', parseInt(b.dataset.n) === n));
   startN = n;
   absTransitions = calcAbsTrans(startN);
   doReset();
 });
 
-document.getElementById('copyBtn').addEventListener('click', () => {
-  navigator.clipboard.writeText(document.documentElement.outerHTML).then(() => {
-    const b = document.getElementById('copyBtn');
-    b.textContent = '✓ KOPIERET!';
-    setTimeout(() => b.textContent = '⎘ KOPIER KODE', 2200);
-  });
-});
-
-document.getElementById('modeBtn').addEventListener('click', () => {
-  dark = !dark;
-  if (dark) document.documentElement.removeAttribute('data-theme');
-  else      document.documentElement.setAttribute('data-theme','light');
-  document.getElementById('modeBtn').textContent = dark ? '☀ LYS TILSTAND' : '🌙 MØRK TILSTAND';
-  updSlider();
+// ── Resize handling ──────────────────────────────────────────────────────
+let resizeTimer = null;
+window.addEventListener('resize', () => {
+  if (resizeTimer) clearTimeout(resizeTimer);
+  resizeTimer = setTimeout(() => { resizeCanvases(); }, 100);
 });
 
 // ── Init ──────────────────────────────────────────────────────────────────
-buildSwatch(); updSlider(); buildCloud(1);
+resizeCanvases();
+updSlider();
+buildCloud(1);
+renderLog();
 lastTs = performance.now();
 requestAnimationFrame(tick);
+
+// Also re-init after full load (fonts, images) to catch any layout shift
+window.addEventListener('load', resizeCanvases);
 </script>
 </body>
 </html>
