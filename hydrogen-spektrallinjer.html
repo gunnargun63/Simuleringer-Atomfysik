@@ -160,6 +160,129 @@ input[type=range]::-moz-range-thumb{
 [data-theme="light"] .btn-sm{ color:#1a1a1a; }
 [data-theme="light"] .btn-sm.active{ color:#fff; }
 
+/* Resonance chips — direct selection of exact transition wavelengths.
+   Necessary because the Lyman/Balmer series converge: n=1→5 (95,0 nm) and
+   n=1→6 (93,8 nm) sit <2 px apart on any slider. Chips guarantee reachability. */
+.chip-row{
+  display:flex; gap:4px; margin-top:8px; flex-wrap:wrap;
+}
+.chip{
+  flex:1; min-width:44px;
+  background:var(--bg3); color:var(--text);
+  border:1px solid var(--border); border-radius:3px;
+  padding:5px 2px; cursor:pointer; transition:var(--tr);
+  font-family:var(--font); line-height:1.25;
+  display:flex; flex-direction:column; align-items:center;
+}
+.chip:hover{ border-color:var(--cyan); background:var(--bg2); }
+.chip.active{
+  background:var(--cyan); border-color:var(--cyan); color:var(--bg0);
+}
+.chip .c-n{ font-size:.72rem; font-weight:700; letter-spacing:.02em; }
+.chip .c-arrow{
+  font-size:1.05em; font-weight:400;
+  position:relative; top:-1px;      /* løft — ellers ligner den et minustegn */
+  margin-right:1px;
+}
+.chip .c-l{ font-size:.66rem; font-weight:700; opacity:.85; }
+[data-theme="light"] .chip{ color:#1a1a1a; }
+[data-theme="light"] .chip.active{ color:#fff; }
+.chip-none{
+  font-size:.75rem; color:var(--dim); font-style:italic;
+  padding:6px 2px; line-height:1.4;
+}
+[data-theme="light"] .chip-none{ color:#333; font-weight:700; }
+.chip-hint{
+  font-size:.68rem; color:var(--dim); margin-top:6px; line-height:1.35;
+}
+[data-theme="light"] .chip-hint{ color:#333; font-weight:700; }
+
+/* ── Modal popups (Forklaring / Opgaver) — samme stil som BB84 ───────────── */
+.hide{ display:none !important; }
+.modal-bg{
+  position:fixed; inset:0; z-index:100;
+  background:rgba(0,0,0,0.72);
+  display:flex; align-items:center; justify-content:center;
+  padding:20px;
+  animation:fadein .2s ease;
+}
+[data-theme="light"] .modal-bg{ background:rgba(0,0,0,0.45); }
+@keyframes fadein{ from{opacity:0} to{opacity:1} }
+.modal-box{
+  background:var(--bg1); border:1px solid var(--border);
+  border-radius:6px; max-width:820px; width:100%;
+  max-height:90vh; overflow-y:auto;
+  padding:24px 28px; position:relative;
+  box-shadow:0 0 30px rgba(0,255,159,0.15);
+}
+[data-theme="light"] .modal-box{ box-shadow:0 4px 24px rgba(0,0,0,0.18); }
+.modal-close{
+  position:absolute; top:10px; right:10px;
+  width:32px; height:32px; border-radius:4px;
+  background:var(--bg2); color:var(--dim);
+  border:1px solid var(--border);
+  font-family:var(--font); font-size:1.1rem; font-weight:700;
+  cursor:pointer; transition:var(--tr);
+  line-height:1; display:flex; align-items:center; justify-content:center;
+}
+.modal-close:hover{ border-color:var(--green); color:var(--green); }
+.modal-box h1{
+  font-family:'Orbitron',sans-serif;
+  font-size:18px; letter-spacing:.18em; text-transform:uppercase;
+  color:var(--green); margin:0 0 4px 0;
+}
+.modal-box h2{
+  color:var(--green); font-family:'Orbitron',sans-serif;
+  font-size:15px; letter-spacing:.18em; text-transform:uppercase;
+  margin:24px 0 12px 0; padding-bottom:6px;
+  border-bottom:1px solid var(--border);
+}
+.modal-box h2:first-child{ margin-top:0; }
+.modal-box .subtitle{ color:var(--dim); font-size:.9rem; margin-bottom:18px; }
+[data-theme="light"] .modal-box .subtitle{ color:#333; font-weight:700; }
+.modal-box p{ line-height:1.55; margin:0 0 10px 0; font-size:.92rem; }
+[data-theme="light"] .modal-box p{ color:#161616; }
+.modal-box ul, .modal-box ol{ margin:0 0 12px 0; padding-left:24px; line-height:1.55; font-size:.92rem; }
+.modal-box li{ margin-bottom:4px; }
+[data-theme="light"] .modal-box li{ color:#161616; }
+.modal-box table{
+  width:auto; border-collapse:collapse;
+  font-family:'Courier New',monospace; font-size:.88rem;
+  margin:0 0 14px 0;
+}
+.modal-box th, .modal-box td{
+  border:1px solid var(--border);
+  padding:5px 12px; text-align:left;
+}
+.modal-box th{
+  background:var(--bg2); color:var(--green); font-weight:700;
+  text-transform:none; letter-spacing:0; font-size:.85rem;
+}
+[data-theme="light"] .modal-box th{ color:#1D9E75; }
+.modal-box hr{ border:none; border-top:1px solid var(--border); margin:18px 0; }
+.modal-box .op{
+  background:rgba(0,207,255,0.06);
+  border-left:3px solid var(--cyan);
+  padding:8px 12px; margin:10px 0;
+}
+[data-theme="light"] .modal-box .op{ background:rgba(55,138,221,0.10); }
+.modal-box .eq{
+  background:var(--bg2); border-left:3px solid var(--green);
+  padding:10px 14px; margin:12px 0;
+  font-family:'Courier New',monospace; font-size:.95rem;
+  text-align:center; letter-spacing:.02em;
+}
+[data-theme="light"] .modal-box .eq{ color:#111; font-weight:700; }
+.modal-box code{
+  background:var(--bg3); padding:1px 4px; border-radius:3px;
+  font-size:.85em;
+}
+.modal-box .footer-note{
+  color:var(--dim); font-style:italic; font-size:.85rem;
+  margin-top:20px; padding-top:12px; border-top:1px solid var(--border);
+}
+[data-theme="light"] .modal-box .footer-note{ color:#333; font-weight:700; }
+
 /* Big action buttons */
 .btn-row{ display:flex; gap:8px; flex-wrap:wrap; margin-top:10px; }
 .btn-big{
@@ -294,6 +417,8 @@ canvas{ display:block; width:100%; background:var(--bg1); border:1px solid var(-
     <h1><span class="h-green">BOHR-MODELLEN</span><span class="h-dash">—</span><span class="h-cyan">SPEKTRALLINJER</span></h1>
   </div>
   <div class="header-btns">
+    <button class="btn-util" id="explainBtn">Forklaring</button>
+    <button class="btn-util" id="taskBtn">Opgaver</button>
     <button class="btn-util" id="copyBtn">Kopier kode</button>
     <button class="btn-util" id="themeBtn">Lyst tema</button>
   </div>
@@ -326,7 +451,9 @@ canvas{ display:block; width:100%; background:var(--bg1); border:1px solid var(-
             <span class="ctrl-label">Bølgelængde</span>
             <span class="ctrl-val"><span id="wlv">121.6</span> nm<span class="ev"><span id="ev">10.20</span> eV</span></span>
           </div>
-          <input type="range" id="sl" min="90" max="700" step="0.1" value="121.6">
+          <input type="range" id="sl" min="0" max="4000" step="1" value="0">
+          <div class="chip-row" id="chipRow"></div>
+          <div class="chip-hint" id="chipHint">Klik en linje for at ramme den præcist. Skyderen er logaritmisk (90–8000 nm) og snapper til nærliggende linjer.</div>
         </div>
 
         <div class="ctrl">
@@ -377,6 +504,149 @@ canvas{ display:block; width:100%; background:var(--bg1); border:1px solid var(-
   </div>
 
 </main>
+
+<!-- ════════ Modal: Forklaring ════════ -->
+<div class="modal-bg hide" id="explainModal">
+  <div class="modal-box" role="dialog" aria-labelledby="explainTitle">
+    <button class="modal-close" id="explainClose" aria-label="Luk">×</button>
+    <h1 id="explainTitle">Bohr-modellen — Spektrallinjer</h1>
+    <div class="subtitle">Energiniveauer, kvantebetingelsen og tilfældigheden i henfaldet</div>
+
+    <p>I centrum af hydrogenatomet tegnes protonen som en kompakt kugle. De diffuse blå områder
+    omkring kernen, er en forenklet illustration af hvor elektronen sandsynligvis vil befinde sig
+    i en given tilstand. Fotonerne tegnes som bølger med en pil, der angiver
+    bevægelsesretningen.</p>
+
+    <h2>Energiniveauer i hydrogen</h2>
+    <p>Efter Bohrs første postulat kan elektronen kun befinde sig i bestemte <b>stationære
+    tilstande</b> med veldefineret energi. For hydrogen er energien i tilstand <i>n</i></p>
+    <div class="eq">E<sub>n</sub> = −13,60 eV / n²</div>
+    <p>Tilstanden <i>n</i> = 1 er <b>grundtilstanden</b>, og alle højere tilstande kaldes
+    <b>exciterede tilstande</b>. Fortegnet skyldes valget af nulniveau: energien er nul, når
+    elektronen lige akkurat er fri af kernen. Derfor bliver niveauerne mindre og mindre negative,
+    jo højere man kommer op — og de klumper sig sammen mod 0 eV, som du kan se i
+    energiniveaudiagrammet.</p>
+
+    <table>
+      <tr><th>n</th><th>1</th><th>2</th><th>3</th><th>4</th><th>5</th><th>6</th></tr>
+      <tr><th>E<sub>n</sub> / eV</th><td>−13,60</td><td>−3,400</td><td>−1,511</td><td>−0,850</td><td>−0,544</td><td>−0,378</td></tr>
+    </table>
+
+    <h2>Bohrs kvantebetingelse</h2>
+    <p>Bohrs andet postulat — <b>kvantebetingelsen</b> — siger, at atomet kun kan skifte tilstand
+    ved at absorbere eller emittere én foton, hvis energi er præcis lig energiforskellen mellem
+    de to niveauer:</p>
+    <div class="eq">E<sub>foton</sub> = E<sub>n</sub> − E<sub>m</sub></div>
+    <p>Da fotonens energi hænger sammen med frekvensen og dermed bølgelængden gennem
+    <code>E<sub>foton</sub> = h·f = h·c/λ</code>, kan man finde bølgelængden af den foton, der
+    hører til en bestemt overgang:</p>
+    <div class="eq">λ = h·c / (E<sub>n</sub> − E<sub>m</sub>)</div>
+    <p>Det afgørende ord er <b>præcis</b>. Betingelsen er en <i>resonansbetingelse</i>: rammer
+    fotonens energi ikke en energiforskel i atomet, sker der ingenting — fotonen passerer
+    uabsorberet igennem. Det er derfor, du kan trække bølgelængdeskyderen hen over store områder
+    uden at få en eneste absorption. Netop dette forklarer, hvorfor spektret består af <b>skarpe
+    linjer</b> og ikke et kontinuert bånd.</p>
+    <p>Har fotonen mere energi end det, der skal til for at rive elektronen helt fri (13,60 eV fra
+    grundtilstanden), bliver atomet <b>ioniseret</b>. Her gælder kvantebetingelsen ikke længere
+    — al overskydende energi bliver blot til kinetisk energi hos den frie elektron.</p>
+
+    <h2>Tilfældighed I: hvilket niveau falder atomet ned til?</h2>
+    <p>Når atomet først er exciteret, vender det af sig selv tilbage mod grundtilstanden ved
+    <b>spontan emission</b>. Men det sker ikke nødvendigvis i ét spring. Fra fx <i>n</i> = 6 kan
+    elektronen falde direkte til <i>n</i> = 1, eller den kan tage turen over flere trin, fx
+    6 → 4 → 2 → 1. Hvert trin udsender sin egen foton.</p>
+    <p>Hvilken vej atomet vælger, er <b>ikke bestemt på forhånd</b>. Kvantemekanikken giver kun
+    sandsynligheder for hvert muligt spring. Skyder du den samme foton ind ti gange i træk, får du
+    typisk mange forskellige kaskader — og dermed forskellige fotoner ud. I hydrogenatomet er
+    overgange mellem nærliggende niveauer ofte mest sandsynlige, især for højt exciterede
+    tilstande.</p>
+    <p>Det er præcis derfor, spektrallinjerne har forskellig <b>styrke</b>. Kør simuleringen mange
+    gange, og se det akkumulerede spektrum bygge sig op: den røde H<sub>α</sub>-linje ved 656 nm
+    bliver klart den kraftigste i Balmerserien, fordi springet 3 → 2 er langt det mest
+    sandsynlige.</p>
+
+    <h2>Tilfældighed II: hvor længe venter atomet?</h2>
+    <p>Heller ikke <i>tidspunktet</i> for henfaldet er bestemt. Man kan kun angive en
+    <b>middellevetid</b> τ for hver exciteret tilstand — typisk få nanosekunder. Sandsynligheden
+    for at atomet stadig er exciteret, aftager eksponentielt med tiden, ganske som ved radioaktivt
+    henfald.</p>
+    <p>Det betyder, at ventetiden svinger fra gang til gang: nogle gange henfalder atomet næsten
+    med det samme, andre gange trækker det ud. Læg mærke til, at højere tilstande har længere
+    middellevetid — statuslinjen viser τ for den tilstand, elektronen sidder i.</p>
+
+    <h2>Serier og energibevarelse</h2>
+    <p>Overgange, der ender i samme niveau, samles i <b>serier</b>: alle spring ned til
+    <i>n</i> = 1 udgør <b>Lymanserien</b> (ligger i UV), alle spring ned til <i>n</i> = 2 udgør
+    <b>Balmerserien</b> (de fire synlige linjer), og spring ned til <i>n</i> = 3 udgør
+    <b>Paschenserien</b> (infrarød). I det akkumulerede spektrum er UV-linjerne tegnet blåhvide og
+    de infrarøde grå — kun Balmerlinjerne er farvede, for det er kun dem, øjet kan se.</p>
+    <p>Uanset hvilken vej kaskaden tager, gælder <b>energibevarelse</b>: summen af de emitterede
+    fotoners energi er altid nøjagtig lig den energi, atomet absorberede. Det kan du følge direkte
+    i regnskabet under "Emitterede fotoner".</p>
+
+    <div class="footer-note">Bemærk: simuleringen bruger en forenklet model for
+    overgangssandsynlighederne. Rækkefølgen og de indbyrdes styrkeforhold er kvalitativt rigtige —
+    H<sub>α</sub> er klart kraftigst — men de er justeret, så alle fire Balmerlinjer kan nås inden
+    for et rimeligt antal forsøg.</div>
+  </div>
+</div>
+
+<!-- ════════ Modal: Opgaver ════════ -->
+<div class="modal-bg hide" id="taskModal">
+  <div class="modal-box" role="dialog" aria-labelledby="taskTitle">
+    <button class="modal-close" id="taskClose" aria-label="Luk">×</button>
+    <h1 id="taskTitle">Opgaver</h1>
+    <div class="subtitle">Bohr-modellen og hydrogens spektrallinjer</div>
+
+    <p>Til opgaverne kan du bruge <code>h = 4,136·10⁻¹⁵ eV·s</code> og
+    <code>E<sub>n</sub> = −13,60 eV / n²</code>.</p>
+
+    <h2>Opgave 1 — Kvantebetingelsen</h2>
+    <div class="op"><b>1.1</b> Vælg starttilstand <b>n = 1</b>. Beregn energiforskellen
+    E<sub>2</sub> − E<sub>1</sub>, og brug den til at beregne bølgelængden af den foton, der kan
+    løfte elektronen fra <i>n</i> = 1 til <i>n</i> = 2.</div>
+    <div class="op"><b>1.2</b> Kontrollér dit svar i simuleringen: klik absorptionslinjen
+    <b>⟶2</b>. Passer bølgelængden og fotonenergien med din beregning?</div>
+    <div class="op"><b>1.3</b> Træk nu skyderen til ca. 110 nm og tryk <b>Afspil</b>. Hvad sker
+    der med fotonen? Forklar med Bohrs kvantebetingelse, hvorfor atomet ikke absorberer
+    den.</div>
+    <div class="op"><b>1.4</b> Hvad fortæller dette om, hvorfor et hydrogenspektrum består af
+    skarpe linjer frem for et kontinuert farvebånd?</div>
+
+    <h2>Opgave 2 — Balmerserien</h2>
+    <div class="op"><b>2.1</b> Vælg starttilstand <b>n = 2</b>. Beregn bølgelængderne for de fire
+    overgange 2 → 3, 2 → 4, 2 → 5 og 2 → 6. Sammenlign med de angivne værdier ved
+    overgangsvælgeren i simuleringen.</div>
+    <div class="op"><b>2.2</b> Ligger alle disse bølgelængder i det synlige område?</div>
+    <div class="op"><b>2.3</b> Beregn bølgelængden for overgangen 2 → 7. Ligger den stadig i det
+    synlige område? Hvad sker der med bølgelængderne, når den tilstand elektronen springer op til
+    vokser?</div>
+
+    <h2>Opgave 3 — Tilfældighed i henfaldet</h2>
+    <div class="op"><b>3.1</b> Vælg <b>n = 1</b> og klik absorptionslinjen <b>⟶6</b> (93,8 nm).
+    Tryk <b>Afspil</b> og notér, hvilken vej elektronen falder ned (fx 6 → 4 → 2 → 1). Gentag
+    <b>10 gange</b> og skriv kaskaden ned hver gang.</div>
+    <div class="op"><b>3.2</b> Fik du den samme kaskade hver gang? Hvad siger det om, hvorvidt
+    henfaldet er forudsigeligt for det enkelte atom?</div>
+    <div class="op"><b>3.3</b> Læg mærke til <b>Σ E<sub>emit</sub></b> i regnskabet. Sammenlign
+    med E<sub>absorb.</sub> for hver af dine ti kørsler. Hvad gælder altid — uanset hvilken vej
+    kaskaden tager?</div>
+    <div class="op"><b>3.4</b> Bemærk også ventetiden, før atomet henfalder. Er den ens hver
+    gang? Hvad kan man overhovedet forudsige om tidspunktet for et enkelt henfald?</div>
+
+    <h2>Opgave 4 — Linjestyrker og det akkumulerede spektrum</h2>
+    <div class="op"><b>4.1</b> Bliv ved med at skyde 93,8 nm-fotoner ind fra <i>n</i> = 1
+    (mindst 20–30 gange). Følg med i <b>Akkumuleret spektrum</b> forneden.</div>
+    <div class="op"><b>4.2</b> Find de fire Balmerlinjer i spektret (410, 434, 486 og 656 nm).
+    Hvilken er kraftigst? Forklar ud fra sandsynligheden for de forskellige spring.</div>
+    <div class="op"><b>4.3</b> Vælg nu starttilstand <b>n = 3</b>. Prøv at finde en bølgelængde i
+    det synlige område, som atomet vil absorbere. Hvad sker der i stedet? Beregn
+    ioniseringsenergien fra <i>n</i> = 3, og forklar resultatet.</div>
+
+    <div class="footer-note">Tip: Brug knappen <b>Ryd spektrum</b>, hvis du vil starte en ny serie
+    målinger med et rent spektrum.</div>
+  </div>
+</div>
 
 <script>
 'use strict';
@@ -994,11 +1264,22 @@ function renderLog() {
 }
 
 // ── Decay & lifetimes ─────────────────────────────────────────────────────
+// Kaskade-vægtning: 1/(Δn)^1.5 — små spring favoriseres, som i virkeligheden.
+// Giver H-α:H-β:H-γ:H-δ ≈ 1 : 0,29 : 0,15 : 0,17 fra n=6.
+//
+// Bevidst pædagogisk valg: H-δ (0,17) ligger en anelse over H-γ (0,15), hvilket
+// er en lille inversion i forhold til det virkelige spektrum (1 : 0,35 : 0,16 :
+// 0,09). Årsagen er strukturel — H-δ kræver ét direkte 6→2 spring, mens H-γ
+// kræver at kaskaden først lander på n=5 og derfra springer til n=2.
+// En højere eksponent (1,8) ville rette rækkefølgen, men gør H-γ og H-δ endnu
+// sjældnere (hver 17.-19. skud mod hver 14.-15.), hvilket forringer elevens
+// mulighed for at se hele Balmer-serien inden for rimelig tid. Synligheden
+// vægter tungest her; H-α's klare dominans — den vigtigste pointe — er intakt.
 function randDecay(from) {
   const path = [from]; let cur = from;
   while (cur > 1) {
     const tgts=[], ws=[];
-    for (let n=1; n<cur; n++) { tgts.push(n); ws.push(1/Math.pow(cur-n,1.5)); }
+    for (let n=1; n<cur; n++) { tgts.push(n); ws.push(1/Math.pow(cur-n, 1.5)); }
     const sum = ws.reduce((a,b)=>a+b,0);
     let r = Math.random()*sum, chosen = tgts[0];
     for (let i=0; i<tgts.length; i++) { r-=ws[i]; if(r<=0){chosen=tgts[i];break;} }
@@ -1096,7 +1377,15 @@ function tick(ts) {
           renderLog();
         } else {
           ss = 'READY'; setPlay(false);
-          setSt('Henfald afsluttet — elektronen er tilbage i grundtilstanden.');
+          // Kaskaden løber altid helt ned til grundtilstanden (korrekt fysik), så
+          // elektronen bliver liggende i n=1 — det er hvad der faktisk skete, og det
+          // skal tegningen vise. Er starttilstanden exciteret, præpareres atomet igen
+          // ved næste skud (se playBtn), hvor springet op er synligt for eleven.
+          if (startN > 1) {
+            setSt(`Henfald afsluttet — elektronen er i grundtilstanden. Næste skud præparerer atomet i n=${startN} igen.`);
+          } else {
+            setSt('Henfald afsluttet — elektronen er tilbage i grundtilstanden.');
+          }
           renderLog();
         }
       }
@@ -1125,10 +1414,56 @@ function setPlay(on) {
   b.textContent = (on && !paused) ? '⏸ Pause' : '▶ Afspil';
 }
 
-function updSlider() {
-  selWL = parseFloat(document.getElementById('sl').value);
+// ── Wavelength slider: LOGARITHMIC mapping, 90–8000 nm ────────────────────
+// Two problems forced this design:
+//
+//  1. RANGE. Absorption lines from n=3,4,5 lie at 1094–7460 nm. The old 90–700
+//     nm slider could not reach them at all, so those start states could only
+//     ever ionise. The range now covers every n→n' transition in the model.
+//
+//  2. RESOLUTION. The Lyman series converges toward 91,2 nm, so n=1→5 (95,0 nm)
+//     and n=1→6 (93,8 nm) sit under 1 px apart on any slider at this width — no
+//     snap window can separate them, and a linear scale made it worse still
+//     (0,6 px). A log scale spreads the range evenly and helps everywhere else,
+//     but the converging upper lines are simply not selectable by dragging.
+//     The chips below are therefore not a convenience: they are the only
+//     reliable way to hit those lines. Snap handles the well-separated ones.
+const LAM_MIN = 90, LAM_MAX = 8000;
+const LAM_RATIO = LAM_MAX / LAM_MIN;
+const LAM_LNR = Math.log(LAM_RATIO);
+const SL_STEPS = 4000;
+
+const posToLam = pos => LAM_MIN * Math.pow(LAM_RATIO, pos / SL_STEPS);
+const lamToPos = lam => Math.round(SL_STEPS * Math.log(lam / LAM_MIN) / LAM_LNR);
+
+// Snap-to-resonance. Window is 1,5% but never more than 40% of the distance to
+// the nearest neighbouring line, so adjacent lines can't steal each other.
+function snapToResonance(lam) {
+  let best = null, bestDiff = Infinity;
+  for (const t of absTransitions) {
+    // distance to nearest other line, to bound the window
+    let nearestGap = Infinity;
+    for (const o of absTransitions) {
+      if (o === t) continue;
+      nearestGap = Math.min(nearestGap, Math.abs(o.lam - t.lam));
+    }
+    const win = Math.min(t.lam * 0.015, nearestGap * 0.4);
+    const diff = Math.abs(lam - t.lam);
+    if (diff <= win && diff < bestDiff) { bestDiff = diff; best = t.lam; }
+  }
+  return best;
+}
+
+function setWavelength(lam) {
+  lam = Math.max(LAM_MIN, Math.min(LAM_MAX, lam));
+  document.getElementById('sl').value = lamToPos(lam);
+  selWL = lam;                       // keep exact value, not the quantised one
+  refreshWavelengthUI();
+}
+
+function refreshWavelengthUI() {
   document.getElementById('wlv').textContent = selWL.toFixed(1);
-  document.getElementById('ev').textContent = (HC/selWL).toFixed(2);
+  document.getElementById('ev').textContent = (HC / selWL).toFixed(2);
 
   const pE = HC / selWL;
   const isIon = pE >= ionE(startN) * 0.999;
@@ -1145,6 +1480,40 @@ function updSlider() {
     badge.className = 'badge b-no';
     badge.textContent = 'Ingen match';
   }
+  markActiveChip();
+}
+
+// Called on slider drag: read position, map to λ, snap if close to a line.
+function updSlider() {
+  const raw = posToLam(parseFloat(document.getElementById('sl').value));
+  const snapped = snapToResonance(raw);
+  selWL = (snapped !== null) ? snapped : raw;
+  refreshWavelengthUI();
+}
+
+// ── Resonance chips ───────────────────────────────────────────────────────
+function renderChips() {
+  const row = document.getElementById('chipRow');
+  const hint = document.getElementById('chipHint');
+  if (absTransitions.length === 0) {
+    row.innerHTML = `<div class="chip-none">Ingen absorptionslinjer fra n=6 — enhver foton i dette område ioniserer atomet.</div>`;
+    hint.style.display = 'none';
+    return;
+  }
+  hint.style.display = '';
+  row.innerHTML = absTransitions.map(t =>
+    `<button class="chip" data-lam="${t.lam}">
+       <span class="c-n"><span class="c-arrow">⟶</span>${t.hi}</span>
+       <span class="c-l">${t.lam.toFixed(1)}</span>
+     </button>`
+  ).join('');
+  markActiveChip();
+}
+function markActiveChip() {
+  document.querySelectorAll('.chip').forEach(c => {
+    const lam = parseFloat(c.dataset.lam);
+    c.classList.toggle('active', Math.abs(selWL - lam) / lam < 0.001);
+  });
 }
 
 function doReset() {
@@ -1153,13 +1522,21 @@ function doReset() {
   ePh = []; elog = []; dPath = []; dStep = 0;
   ionProgress = 0; paused = false; decayWait = 0;
   absorbedE = 0;
-  setPlay(false); updSlider();
+  setPlay(false);
+  renderChips();            // transitions depend on startN
+  refreshWavelengthUI();    // keep selWL — don't re-read the quantised slider
   setSt('Nulstillet — vælg bølgelængde og klik Afspil.');
   renderLog();
 }
 
 // ── Event listeners ───────────────────────────────────────────────────────
 document.getElementById('sl').addEventListener('input', updSlider);
+
+document.getElementById('chipRow').addEventListener('click', e => {
+  const chip = e.target.closest('.chip');
+  if (!chip) return;
+  setWavelength(parseFloat(chip.dataset.lam));
+});
 
 document.getElementById('nBtns').addEventListener('click', e => {
   const btn = e.target.closest('.btn-sm');
@@ -1174,6 +1551,10 @@ document.getElementById('nBtns').addEventListener('click', e => {
 document.getElementById('playBtn').addEventListener('click', () => {
   if (ss === 'READY' && !paused) {
     elog = []; dPath = []; dStep = 0;
+    // Atomet præpareres i starttilstanden før hvert skud. Efter en kaskade ligger
+    // elektronen i n=1, så her springer den synligt op igen (hvis startN > 1).
+    const reprepared = (eN !== startN);
+    eN = startN; buildCloud(eN);
     const pE = HC / selWL;
     pendingIon = pE >= ionE(startN) * 0.999;
     const ab = pendingIon ? null : findAbs(selWL);
@@ -1184,7 +1565,9 @@ document.getElementById('playBtn').addEventListener('click', () => {
     else                 absorbedE = 0;
     pX = -10; pCol = wlCol(selWL);
     ss = 'SHOOTING'; tmr = 0; paused = false;
-    setSt('Foton sendt mod atomet...');
+    setSt(reprepared
+      ? `Atomet præpareret i n=${startN}. Foton sendt mod atomet...`
+      : 'Foton sendt mod atomet...');
     setPlay(true);
     renderLog();
   } else if (ss !== 'READY' && ss !== 'IONIZED') {
@@ -1210,7 +1593,7 @@ document.getElementById('themeBtn').addEventListener('click', () => {
   if (dark) document.documentElement.removeAttribute('data-theme');
   else      document.documentElement.setAttribute('data-theme','light');
   document.getElementById('themeBtn').textContent = dark ? 'Lyst tema' : 'Mørkt tema';
-  updSlider();
+  refreshWavelengthUI();
   renderLog();
 });
 
@@ -1249,6 +1632,27 @@ eEl.addEventListener('click', e => {
   doReset();
 });
 
+// ── Modals (Forklaring / Opgaver) ─────────────────────────────────────────
+const explainModal = document.getElementById('explainModal');
+const taskModal    = document.getElementById('taskModal');
+
+function openModal(m){ m.classList.remove('hide'); m.scrollTop = 0; m.querySelector('.modal-box').scrollTop = 0; }
+function closeModal(m){ m.classList.add('hide'); }
+
+document.getElementById('explainBtn').addEventListener('click', () => openModal(explainModal));
+document.getElementById('explainClose').addEventListener('click', () => closeModal(explainModal));
+explainModal.addEventListener('click', e => { if (e.target === explainModal) closeModal(explainModal); });
+
+document.getElementById('taskBtn').addEventListener('click', () => openModal(taskModal));
+document.getElementById('taskClose').addEventListener('click', () => closeModal(taskModal));
+taskModal.addEventListener('click', e => { if (e.target === taskModal) closeModal(taskModal); });
+
+document.addEventListener('keydown', e => {
+  if (e.key !== 'Escape') return;
+  if (!explainModal.classList.contains('hide')) closeModal(explainModal);
+  if (!taskModal.classList.contains('hide'))    closeModal(taskModal);
+});
+
 // ── Resize handling ──────────────────────────────────────────────────────
 let resizeTimer = null;
 window.addEventListener('resize', () => {
@@ -1258,7 +1662,8 @@ window.addEventListener('resize', () => {
 
 // ── Init ──────────────────────────────────────────────────────────────────
 resizeCanvases();
-updSlider();
+renderChips();
+setWavelength(121.6);      // Lyman-α, a meaningful default (n=1→2)
 buildCloud(1);
 renderLog();
 lastTs = performance.now();
