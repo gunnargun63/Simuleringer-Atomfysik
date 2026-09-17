@@ -1969,8 +1969,8 @@ eEl.addEventListener('click', e => {
   /* træ -> { html, ren } på én linje */
   function texLinje(liste) {
     var html = '', ren = '', forrige = null;
-    liste.forEach(function (k) {
-      var d = texKnude(k, forrige);
+    liste.forEach(function (k, nr) {
+      var d = texKnude(k, forrige, liste[nr + 1]);
       html += d.html; ren += d.ren;
       forrige = k;
     });
@@ -1992,7 +1992,7 @@ eEl.addEventListener('click', e => {
     return ud;
   }
 
-  function texKnude(k, forrige) {
+  function texKnude(k, forrige, naeste) {
     var d, a, b;
     switch (k.t) {
       case 'var':
@@ -2029,6 +2029,12 @@ eEl.addEventListener('click', e => {
         a = texLinje(k.n); b = texLinje(k.d);
         if (erSammensat(k.n, false)) { a.html = '(' + a.html + ')'; a.ren = '(' + a.ren + ')'; }
         if (erSammensat(k.d, true))  { b.html = '(' + b.html + ')'; b.ren = '(' + b.ren + ')'; }
+        /* står der flere faktorer efter brøken, skal hele brøken i parentes:
+           (1/2)mv², ikke 1/2mv² */
+        if (naeste && naeste.t !== 'op' && naeste.t !== 'rel' && naeste.t !== 'rum' &&
+            !(naeste.t === 'txt' && /^[,.;)\]]/.test(naeste.v))) {
+          return { html: '(' + a.html + '/' + b.html + ')', ren: '(' + a.ren + '/' + b.ren + ')' };
+        }
         return { html: a.html + '/' + b.html, ren: a.ren + '/' + b.ren };
       case 'sc':
         d = texKnude(k.base, forrige);

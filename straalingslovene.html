@@ -498,11 +498,11 @@ table.tbl th{color:var(--cyan); letter-spacing:.06em;}
 <p>Enheden på <span class="eq" data-tex="y"></span>-aksen er <span class="eq" data-tex="\text{W/(m}^{2}\cdot\text{nm)}"></span>: effekt pr. areal pr. bølgelængdeinterval. Kurven har et skævt maksimum — den falder stejlt mod korte bølgelængder og langsomt mod lange. Sådan en graf kaldes en Planck-kurve. Det er ikke meningen, at du skal arbejde med funktionen som sådan, men med funktionens graf.</p>
 <h3>Wiens forskydningslov</h3>
 <p>Toppens placering afhænger kun af temperaturen:</p>
-<div class="eqd" data-tex="\lambda_{\text{top}} \cdot T = b, \quad b = 2{,}90 \cdot 10^{-3}\,\text{m}\cdot\text{K}"></div>
+<div class="eqd" data-tex="\lambda_{\text{top}} \cdot T = b, \quad b = 2,90 \cdot 10^{-3}\,\text{m}\cdot\text{K}"></div>
 <p>Jo varmere stjernen er, desto kortere bølgelængder stråler den mest ved. I simuleringen aflæser du selv <span class="eq" data-tex="\lambda_{\text{top}}"></span> ved at trække markøren hen på toppen.</p>
 <h3>Stefan-Boltzmanns lov</h3>
 <p>Den samlede udstrålede effekt pr. areal er arealet under hele Planck-kurven. Ved integralregning kan det vises, at</p>
-<div class="eqd" data-tex="\frac{P}{A} = \sigma T^{4}, \quad \sigma = 5{,}67 \cdot 10^{-8}\,\text{W/(m}^{2}\cdot\text{K}^{4})"></div>
+<div class="eqd" data-tex="\frac{P}{A} = \sigma T^{4}, \quad \sigma = 5,67 \cdot 10^{-8}\,\text{W/(m}^{2}\cdot\text{K}^{4})"></div>
 <p>Arealet finder du ved at dele bølgelængdeaksen op i søjler. Hver søjle er så høj som kurven midt i søjlen og så bred som <span class="eq" data-tex="\Delta\lambda"></span>. Summen af <span class="eq" data-tex="f(\lambda)\cdot\Delta\lambda"></span> nærmer sig arealet, når du bruger flere søjler. Tallet i måleren er den sum, tegningen viser.</p>
 <h3>Hvorfor rammer søjlesummen ikke <span class="eq" data-tex="\sigma T^{4}"></span>?</h3>
 <p>To grunde, og begge er lærerige. For det første er en sum af endeligt mange søjler kun en tilnærmelse til arealet. For det andet regner du kun inden for det viste <span class="eq" data-tex="\lambda"></span>-vindue, mens <span class="eq" data-tex="\sigma T^{4}"></span> gælder for alle bølgelængder fra <span class="eq" data-tex="0"></span> til uendelig. En kold stjerne har en stor hale ude i infrarødt, som ligger uden for billedet. Slår du <i>Vis facit</i> til, kan du se, hvor stor en andel af <span class="eq" data-tex="\sigma T^{4}"></span> vinduet overhovedet indeholder.</p>
@@ -540,7 +540,7 @@ table.tbl th{color:var(--cyan); letter-spacing:.06em;}
 <p><b>a)</b> Indstil <span class="eq" data-tex="T"></span> til seks forskellige værdier fordelt over hele skalaen. Træk hver gang markøren hen på toppen af kurven, aflæs <span class="eq" data-tex="\lambda_{\text{top}}"></span> og tryk <b>Registrér</b>.</p>
 <p><b>b)</b> Hent CSV-filen, importer den i dit foretrukne regneprogram, og opret en beregnet kolonne for <span class="eq" data-tex="\frac{1}{T}"></span>.</p>
 <p><b>c)</b> Plot <span class="eq" data-tex="\lambda_{\text{top}}"></span> som funktion af <span class="eq" data-tex="\frac{1}{T}"></span> og lav lineær regression. Hvad betyder hældningen fysisk?</p>
-<p><b>d)</b> Omregn hældningen til enheden <span class="eq" data-tex="\text{m}\cdot\text{K}"></span> og sammenlign med <span class="eq" data-tex="b = 2{,}90 \cdot 10^{-3}\,\text{m}\cdot\text{K}"></span>. Beregn den relative afvigelse.</p>
+<p><b>d)</b> Omregn hældningen til enheden <span class="eq" data-tex="\text{m}\cdot\text{K}"></span> og sammenlign med <span class="eq" data-tex="b = 2,90 \cdot 10^{-3}\,\text{m}\cdot\text{K}"></span>. Beregn den relative afvigelse.</p>
 <h3>3. Stefan-Boltzmanns lov</h3>
 <p>Behold <span class="eq" data-tex="\lambda"></span>-vinduet på 2500 nm. Sæt flueben i <i>Vis søjler under kurven</i> og vælg 50 søjler.</p>
 <p><b>a)</b> Ryd tabellen. Registrér søjlesummen (tilnærmet værdi for arealet under grafen) ved de samme seks temperaturer som i opgave 2.</p>
@@ -566,13 +566,14 @@ table.tbl th{color:var(--cyan); letter-spacing:.06em;}
    Der understøttes netop den delmængde, disse simuleringer bruger:
 
      \frac{a}{b}   \sqrt{a}   a_{n}   a^{2}   \left( … \right)
-     \lambda \pi \omega \gamma \mu \Delta      græske bogstaver
+     \lambda \pi \omega \gamma \mu \tau \Delta  græske bogstaver
      \cdot \times \pm \approx \le \ge \ne \Leftrightarrow \to
      \sin \cos \tan \log \ln                   opret (ikke kursiv)
      \text{…}                                  opret tekst, fx enheder
      |a|                                       numerisk værdi
      \\  \\,                                    tyndt mellemrum, fx foran enheder
-     0,75                                      danske decimaltal skrives direkte
+     0,75                                      danske decimaltal skrives direkte,
+                                               aldrig 0{,}75
 
    Variable sættes kursivt, tal og enheder opret — præcis som i LaTeX.
    Skriften er Latin Modern Math, indlejret i stilarket som en delmængde.
@@ -581,7 +582,7 @@ table.tbl th{color:var(--cyan); letter-spacing:.06em;}
   'use strict';
   const GREEK = {
     alpha:'α', beta:'β', gamma:'γ', delta:'δ', theta:'θ', lambda:'λ', mu:'μ',
-    eta:'η', pi:'π', rho:'ρ', sigma:'σ', phi:'φ', omega:'ω',
+    eta:'η', pi:'π', rho:'ρ', sigma:'σ', tau:'τ', phi:'φ', omega:'ω',
     Delta:'Δ', Lambda:'Λ', Omega:'Ω', Sigma:'Σ'
   };
   /* [tegn, klasse] — 'o' = regneoperator (smal luft), 'r' = relation (bred luft) */
@@ -609,7 +610,7 @@ table.tbl th{color:var(--cyan); letter-spacing:.06em;}
     alpha:0x1D6FC, beta:0x1D6FD, gamma:0x1D6FE, delta:0x1D6FF, eta:0x1D702,
     theta:0x1D703,
     lambda:0x1D706, mu:0x1D707, pi:0x1D70B, rho:0x1D70C, sigma:0x1D70E,
-    phi:0x1D711, omega:0x1D714
+    tau:0x1D70F, phi:0x1D711, omega:0x1D714
   };
   const esc = t => t.replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;');
 
@@ -1644,8 +1645,8 @@ function bind() {
   /* træ -> { html, ren } på én linje */
   function texLinje(liste) {
     var html = '', ren = '', forrige = null;
-    liste.forEach(function (k) {
-      var d = texKnude(k, forrige);
+    liste.forEach(function (k, nr) {
+      var d = texKnude(k, forrige, liste[nr + 1]);
       html += d.html; ren += d.ren;
       forrige = k;
     });
@@ -1667,7 +1668,7 @@ function bind() {
     return ud;
   }
 
-  function texKnude(k, forrige) {
+  function texKnude(k, forrige, naeste) {
     var d, a, b;
     switch (k.t) {
       case 'var':
@@ -1704,6 +1705,12 @@ function bind() {
         a = texLinje(k.n); b = texLinje(k.d);
         if (erSammensat(k.n, false)) { a.html = '(' + a.html + ')'; a.ren = '(' + a.ren + ')'; }
         if (erSammensat(k.d, true))  { b.html = '(' + b.html + ')'; b.ren = '(' + b.ren + ')'; }
+        /* står der flere faktorer efter brøken, skal hele brøken i parentes:
+           (1/2)mv², ikke 1/2mv² */
+        if (naeste && naeste.t !== 'op' && naeste.t !== 'rel' && naeste.t !== 'rum' &&
+            !(naeste.t === 'txt' && /^[,.;)\]]/.test(naeste.v))) {
+          return { html: '(' + a.html + '/' + b.html + ')', ren: '(' + a.ren + '/' + b.ren + ')' };
+        }
         return { html: a.html + '/' + b.html, ren: a.ren + '/' + b.ren };
       case 'sc':
         d = texKnude(k.base, forrige);
