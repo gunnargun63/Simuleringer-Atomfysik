@@ -197,26 +197,42 @@ table.maal tr:last-child td{border-bottom:none;}
 }
 [data-theme="light"] .modal{background:rgba(60,50,35,.6);}
 .modal.vis{display:flex;}
+/* Layoutet følger henfaldstyper. Brødteksten har normal vægt i begge temaer;
+   med vægt 700 i det lyse tema forsvandt al fremhævning af knapnavne. */
 .modal-inner{
   background:var(--bg1); border:1px solid var(--border);
-  max-width:860px; width:100%; padding:20px 22px;
+  max-width:820px; width:100%; padding:24px 28px;
 }
 .modal-inner h2{
-  font-family:'Orbitron',var(--font); font-size:13px; letter-spacing:.18em;
-  color:var(--green); margin:0 0 14px 0; text-transform:uppercase;
+  font-family:'Orbitron',var(--font); font-size:18px; letter-spacing:.18em;
+  color:var(--green); margin:0 0 4px 0; text-transform:uppercase;
 }
 .modal-inner h3{
-  font-size:11px; letter-spacing:.18em; color:var(--cyan); text-transform:uppercase;
-  margin:18px 0 7px 0; font-weight:700;
+  font-family:'Orbitron',var(--font); font-size:15px; letter-spacing:.18em;
+  color:var(--green); text-transform:uppercase;
+  margin:24px 0 12px 0; padding-bottom:6px; border-bottom:1px solid var(--border);
 }
-.modal-inner p, .modal-inner li{font-size:12px; color:var(--text); line-height:1.75;}
-[data-theme="light"] .modal-inner p,[data-theme="light"] .modal-inner li{color:#161616; font-weight:700;}
-.modal-inner ol,.modal-inner ul{padding-left:19px; margin:7px 0;}
-.modal-inner li{margin-bottom:7px;}
+.modal-inner p, .modal-inner li{font-size:.92rem; color:var(--text); line-height:1.55;}
+.modal-inner p{margin:0 0 10px 0;}
+[data-theme="light"] .modal-inner p,[data-theme="light"] .modal-inner li{color:#161616;}
+.modal-inner ol,.modal-inner ul{padding-left:24px; margin:0 0 12px 0;}
+.modal-inner li{margin-bottom:4px;}
+.modal-inner .acc-g{color:var(--green);}
+.modal-inner .acc{color:var(--cyan);}
+.modal-inner .acc-y{color:var(--yellow);}
 .close-row{display:flex; justify-content:flex-end; margin-top:16px;}
-table.tbl{border-collapse:collapse; width:100%; margin:9px 0; font-size:11px;}
-table.tbl th,table.tbl td{border:1px solid var(--border); padding:5px 8px; text-align:left; color:var(--text);}
-[data-theme="light"] table.tbl th,[data-theme="light"] table.tbl td{color:#161616; font-weight:700;}
+.modal-top{display:flex; align-items:center; justify-content:space-between; gap:14px;
+  margin-bottom:12px;}
+.modal-top h2{margin:0;}
+.modal-top .btn{flex:0 0 auto;}
+/* to kolonner, når md-filen har ===== HØJRE ===== */
+.modal-inner:has(> .modal-kol){max-width:1120px;}
+.modal-kol{display:grid; grid-template-columns:1fr 1fr; gap:8px 36px;}
+@media (max-width:900px){ .modal-kol{grid-template-columns:1fr;} }
+table.tbl{border-collapse:collapse; margin:4px 0 14px 0; font-size:.85rem;}
+table.tbl th,table.tbl td{border:1px solid var(--border); padding:5px 12px; text-align:right; color:var(--text);}
+table.tbl th:first-child,table.tbl td:first-child{text-align:left;}
+[data-theme="light"] table.tbl td{color:#161616;}
 table.tbl th{color:var(--cyan); letter-spacing:.06em;}
 [data-theme="light"] table.tbl th{color:#2767a8;}
 
@@ -466,141 +482,79 @@ table.tbl th{color:var(--cyan); letter-spacing:.06em;}
   </div>
 </div>
 
-<!-- ================= FORKLARING ================= -->
+<!-- ================= FORKLARING =================
+     Teksten står i straalingslovene-forklaring.md og sættes ind med
+     python3 byg-modaler.py straalingslovene.html -->
 <div class="modal" id="mForklar"><div class="modal-inner">
-  <h2>Forklaring</h2>
+  <div class="modal-top">
+    <h2>Forklaring</h2>
+    <button class="btn btn-lille" data-kopier="mForklar">Kopier teksten</button>
+  </div>
 
-  <h3>Plancks strålingslov</h3>
-  <p>Et sort legeme (som en stjerne) med overfladetemperaturen <span class="eq" data-tex="T"></span>
-  udsender stråling ved alle bølgelængder. Hvor meget der kommer ud pr. kvadratmeter overflade og
-  pr. nanometer bølgelængde, kaldes den <b>spektrale intensitet</b> og er givet ved denne
-  funktion:</p>
-  <div class="eqd" data-tex="f(\lambda) = \frac{2\pi h c^{2}}{\lambda^{5}\left( \exp\left( \frac{hc}{\lambda k T} \right) - 1 \right)}"></div>
-  <p>Enheden på <span class="eq" data-tex="y"></span>-aksen er
-  <span class="eq" data-tex="\text{W/(m}^{2}\cdot\text{nm)}"></span>: effekt pr. areal pr.
-  bølgelængdeinterval. Kurven har et skævt maksimum &mdash; den falder stejlt mod korte
-  bølgelængder og langsomt mod lange. Sådan en graf kaldes en Planck-kurve. Det er ikke meningen,
-  at du skal arbejde med funktionen som sådan, men med funktionens graf.</p>
-
-  <h3>Wiens forskydningslov</h3>
-  <p>Toppens placering afhænger kun af temperaturen:</p>
-  <div class="eqd" data-tex="\lambda_{\text{top}} \cdot T = b, \quad b = 2{,}90 \cdot 10^{-3}\,\text{m}\cdot\text{K}"></div>
-  <p>Jo varmere stjernen er, desto kortere bølgelængder stråler den mest ved. I simuleringen
-  aflæser du selv <span class="eq" data-tex="\lambda_{\text{top}}"></span> ved at trække markøren
-  hen på toppen.</p>
-
-  <h3>Stefan-Boltzmanns lov</h3>
-  <p>Den samlede udstrålede effekt pr. areal er arealet under hele Planck-kurven. Ved
-  integralregning kan det vises, at</p>
-  <div class="eqd" data-tex="\frac{P}{A} = \sigma T^{4}, \quad \sigma = 5{,}67 \cdot 10^{-8}\,\text{W/(m}^{2}\cdot\text{K}^{4})"></div>
-  <p>Arealet finder du ved at dele bølgelængdeaksen op i søjler. Hver søjle er så høj som kurven
-  midt i søjlen og så bred som <span class="eq" data-tex="\Delta\lambda"></span>. Summen af
-  <span class="eq" data-tex="f(\lambda)\cdot\Delta\lambda"></span> nærmer sig arealet, når du
-  bruger flere søjler. Tallet i måleren er den sum, tegningen viser.</p>
-
-  <h3>Hvorfor rammer søjlesummen ikke <span class="eq" data-tex="\sigma T^{4}"></span>?</h3>
-  <p>To grunde, og begge er lærerige. For det første er en sum af endeligt mange søjler kun en
-  tilnærmelse til arealet. For det andet regner du kun inden for det viste
-  <span class="eq" data-tex="\lambda"></span>-vindue, mens
-  <span class="eq" data-tex="\sigma T^{4}"></span> gælder for alle bølgelængder fra
-  <span class="eq" data-tex="0"></span> til uendelig. En kold stjerne har en stor hale ude i
-  infrarødt, som ligger uden for billedet. Slår du <i>Vis facit</i> til, kan du se, hvor stor en
-  andel af <span class="eq" data-tex="\sigma T^{4}"></span> vinduet overhovedet indeholder.</p>
-  <table class="tbl">
-    <tr><th><span class="eq" data-tex="T"></span></th><th>1000 nm</th><th>2500 nm</th><th>6000 nm</th></tr>
-    <tr><td>3500 K</td><td>38 %</td><td>88 %</td><td>99 %</td></tr>
-    <tr><td>5778 K</td><td>72 %</td><td>97 %</td><td>99,7 %</td></tr>
-    <tr><td>12000 K</td><td>95 %</td><td>99,5 %</td><td>99,96 %</td></tr>
-  </table>
-
-  <h3>Om <span class="eq" data-tex="y"></span>-aksen</h3>
-  <p><span class="eq" data-tex="y"></span>-aksen tilpasser sig den højeste kurve, der vises, og
-  eksponenten står i aksens titel. Fastholder du to kurver, deler de samme skala, så
-  sammenligningen er reel &mdash; og at den kolde kurve så bliver næsten flad, er ikke en fejl,
-  men netop <span class="eq" data-tex="T^{4}"></span>-afhængigheden. Med logaritmisk
-  <span class="eq" data-tex="y"></span>-akse kan alle fire stjerner ses på én gang.</p>
-
-  <h3>Stjernernes farve</h3>
-  <p>Farven på stjerne-skiven til venstre er beregnet ud af selve Planck-kurven ved at veje den
-  med øjets tre følsomhedskurver. Derfor er farverne mere blege, end man ser på pressefotos: en
-  rød kæmpestjerne er svagt orange for det blotte øje, ikke helt rød.</p>
+  <!-- MODALTEKST:forklaring -->
+<h3>Plancks strålingslov</h3>
+<p>Et sort legeme (som en stjerne) med overfladetemperaturen <span class="eq" data-tex="T"></span> udsender stråling ved alle bølgelængder. Hvor meget der kommer ud pr. kvadratmeter overflade og pr. nanometer bølgelængde, kaldes den <b>spektrale intensitet</b> og er givet ved denne funktion:</p>
+<div class="eqd" data-tex="f(\lambda) = \frac{2\pi h c^{2}}{\lambda^{5}\left( \exp\left( \frac{hc}{\lambda k T} \right) - 1 \right)}"></div>
+<p>Enheden på <span class="eq" data-tex="y"></span>-aksen er <span class="eq" data-tex="\text{W/(m}^{2}\cdot\text{nm)}"></span>: effekt pr. areal pr. bølgelængdeinterval. Kurven har et skævt maksimum — den falder stejlt mod korte bølgelængder og langsomt mod lange. Sådan en graf kaldes en Planck-kurve. Det er ikke meningen, at du skal arbejde med funktionen som sådan, men med funktionens graf.</p>
+<h3>Wiens forskydningslov</h3>
+<p>Toppens placering afhænger kun af temperaturen:</p>
+<div class="eqd" data-tex="\lambda_{\text{top}} \cdot T = b, \quad b = 2{,}90 \cdot 10^{-3}\,\text{m}\cdot\text{K}"></div>
+<p>Jo varmere stjernen er, desto kortere bølgelængder stråler den mest ved. I simuleringen aflæser du selv <span class="eq" data-tex="\lambda_{\text{top}}"></span> ved at trække markøren hen på toppen.</p>
+<h3>Stefan-Boltzmanns lov</h3>
+<p>Den samlede udstrålede effekt pr. areal er arealet under hele Planck-kurven. Ved integralregning kan det vises, at</p>
+<div class="eqd" data-tex="\frac{P}{A} = \sigma T^{4}, \quad \sigma = 5{,}67 \cdot 10^{-8}\,\text{W/(m}^{2}\cdot\text{K}^{4})"></div>
+<p>Arealet finder du ved at dele bølgelængdeaksen op i søjler. Hver søjle er så høj som kurven midt i søjlen og så bred som <span class="eq" data-tex="\Delta\lambda"></span>. Summen af <span class="eq" data-tex="f(\lambda)\cdot\Delta\lambda"></span> nærmer sig arealet, når du bruger flere søjler. Tallet i måleren er den sum, tegningen viser.</p>
+<h3>Hvorfor rammer søjlesummen ikke <span class="eq" data-tex="\sigma T^{4}"></span>?</h3>
+<p>To grunde, og begge er lærerige. For det første er en sum af endeligt mange søjler kun en tilnærmelse til arealet. For det andet regner du kun inden for det viste <span class="eq" data-tex="\lambda"></span>-vindue, mens <span class="eq" data-tex="\sigma T^{4}"></span> gælder for alle bølgelængder fra <span class="eq" data-tex="0"></span> til uendelig. En kold stjerne har en stor hale ude i infrarødt, som ligger uden for billedet. Slår du <i>Vis facit</i> til, kan du se, hvor stor en andel af <span class="eq" data-tex="\sigma T^{4}"></span> vinduet overhovedet indeholder.</p>
+<table class="tbl">
+<tr><th><span class="eq" data-tex="T"></span></th><th>1000 nm</th><th>2500 nm</th><th>6000 nm</th></tr>
+<tr><td>3500 K</td><td>38 %</td><td>88 %</td><td>99 %</td></tr>
+<tr><td>5778 K</td><td>72 %</td><td>97 %</td><td>99,7 %</td></tr>
+<tr><td>12000 K</td><td>95 %</td><td>99,5 %</td><td>99,96 %</td></tr>
+</table>
+<h3>Om <span class="eq" data-tex="y"></span>-aksen</h3>
+<p><span class="eq" data-tex="y"></span>-aksen tilpasser sig den højeste kurve, der vises, og eksponenten står i aksens titel. Fastholder du to kurver, deler de samme skala, så sammenligningen er reel — og at den kolde kurve så bliver næsten flad, er ikke en fejl, men netop <span class="eq" data-tex="T^{4}"></span>-afhængigheden. Med logaritmisk <span class="eq" data-tex="y"></span>-akse kan alle fire stjerner ses på én gang.</p>
+<h3>Stjernernes farve</h3>
+<p>Farven på stjerne-skiven til venstre er beregnet ud af selve Planck-kurven ved at veje den med øjets tre følsomhedskurver. Derfor er farverne mere blege, end man ser på pressefotos: en rød kæmpestjerne er svagt orange for det blotte øje, ikke helt rød.</p>
+<!-- SLUT MODALTEKST:forklaring -->
 
   <div class="close-row"><button class="btn-sm modal-close">Luk</button></div>
 </div></div>
 
-<!-- ================= OPGAVER ================= -->
+<!-- ================= OPGAVER =================
+     Teksten står i straalingslovene-opgaver.md -->
 <div class="modal" id="mOpgaver"><div class="modal-inner">
-  <h2>Opgaver</h2>
+  <div class="modal-top">
+    <h2>Opgaver</h2>
+    <button class="btn btn-lille" data-kopier="mOpgaver">Kopier teksten</button>
+  </div>
 
-  <p>I opgaverne skal du komme lidt tættere på de tre strålingslove: Plancks strålingslov, Wiens
-  forskydningslov og Stefan-Boltzmanns lov.</p>
-
-  <h3>Opgave 1 &mdash; Fire stjerner på én skala</h3>
-  <ol>
-    <li>Vælg Betelgeuse og tryk <b>Fasthold kurve</b>. Vælg derefter Solen og tryk
-        <b>Fasthold kurve</b> igen. Hvad sker der med Betelgeuses kurve, og hvorfor? Fasthold også
-        Sirius A og vælg til sidst Rigel. Nu er alle fire kurver på skærmen. Kommenter.</li>
-    <li>Slå den logaritmiske <span class="eq" data-tex="y"></span>-akse til. Krydser to
-        Planck-kurver nogensinde hinanden? Hvad betyder svaret fysisk for en varm og en "kold"
-        stjerne?</li>
-    <li>Klik på Betelgeuse og aflæs den spektrale intensitet ved kurvens maksimum. Boksen viser
-        altid den stjerne, du har valgt &mdash; ikke de fastholdte. Gør det samme for Rigel. Hvor
-        mange gange større er Rigels udstråling ved sit maksimum end Betelgeuses ved dens?</li>
-    <li>Betelgeuses top ligger uden for det synlige område, men stjernen ser alligevel rødlig ud
-        og ikke sort. Forklar det ud fra kurven.</li>
-  </ol>
-
-  <h3>Opgave 2 &mdash; Wiens forskydningslov</h3>
-  <ol>
-    <li>Indstil <span class="eq" data-tex="T"></span> til seks forskellige værdier fordelt over
-        hele skalaen. Træk hver gang markøren hen på toppen af kurven, aflæs
-        <span class="eq" data-tex="\lambda_{\text{top}}"></span> og tryk <b>Registrér</b>.</li>
-    <li>Hent CSV-filen, importer den i dit foretrukne regneprogram, og opret en beregnet kolonne
-        for <span class="eq" data-tex="\frac{1}{T}"></span>.</li>
-    <li>Plot <span class="eq" data-tex="\lambda_{\text{top}}"></span> som funktion af
-        <span class="eq" data-tex="\frac{1}{T}"></span> og lav lineær regression. Hvad betyder
-        hældningen fysisk?</li>
-    <li>Omregn hældningen til enheden <span class="eq" data-tex="\text{m}\cdot\text{K}"></span> og
-        sammenlign med <span class="eq" data-tex="b = 2{,}90 \cdot 10^{-3}\,\text{m}\cdot\text{K}"></span>.
-        Beregn den relative afvigelse.</li>
-  </ol>
-
-  <h3>Opgave 3 &mdash; Stefan-Boltzmanns lov</h3>
-  <p>Behold <span class="eq" data-tex="\lambda"></span>-vinduet på 2500 nm. Sæt flueben i
-  <i>Vis søjler under kurven</i> og vælg 50 søjler.</p>
-  <ol>
-    <li>Ryd tabellen. Registrér søjlesummen (tilnærmet værdi for arealet under grafen) ved de
-        samme seks temperaturer som i opgave 2.</li>
-    <li>Plot søjlesummen som funktion af <span class="eq" data-tex="T"></span> og udfør
-        <b>potensregression</b> (<span class="eq" data-tex="a \cdot x^{b}"></span>). Noter
-        eksponenten <span class="eq" data-tex="b"></span>.</li>
-    <li>Beregn den relative afvigelse af <span class="eq" data-tex="b"></span> fra den forventede
-        værdi 4.</li>
-    <li>Gentag punkt 1 og 2 med <span class="eq" data-tex="\lambda"></span>-vinduet på 6000 nm.
-        Kommer eksponenten tættere på 4?</li>
-    <li>Din eksponent er større end 4 og ikke mindre. Vinduet skærer en hale af hver kurve &mdash;
-        se tabellen i <b>Forklaring</b>. Hvorfor rammer den beskæring de kolde stjerner hårdere end
-        de varme, og hvordan får det summen til at vokse hurtigere end
-        <span class="eq" data-tex="T^{4}"></span>?</li>
-  </ol>
-
-  <h3>Opgave 4 &mdash; Den synlige del af strålingen</h3>
-  <p>Vælg Solen og 2500 nm-vinduet. Slå søjlerne fra &mdash; denne gang skal du selv lave
-  summen.</p>
-  <ol>
-    <li>Sæt markøren ved 450 nm og notér <span class="eq" data-tex="f(\lambda)"></span>. Gør det
-        samme ved 550 nm og 650 nm.</li>
-    <li>De tre aflæsninger er højderne af tre søjler, hver 100 nm bred, som tilsammen dækker
-        400&ndash;700 nm. Beregn hver søjles areal og læg dem sammen. Hvilken enhed får summen, og
-        hvorfor?</li>
-    <li>Slå <i>Vis facit</i> til og aflæs <span class="eq" data-tex="\sigma T^{4}"></span>. Hvor
-        stor en del af Solens udstråling ligger i det synlige område?</li>
-    <li>Gentag proceduren for Betelgeuse og Rigel. Hvor stor en del af deres udstrålede effekt
-        ligger inden for det synlige spektrum?</li>
-    <li>Solens spektrum har mørke absorptionslinjer, som Planck-kurven her ikke har. Hvad fortæller
-        de om Solen, og hvorfor ændrer de ikke nævneværdigt ved bestemmelsen af
-        <span class="eq" data-tex="\lambda_{\text{top}}"></span>?</li>
-  </ol>
+  <!-- MODALTEKST:opgaver -->
+<p>I opgaverne skal du komme lidt tættere på de tre strålingslove: Plancks strålingslov, Wiens forskydningslov og Stefan-Boltzmanns lov.</p>
+<h3>1. Fire stjerner på én skala</h3>
+<p><b>a)</b> Vælg Betelgeuse og tryk <b>Fasthold kurve</b>. Vælg derefter Solen og tryk <b>Fasthold kurve</b> igen. Hvad sker der med Betelgeuses kurve, og hvorfor? Fasthold også Sirius A og vælg til sidst Rigel. Nu er alle fire kurver på skærmen. Kommenter.</p>
+<p><b>b)</b> Slå den logaritmiske <span class="eq" data-tex="y"></span>-akse til. Krydser to Planck-kurver nogensinde hinanden? Hvad betyder svaret fysisk for en varm og en "kold" stjerne?</p>
+<p><b>c)</b> Klik på Betelgeuse og aflæs den spektrale intensitet ved kurvens maksimum. Boksen viser altid den stjerne, du har valgt — ikke de fastholdte. Gør det samme for Rigel. Hvor mange gange større er Rigels udstråling ved sit maksimum end Betelgeuses ved dens?</p>
+<p><b>d)</b> Betelgeuses top ligger uden for det synlige område, men stjernen ser alligevel rødlig ud og ikke sort. Forklar det ud fra kurven.</p>
+<h3>2. Wiens forskydningslov</h3>
+<p><b>a)</b> Indstil <span class="eq" data-tex="T"></span> til seks forskellige værdier fordelt over hele skalaen. Træk hver gang markøren hen på toppen af kurven, aflæs <span class="eq" data-tex="\lambda_{\text{top}}"></span> og tryk <b>Registrér</b>.</p>
+<p><b>b)</b> Hent CSV-filen, importer den i dit foretrukne regneprogram, og opret en beregnet kolonne for <span class="eq" data-tex="\frac{1}{T}"></span>.</p>
+<p><b>c)</b> Plot <span class="eq" data-tex="\lambda_{\text{top}}"></span> som funktion af <span class="eq" data-tex="\frac{1}{T}"></span> og lav lineær regression. Hvad betyder hældningen fysisk?</p>
+<p><b>d)</b> Omregn hældningen til enheden <span class="eq" data-tex="\text{m}\cdot\text{K}"></span> og sammenlign med <span class="eq" data-tex="b = 2{,}90 \cdot 10^{-3}\,\text{m}\cdot\text{K}"></span>. Beregn den relative afvigelse.</p>
+<h3>3. Stefan-Boltzmanns lov</h3>
+<p>Behold <span class="eq" data-tex="\lambda"></span>-vinduet på 2500 nm. Sæt flueben i <i>Vis søjler under kurven</i> og vælg 50 søjler.</p>
+<p><b>a)</b> Ryd tabellen. Registrér søjlesummen (tilnærmet værdi for arealet under grafen) ved de samme seks temperaturer som i opgave 2.</p>
+<p><b>b)</b> Plot søjlesummen som funktion af <span class="eq" data-tex="T"></span> og udfør <b>potensregression</b> (<span class="eq" data-tex="a \cdot x^{b}"></span>). Noter eksponenten <span class="eq" data-tex="b"></span>.</p>
+<p><b>c)</b> Beregn den relative afvigelse af <span class="eq" data-tex="b"></span> fra den forventede værdi 4.</p>
+<p><b>d)</b> Gentag a) og b) med <span class="eq" data-tex="\lambda"></span>-vinduet på 6000 nm. Kommer eksponenten tættere på 4?</p>
+<h3>4. Den synlige del af strålingen</h3>
+<p>Vælg Solen og 2500 nm-vinduet. Slå søjlerne fra — denne gang skal du selv lave summen.</p>
+<p><b>a)</b> Sæt markøren ved 450 nm og notér <span class="eq" data-tex="f(\lambda)"></span>. Gør det samme ved 550 nm og 650 nm.</p>
+<p><b>b)</b> De tre aflæsninger er højderne af tre søjler, hver 100 nm bred, som tilsammen dækker 400–700 nm. Beregn hver søjles areal og læg dem sammen. Hvilken enhed får summen, og hvorfor?</p>
+<p><b>c)</b> Slå <i>Vis facit</i> til og aflæs <span class="eq" data-tex="\sigma T^{4}"></span>. Hvor stor en del af Solens udstråling ligger i det synlige område?</p>
+<p><b>d)</b> Gentag proceduren for Betelgeuse og Rigel. Hvor stor en del af deres udstrålede effekt ligger inden for det synlige spektrum?</p>
+<p><b>e)</b> Solens spektrum har mørke absorptionslinjer, som Planck-kurven her ikke har. Hvad fortæller de om Solen, og hvorfor ændrer de ikke nævneværdigt ved bestemmelsen af <span class="eq" data-tex="\lambda_{\text{top}}"></span>?</p>
+<!-- SLUT MODALTEKST:opgaver -->
 
   <div class="close-row"><button class="btn-sm modal-close">Luk</button></div>
 </div></div>
@@ -1559,6 +1513,312 @@ function bind() {
       navigator.clipboard.writeText(kilde).then(ok, fejl);
     } else fejl();
   });
+
+  /* kopier teksten i en modal ------------------------------------------
+     En sat formel er bygget af kasser og går i stykker ved et almindeligt
+     træk-og-kopier. Knappen lægger derfor to udgaver på udklipsholderen:
+     en HTML-udgave med kursiv, <sup> og <sub>, som Word og Google Docs
+     bevarer, og en ren tekstudgave med Unicode-hævet og -sænket skrift,
+     hvor det kan lade sig gøre. Brøker skrives på én linje: a/b.
+     Begge laves ud fra TeX-kilden i data-tex, ikke ud fra den satte formel. */
+  var TEX_TEGN = {
+    alpha:'\u03b1', beta:'\u03b2', gamma:'\u03b3', delta:'\u03b4', epsilon:'\u03b5',
+    varepsilon:'\u03b5', zeta:'\u03b6', eta:'\u03b7', theta:'\u03b8', iota:'\u03b9',
+    kappa:'\u03ba', lambda:'\u03bb', mu:'\u03bc', nu:'\u03bd', xi:'\u03be', pi:'\u03c0',
+    rho:'\u03c1', sigma:'\u03c3', tau:'\u03c4', upsilon:'\u03c5', phi:'\u03c6',
+    varphi:'\u03c6', chi:'\u03c7', psi:'\u03c8', omega:'\u03c9'
+  };
+  var TEX_STORE = { Gamma:'\u0393', Delta:'\u0394', Theta:'\u0398', Lambda:'\u039b',
+    Pi:'\u03a0', Sigma:'\u03a3', Phi:'\u03a6', Psi:'\u03a8', Omega:'\u03a9' };
+  var TEX_OP = { cdot:'\u00b7', times:'\u00d7', div:'\u00f7', pm:'\u00b1', mp:'\u2213' };
+  var TEX_REL = { approx:'\u2248', ne:'\u2260', neq:'\u2260', le:'\u2264', leq:'\u2264',
+    ge:'\u2265', geq:'\u2265', to:'\u2192', rightarrow:'\u2192', Rightarrow:'\u21d2',
+    Leftrightarrow:'\u21d4', propto:'\u221d', sim:'\u223c' };
+  var TEX_FUN = ['sin','cos','tan','log','ln','exp','max','min','lim'];
+  var HAEV = { '0':'\u2070','1':'\u00b9','2':'\u00b2','3':'\u00b3','4':'\u2074',
+    '5':'\u2075','6':'\u2076','7':'\u2077','8':'\u2078','9':'\u2079',
+    '+':'\u207a','-':'\u207b','\u2212':'\u207b','=':'\u207c','(':'\u207d',')':'\u207e',
+    a:'\u1d43',b:'\u1d47',c:'\u1d9c',d:'\u1d48',e:'\u1d49',f:'\u1da0',g:'\u1d4d',
+    h:'\u02b0',i:'\u2071',j:'\u02b2',k:'\u1d4f',l:'\u02e1',m:'\u1d50',n:'\u207f',
+    o:'\u1d52',p:'\u1d56',r:'\u02b3',s:'\u02e2',t:'\u1d57',u:'\u1d58',v:'\u1d5b',
+    w:'\u02b7',x:'\u02e3',y:'\u02b8',z:'\u1dbb' };
+  var SAENK = { '0':'\u2080','1':'\u2081','2':'\u2082','3':'\u2083','4':'\u2084',
+    '5':'\u2085','6':'\u2086','7':'\u2087','8':'\u2088','9':'\u2089',
+    '+':'\u208a','-':'\u208b','\u2212':'\u208b','=':'\u208c','(':'\u208d',')':'\u208e',
+    a:'\u2090',e:'\u2091',h:'\u2095',i:'\u1d62',j:'\u2c7c',k:'\u2096',l:'\u2097',
+    m:'\u2098',n:'\u2099',o:'\u2092',p:'\u209a',r:'\u1d63',s:'\u209b',t:'\u209c',
+    u:'\u1d64',v:'\u1d65',x:'\u2093' };
+
+  function htmlEsc(t) { return t.replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;'); }
+
+  /* TeX-kilde -> træ af knuder */
+  function texTrae(src) {
+    var i = 0;
+    function ws() { while (i < src.length && src[i] === ' ') i++; }
+    function gruppe(slut) {
+      var liste = [];
+      for (;;) {
+        ws();
+        if (i >= src.length) break;
+        if (slut && src[i] === slut) break;
+        if (src.substr(i, 6) === '\\right') break;
+        var foer = i, k = en();
+        if (k) liste.push(scripts(k));
+        if (i === foer) i++;
+      }
+      return liste;
+    }
+    function arg() {
+      ws();
+      if (src[i] === '{') { i++; var g = gruppe('}'); if (src[i] === '}') i++; return g; }
+      var k = en(); return k ? [k] : [];
+    }
+    function scripts(k) {
+      for (;;) {
+        ws();
+        if (src[i] === '_' && !k.sub) { i++; k = { t:'sc', base:k.base || k, sub:arg(), sup:k.sup || null }; }
+        else if (src[i] === '^' && !k.sup) { i++; k = { t:'sc', base:k.base || k, sup:arg(), sub:k.sub || null }; }
+        else break;
+      }
+      return k;
+    }
+    function en() {
+      ws();
+      var c = src[i];
+      if (c === undefined) return null;
+      if (c === '{') { i++; var g = gruppe('}'); if (src[i] === '}') i++; return { t:'grp', liste:g }; }
+      if (c === '}') return null;
+      if (c === '\\') {
+        var j = i + 1, navn = '';
+        while (j < src.length && /[A-Za-z]/.test(src[j])) navn += src[j++];
+        if (!navn) {
+          var z = src[j]; i = j + 1;
+          if (z === ',' || z === ';' || z === ':' || z === ' ') return { t:'rum', bred:false };
+          return { t:'txt', v:z };
+        }
+        i = j;
+        if (navn === 'frac') { var n = arg(), d = arg(); return { t:'frac', n:n, d:d }; }
+        if (navn === 'sqrt') return { t:'sqrt', x:arg() };
+        if (navn === 'text' || navn === 'mathrm') {
+          ws();
+          if (src[i] !== '{') return { t:'txt', v:'' };
+          var dybde = 0, start = ++i;
+          while (i < src.length && (src[i] !== '}' || dybde)) {
+            if (src[i] === '{') dybde++; else if (src[i] === '}') dybde--;
+            i++;
+          }
+          var v = src.slice(start, i); i++;
+          return { t:'txt', v:v, enhed:true };
+        }
+        if (navn === 'left') {
+          ws(); var ve = src[i++]; if (ve === '\\') ve = src[i++];
+          var ind = gruppe(null);
+          if (src.substr(i, 6) === '\\right') i += 6;
+          ws(); var ho = src[i++]; if (ho === '\\') ho = src[i++];
+          return { t:'delim', v:ve === '.' ? '' : ve, h:ho === '.' ? '' : ho, liste:ind };
+        }
+        if (navn === 'quad' || navn === 'qquad') return { t:'rum', bred:true };
+        if (TEX_TEGN[navn]) return { t:'var', v:TEX_TEGN[navn] };
+        if (TEX_STORE[navn]) return { t:'txt', v:TEX_STORE[navn] };
+        if (TEX_OP[navn]) return { t:'op', v:TEX_OP[navn] };
+        if (TEX_REL[navn]) return { t:'rel', v:TEX_REL[navn] };
+        if (navn === 'ldots' || navn === 'dots') return { t:'txt', v:'\u2026' };
+        if (navn === 'infty') return { t:'txt', v:'\u221e' };
+        if (TEX_FUN.indexOf(navn) >= 0) return { t:'fun', v:navn };
+        return { t:'txt', v:navn };
+      }
+      i++;
+      if (/[A-Za-z]/.test(c)) return { t:'var', v:c };
+      if (/[0-9.]/.test(c)) {
+        var tal = c;
+        while (i < src.length && /[0-9.]/.test(src[i])) tal += src[i++];
+        return { t:'txt', v:tal };
+      }
+      if (c === '+' || c === '-') return { t:'op', v:c === '-' ? '\u2212' : '+' };
+      if (c === '=' || c === '<' || c === '>') return { t:'rel', v:c };
+      return { t:'txt', v:c };
+    }
+    return gruppe(null);
+  }
+
+  /* træ -> { html, ren } på én linje */
+  function texLinje(liste) {
+    var html = '', ren = '', forrige = null;
+    liste.forEach(function (k) {
+      var d = texKnude(k, forrige);
+      html += d.html; ren += d.ren;
+      forrige = k;
+    });
+    return { html: html, ren: ren };
+  }
+
+  function erSammensat(liste, ogsaaProdukt) {
+    var ind = liste.length === 1 && liste[0].t === 'grp' ? liste[0].liste : liste;
+    if (ogsaaProdukt) return ind.length > 1;
+    return ind.some(function (k) { return k.t === 'op' || k.t === 'rel'; });
+  }
+
+  function omsaet(tekst, tabel) {
+    var ud = '';
+    for (var i = 0; i < tekst.length; i++) {
+      if (!tabel[tekst[i]]) return null;
+      ud += tabel[tekst[i]];
+    }
+    return ud;
+  }
+
+  function texKnude(k, forrige) {
+    var d, a, b;
+    switch (k.t) {
+      case 'var':
+        return { html: '<i>' + htmlEsc(k.v) + '</i>', ren: k.v };
+      case 'txt':
+        return { html: htmlEsc(k.v), ren: k.v };
+      case 'fun':
+        return { html: k.v, ren: k.v };
+      case 'grp':
+        return texLinje(k.liste);
+      case 'rum':
+        return k.bred ? { html: '&emsp;', ren: '  ' } : { html: '&thinsp;', ren: ' ' };
+      case 'rel':
+        return { html: ' ' + htmlEsc(k.v) + ' ', ren: ' ' + k.v + ' ' };
+      case 'op':
+        /* fortegn: først i udtrykket eller efter et andet tegn */
+        /* mellem enheder uden luft: m·K */
+        if (k.v === '\u00b7' && forrige && (forrige.enhed || (forrige.t === 'sc' && forrige.base.enhed))) {
+          return { html: k.v, ren: k.v };
+        }
+        if (!forrige || forrige.t === 'op' || forrige.t === 'rel' ||
+            (forrige.t === 'txt' && /[(\[]$/.test(forrige.v))) {
+          return { html: k.v, ren: k.v };
+        }
+        return { html: ' ' + k.v + ' ', ren: ' ' + k.v + ' ' };
+      case 'delim':
+        d = texLinje(k.liste);
+        return { html: htmlEsc(k.v) + d.html + htmlEsc(k.h), ren: k.v + d.ren + k.h };
+      case 'sqrt':
+        d = texLinje(k.x);
+        if (erSammensat(k.x, true)) return { html: '\u221a(' + d.html + ')', ren: '\u221a(' + d.ren + ')' };
+        return { html: '\u221a' + d.html, ren: '\u221a' + d.ren };
+      case 'frac':
+        a = texLinje(k.n); b = texLinje(k.d);
+        if (erSammensat(k.n, false)) { a.html = '(' + a.html + ')'; a.ren = '(' + a.ren + ')'; }
+        if (erSammensat(k.d, true))  { b.html = '(' + b.html + ')'; b.ren = '(' + b.ren + ')'; }
+        return { html: a.html + '/' + b.html, ren: a.ren + '/' + b.ren };
+      case 'sc':
+        d = texKnude(k.base, forrige);
+        if (k.sub) {
+          a = texLinje(k.sub);
+          d.html += '<sub>' + a.html + '</sub>';
+          var s = omsaet(a.ren, SAENK);
+          d.ren += s !== null ? s : (a.ren.length === 1 ? '_' + a.ren : '_(' + a.ren + ')');
+        }
+        if (k.sup) {
+          b = texLinje(k.sup);
+          d.html += '<sup>' + b.html + '</sup>';
+          var h = omsaet(b.ren, HAEV);
+          d.ren += h !== null ? h : (b.ren.length === 1 ? '^' + b.ren : '^(' + b.ren + ')');
+        }
+        return d;
+    }
+    return { html: '', ren: '' };
+  }
+
+  function texTilLinje(src) { return texLinje(texTrae(src)); }
+
+  function modalTekst(id) {
+    var kilde = document.getElementById(id).querySelector('.modal-inner');
+    var klon = kilde.cloneNode(true);
+    Array.prototype.forEach.call(klon.querySelectorAll('.modal-top button, .close-row'),
+      function (e) { e.parentNode.removeChild(e); });
+
+    /* formlerne skrives om fra TeX-kilden */
+    Array.prototype.forEach.call(klon.querySelectorAll('[data-tex]'), function (e) {
+      var l = texTilLinje(e.getAttribute('data-tex'));
+      var ny;
+      if (e.classList.contains('eqd')) {
+        ny = document.createElement('p');
+        ny.className = 'formel';
+        ny.setAttribute('style', 'text-align:center');
+      } else {
+        ny = document.createElement('span');
+      }
+      ny.innerHTML = l.html;
+      ny.setAttribute('data-ren', l.ren);
+      e.parentNode.replaceChild(ny, e);
+    });
+    /* tabeller får kanter, så de også har dem i Word */
+    Array.prototype.forEach.call(klon.querySelectorAll('th, td'), function (c) {
+      c.setAttribute('style', 'border:1px solid #999; padding:3px 10px');
+    });
+    Array.prototype.forEach.call(klon.querySelectorAll('table'), function (t) {
+      t.setAttribute('style', 'border-collapse:collapse');
+    });
+
+    var htmlUd = '<div style="font-family:Georgia,serif;line-height:1.6">' +
+                 klon.innerHTML + '</div>';
+
+    /* ren tekst */
+    Array.prototype.forEach.call(klon.querySelectorAll('[data-ren]'), function (e) {
+      e.textContent = e.getAttribute('data-ren');
+    });
+    var ren = '';
+    Array.prototype.forEach.call(klon.childNodes, function (e) { ren += blokTekst(e); });
+    ren = ren.split('\n').map(function (r) {
+      return /\S/.test(r) ? r.replace(/\s+$/, '') : '';
+    }).join('\n');
+    return { html: htmlUd, ren: ren.replace(/\n{3,}/g, '\n\n').trim() };
+  }
+
+  function blokTekst(e) {
+    if (e.nodeType === 3) return '';
+    if (e.nodeType !== 1) return '';
+    var t = e.tagName;
+    if (t === 'H2') return '\n' + e.textContent.toUpperCase() + '\n\n';
+    if (t === 'H3') return '\n' + e.textContent.replace(/\s+/g, ' ').trim() + '\n\n';
+    if (t === 'P' && e.classList.contains('formel')) return '    ' + e.textContent.trim() + '\n\n';
+    if (t === 'P') return e.textContent.replace(/\s+/g, ' ').trim() + '\n\n';
+    if (t === 'LI') return '- ' + e.textContent.replace(/\s+/g, ' ').trim() + '\n';
+    if (t === 'TR') {
+      var celler = [];
+      Array.prototype.forEach.call(e.children, function (c) {
+        celler.push(c.textContent.replace(/\s+/g, ' ').trim());
+      });
+      return celler.join('\t') + '\n';
+    }
+    var ud = '';
+    Array.prototype.forEach.call(e.childNodes, function (b) { ud += blokTekst(b); });
+    if (t === 'TABLE' || t === 'UL' || t === 'OL') ud += '\n';
+    return ud;
+  }
+
+  function reserveKopi(t, ok, fejl) {
+    try {
+      if (navigator.clipboard && navigator.clipboard.writeText) {
+        navigator.clipboard.writeText(t.ren).then(ok, fejl);
+        return;
+      }
+    } catch (err) { /* falder igennem */ }
+    fejl();
+  }
+
+  Array.prototype.forEach.call(document.querySelectorAll('[data-kopier]'), function (b) {
+    b.addEventListener('click', function () {
+      var org = this.textContent, knap = this;
+      var t = modalTekst(this.getAttribute('data-kopier'));
+      function ok()   { knap.textContent = 'Kopieret!';  setTimeout(function () { knap.textContent = org; }, 1600); }
+      function fejl() { knap.textContent = 'Kunne ikke'; setTimeout(function () { knap.textContent = org; }, 1600); }
+      try {
+        if (window.ClipboardItem && navigator.clipboard && navigator.clipboard.write) {
+          navigator.clipboard.write([new window.ClipboardItem({
+            'text/html':  new Blob([t.html], { type: 'text/html' }),
+            'text/plain': new Blob([t.ren],  { type: 'text/plain' })
+          })]).then(ok, function () { reserveKopi(t, ok, fejl); });
+        } else reserveKopi(t, ok, fejl);
+      } catch (err) { reserveKopi(t, ok, fejl); }
+    });
+  });
+  window.modalTekst = modalTekst;   /* til test */
 
   /* tema */
   document.getElementById('bTema').addEventListener('click', function () {
